@@ -1,22 +1,36 @@
 <script lang="ts">
-	import { Chart, LineSeries } from 'svelte-lightweight-charts';
-	const data = [
-		{ time: '2019-04-11', value: 80.01 },
-		{ time: '2019-04-12', value: 96.63 },
-		{ time: '2019-04-13', value: 76.64 },
-		{ time: '2019-04-14', value: 81.89 },
-		{ time: '2019-04-15', value: 74.43 },
-		{ time: '2019-04-16', value: 80.01 },
-		{ time: '2019-04-17', value: 96.63 },
-		{ time: '2019-04-18', value: 76.64 },
-		{ time: '2019-04-19', value: 81.89 },
-		{ time: '2019-04-20', value: 74.43 }
-	];
+	import { CandlestickSeries, Chart, LineSeries, TimeScale } from 'svelte-lightweight-charts';
+	import type { PageData } from './$types';
+	import type { IChartApi, LogicalRange, Range } from 'lightweight-charts';
+
+	export let data: PageData;
+	let { ohlc, rsi } = data;
+
+	let chart: IChartApi | null;
+	let axis: IChartApi | null;
+
+	const handleChartLogicalRangeChange = (
+		e: CustomEvent<LogicalRange | null> & { type: 'visibleLogicalRangeChange' }
+	) => {
+		const range = e.detail;
+		if (axis && range) axis.timeScale().setVisibleLogicalRange(range);
+	};
+
+	const handleAxisLogicalRangeChange = (
+		e: CustomEvent<LogicalRange | null> & { type: 'visibleLogicalRangeChange' }
+	) => {
+		const range = e.detail;
+		if (chart && range) chart.timeScale().setVisibleLogicalRange(range);
+	};
 </script>
 
-<h1>Welcome to SvelteKit</h1>
-<p>Visit <a href="https://kit.svelte.dev">kit.svelte.dev</a> to read the documentation</p>
-
-<Chart width={800} height={600}>
-	<LineSeries {data} />
-</Chart>
+<div class="w-screen h-screen">
+	<Chart ref={(ref) => (chart = ref)} container={{ class: 'w-10/12 h-5/6' }}>
+		<TimeScale visible={true} on:visibleLogicalRangeChange={handleChartLogicalRangeChange} />
+		<CandlestickSeries data={ohlc} />
+	</Chart>
+	<Chart ref={(ref) => (axis = ref)} container={{ class: 'w-10/12 h-1/6' }}>
+		<TimeScale on:visibleLogicalRangeChange={handleAxisLogicalRangeChange} />
+		<LineSeries data={rsi} />
+	</Chart>
+</div>
