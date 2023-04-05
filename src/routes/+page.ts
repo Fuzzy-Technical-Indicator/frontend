@@ -57,6 +57,9 @@ export const load: PageLoad = async ({ fetch }) => {
 		await fetch(`http://127.0.0.1:8000/api/indicator?symbol=BTC/USDT&interval=1d&kind=rsi`)
 	);
 
+	const filler = ohlc.filter((x) => x.time < rsi[0].time).map((x) => {return {time: x.time, value: NaN } as LineData});
+	rsi.unshift(...filler)
+
 	return {
 		ohlc: ohlc,
 		rsi: rsi
