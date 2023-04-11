@@ -4,7 +4,7 @@
 	import type { IChartApi, LogicalRange, PriceFormatterFn } from 'lightweight-charts';
 
 	export let data: PageData;
-	let { ohlc, rsi, sma, bb_lower, bb_upper } = data;
+	let { ohlc, long, short /* rsi, sma, bb_lower, bb_upper */ } = data;
 
 	let main: IChartApi | null;
 	let rsi_chart: IChartApi | null;
@@ -25,13 +25,13 @@
 
 	let c_sty = '';
 
-	const handleResize = () => { // could be more generic
+	const handleResize = () => {
+		// could be more generic
 		const w1 = main ? main.priceScale('right').width() : 0;
 		const w2 = rsi_chart ? rsi_chart.priceScale('right').width() : 0;
 		const margin = Math.max(w1, w2) - Math.min(w1, w2);
 		c_sty = `width: calc(100% - ${margin}px)`;
 	};
-
 </script>
 
 <div class="w-screen h-screen">
@@ -49,9 +49,11 @@
 			}}
 		/>
 		<CandlestickSeries data={ohlc} />
+		<!-- 
 		<LineSeries lineWidth={1} data={sma} />
 		<LineSeries lineWidth={1} color={"blue"} data={bb_lower} />
-		<LineSeries lineWidth={1} color={"blue"}  data={bb_upper} />
+		<LineSeries lineWidth={1} color={"blue"}  data={bb_upper} /> 
+		-->
 	</Chart>
 	<Chart
 		ref={(ref) => (rsi_chart = ref)}
@@ -65,6 +67,10 @@
 				handleResize(); // TODO: this is a hack
 			}}
 		/>
+		<!-- 
 		<LineSeries lineWidth={2} data={rsi} />
+		-->
+		<LineSeries lineWidth={2} data={long} color={'green'} />
+		<LineSeries lineWidth={2} data={short} color={'red'} />
 	</Chart>
 </div>
