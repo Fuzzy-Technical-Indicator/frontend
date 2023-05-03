@@ -1,5 +1,11 @@
 import type { PageLoad } from './$types';
-import type { CandlestickData, LineData, UTCTimestamp } from 'lightweight-charts/dist/typings';
+import type {
+	CandlestickData,
+	HistogramData,
+	LineData,
+	SingleValueData,
+	UTCTimestamp
+} from 'lightweight-charts/dist/typings';
 
 type Fetch = (input: RequestInfo | URL, init?: RequestInit | undefined) => Promise<Response>;
 
@@ -23,13 +29,35 @@ interface DTValue<T> {
 	value: T;
 }
 
+const COIN = 'ETH/USDT';
+const INTERVAL = '1d';
+
+function null_to_nan(x: number | null): number {
+	return x == null ? NaN : x;
+}
+
+function get_time<T>(x: Ohlc | DTValue<T>): UTCTimestamp {
+	return (x.time.$date.$numberLong / 1000) as UTCTimestamp;
+}
+
+function to_svd(data: DTValue<number>[]): SingleValueData[] {
+	return data.map((x) => {
+		return { time: get_time(x), value: null_to_nan(x.value) } as SingleValueData;
+	});
+}
+
+function to_svd_idx(data: DTValue<number[]>[], idx: number): SingleValueData[] {
+	return data.map((x) => {
+		return { time: get_time(x), value: null_to_nan(x.value[idx]) } as SingleValueData;
+	});
+}
+
 async function ohlc_from(fetch: Fetch): Promise<CandlestickData[]> {
-	const resp = await fetch(`http://127.0.0.1:8000/api/ohlc?symbol=BTC/USDT&interval=1d`);
+	const resp = await fetch(`http://127.0.0.1:8000/api/ohlc?symbol=${COIN}&interval=${INTERVAL}`);
 	const ohlc = (await resp.json()) as Ohlc[];
 	const data: CandlestickData[] = ohlc.map((x) => {
-		const t = x.time.$date.$numberLong;
 		return {
-			time: (t / 1000) as UTCTimestamp,
+			time: get_time(x),
 			open: x.open,
 			high: x.high,
 			low: x.low,
@@ -40,82 +68,70 @@ async function ohlc_from(fetch: Fetch): Promise<CandlestickData[]> {
 }
 
 async function rsi_from(fetch: Fetch): Promise<LineData[]> {
-	const resp = await fetch(`http://127.0.0.1:8000/api/indicator/rsi?symbol=BTC/USDT&interval=1d`);
+	const resp = await fetch(
+		`http://127.0.0.1:8000/api/indicator/rsi?symbol=${COIN}&interval=${INTERVAL}`
+	);
 	const json = (await resp.json()) as DTValue<number>[];
-	const data: LineData[] = json.map((x) => {
-		const t = x.time.$date.$numberLong;
-		return {
-			time: (t / 1000) as UTCTimestamp,
-			value: x.value
-		};
-	});
-	return data;
+	return to_svd(json);
 }
-
-function bb_idx(data: DTValue<[number, number, number]>[], index: number): LineData[] {
-	return data.map((x) => {
-		return {
-			time: (x.time.$date.$numberLong / 1000) as UTCTimestamp,
-			value: x.value[index]
-		} as LineData;
-	});
-}
-
 async function bb_from(fetch: Fetch): Promise<[LineData[], LineData[], LineData[]]> {
-	const resp = await fetch(`http://127.0.0.1:8000/api/indicator/bb?symbol=BTC/USDT&interval=1d`);
+	const resp = await fetch(
+		`http://127.0.0.1:8000/api/indicator/bb?symbol=${COIN}&interval=${INTERVAL}`
+	);
 	const json = (await resp.json()) as DTValue<[number, number, number]>[];
-	return [bb_idx(json, 0), bb_idx(json, 1), bb_idx(json, 2)];
+	return [to_svd_idx(json, 0), to_svd_idx(json, 1), to_svd_idx(json, 2)];
 }
 
 async function fuzzy_from(fetch: Fetch): Promise<[LineData[], LineData[]]> {
-	const resp = await fetch(`http://127.0.0.1:8000/api/fuzzy?symbol=BTC/USDT&interval=1d`);
+	const resp = await fetch(`http://127.0.0.1:8000/api/fuzzy?symbol=${COIN}&interval=${INTERVAL}`);
 	const json = (await resp.json()) as DTValue<number[]>[];
-	const dt1: LineData[] = json.map((x) => {
-		return {
-			time: (x.time.$date.$numberLong / 1000) as UTCTimestamp,
-			value: x.value[0]
-		} as LineData;
-	});
-	const dt2: LineData[] = json.map((x) => {
-		return {
-			time: (x.time.$date.$numberLong / 1000) as UTCTimestamp,
-			value: x.value[1]
-		} as LineData;
-	});
+	const dt1: LineData[] = to_svd_idx(json, 0);
+	const dt2: LineData[] = to_svd_idx(json, 1);
 	return [dt1, dt2];
+}
+
+async function macd_from(fetch: Fetch): Promise<[LineData[], LineData[], HistogramData[]]> {
+	const resp = await fetch(
+		`http://127.0.0.1:8000/api/indicator/macd?symbol=${COIN}&interval=${INTERVAL}`
+	);
+	const json = (await resp.json()) as DTValue<[number, number, number]>[];
+	const macd_line: LineData[] = to_svd_idx(json, 0);
+	const signal_line: LineData[] = to_svd_idx(json, 1);
+	const histogram: HistogramData[] = to_svd_idx(json, 2);
+
+	return [macd_line, signal_line, histogram];
+}
+
+async function adx_from(fetch: Fetch): Promise<LineData[]> {
+	const resp = await fetch(
+		`http://127.0.0.1:8000/api/indicator/adx?symbol=${COIN}&interval=${INTERVAL}`
+	);
+	const json = (await resp.json()) as DTValue<number>[];
+	return to_svd(json);
+}
+
+async function mymacd_from(fetch: Fetch): Promise<LineData[]> {
+	const resp = await fetch(
+		`http://127.0.0.1:8000/api/indicator/mymacd?symbol=${COIN}&interval=${INTERVAL}`
+	)
+	const json = (await resp.json()) as DTValue<number>[];
+	return to_svd(json);
 }
 
 export const load: PageLoad = async ({ fetch }) => {
 	// this is hardcoded for now
 	const ohlc = await ohlc_from(fetch);
-	//const rsi = await rsi_from(fetch);
-	//const [sma, lower, upper] = await bb_from(fetch);
-	const [long, short] = await fuzzy_from(fetch);
-
-	const filler = ohlc
-		.filter((x) => x.time < long[0].time)
-		.map((x) => {
-			return { time: x.time, value: NaN } as LineData;
-		});
+	const [sma, lower, upper] = await bb_from(fetch);
 	/*
-	rsi.unshift(...filler);
-	sma.unshift(...filler);
-	lower.unshift(...filler);
-	upper.unshift(...filler);
+	const rsi = await rsi_from(fetch);
+	const [long, short] = await fuzzy_from(fetch);
+	const macd = await macd_from(fetch);
+	const adx = await adx_from(fetch);
+	const mymacd = await mymacd_from(fetch);
 	*/
-	long.unshift(...filler);
-	short.unshift(...filler);
-	
 
 	return {
 		ohlc: ohlc,
-		long: long,
-		short: short,
-		/*
-		rsi: rsi,
-		sma: sma,
-		bb_lower: lower,
-		bb_upper: upper
-		*/
+		bb: [sma, lower, upper],
 	};
 };

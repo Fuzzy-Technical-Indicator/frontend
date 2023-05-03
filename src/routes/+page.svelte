@@ -1,76 +1,117 @@
 <script lang="ts">
-	import { CandlestickSeries, Chart, LineSeries, TimeScale } from 'svelte-lightweight-charts';
+	import {
+		CandlestickSeries,
+		Chart,
+		HistogramSeries,
+		LineSeries,
+		TimeScale
+	} from 'svelte-lightweight-charts';
 	import type { PageData } from './$types';
-	import type { IChartApi, LogicalRange, PriceFormatterFn } from 'lightweight-charts';
+	import type { IChartApi, LogicalRange } from 'lightweight-charts';
+	import { priceFn } from '$lib/utills';
+	import LineInd from '$lib/LineInd.svelte';
 
 	export let data: PageData;
-	let { ohlc, long, short /* rsi, sma, bb_lower, bb_upper */ } = data;
+	let ohlc = data.ohlc;
+	let [sma, bb_lower, bb_upper] = data.bb;
 
 	let main: IChartApi | null;
-	let rsi_chart: IChartApi | null;
 
-	const handleLogicalRangeChange = (
+	const handleResize = (main: IChartApi | null, apis: (IChartApi | null)[]): string[] => {
+		const main_w = main ? main.priceScale('right').width() : 0;
+
+		let offset_style = [];
+		for (const api of apis) {
+			let w = api ? api.priceScale('right').width() : 0;
+			const margin = Math.max(main_w, w) - Math.min(main_w, w);
+			offset_style.push(`width: calc(100% - ${margin}px)`);
+		}
+		return offset_style;
+	};
+
+	let offset_style: string[] = [];
+	const handleVisibleLogicalRangeChange = (
 		e: CustomEvent<LogicalRange | null> & { type: 'visibleLogicalRangeChange' },
-		api: IChartApi | null
+		apis: (IChartApi | null)[]
 	) => {
+		offset_style = handleResize(main, other_apis); // a hack
+
 		const range = e.detail;
-		if (api && range) {
-			api.timeScale().setVisibleLogicalRange(range);
+		if (!range) return;
+
+		for (const api of apis) {
+			if (api) {
+				api.timeScale().setVisibleLogicalRange(range);
+			}
 		}
 	};
+	//
+	let bb = true;
+	
+	let options = [
+		"RSI",
+		"ADX"
+	]; 
+	let selected = options[0]; 
 
-	const priceFn: PriceFormatterFn = (price: number) => {
-		return `${price.toFixed(2).padEnd(10)}`;
-	};
-
-	let c_sty = '';
-
-	const handleResize = () => {
-		// could be more generic
-		const w1 = main ? main.priceScale('right').width() : 0;
-		const w2 = rsi_chart ? rsi_chart.priceScale('right').width() : 0;
-		const margin = Math.max(w1, w2) - Math.min(w1, w2);
-		c_sty = `width: calc(100% - ${margin}px)`;
+	let other_apis: (IChartApi | null)[] = [];
+	let added_charts: string[] = [];
+	const handleAdd = (selected: string) => {
+		added_charts.push(selected)
 	};
 </script>
 
-<div class="w-screen h-screen">
+<div class="flex-row w-screen h-screen">
+	<div class="p-4">
+		<select bind:value={selected}>
+			{#each options as option}
+				<option value={option}>{option}</option>
+			{/each}
+		</select>
+		<button class="bg-blue-600 p-2 text-white" on:click={(_) => handleAdd(selected)}>ADD</button>
+	</div>
+
 	<Chart
 		ref={(ref) => (main = ref)}
-		container={{ class: 'h-5/6', style: '' }}
+		container={{ class: 'relative h-4/6' }}
 		autoSize={true}
 		localization={{ priceFormatter: priceFn }}
 	>
+		<div class="absolute z-10 top-0 left-0 p-2 ">
+			BB blabla
+			<input type="checkbox" bind:checked={bb} />
+		</div>
 		<TimeScale
 			visible={true}
-			on:visibleLogicalRangeChange={(e) => {
-				handleLogicalRangeChange(e, rsi_chart);
-				handleResize(); // TODO: this is a hack
-			}}
+			on:visibleLogicalRangeChange={(e) => handleVisibleLogicalRangeChange(e, other_apis)}
 		/>
 		<CandlestickSeries data={ohlc} />
-		<!-- 
-		<LineSeries lineWidth={1} data={sma} />
-		<LineSeries lineWidth={1} color={"blue"} data={bb_lower} />
-		<LineSeries lineWidth={1} color={"blue"}  data={bb_upper} /> 
-		-->
+		{#if bb}
+			<LineSeries lineWidth={1} data={sma} />
+			<LineSeries lineWidth={1} color={'blue'} data={bb_lower} />
+			<LineSeries lineWidth={1} color={'blue'} data={bb_upper} />
+		{/if}
 	</Chart>
-	<Chart
-		ref={(ref) => (rsi_chart = ref)}
-		container={{ class: 'h-1/6', style: c_sty }}
-		autoSize={true}
-		localization={{ priceFormatter: priceFn }}
-	>
-		<TimeScale
-			on:visibleLogicalRangeChange={(e) => {
-				handleLogicalRangeChange(e, main);
-				handleResize(); // TODO: this is a hack
-			}}
-		/>
-		<!-- 
-		<LineSeries lineWidth={2} data={rsi} />
-		-->
-		<LineSeries lineWidth={2} data={long} color={'green'} />
-		<LineSeries lineWidth={2} data={short} color={'red'} />
-	</Chart>
+	
+	{#each added_charts as type, i}
+
+	<LineInd 
+	 	ref={(ref) => (other_apis.push(ref))}
+		offset_style={offset_style[i]}
+		main_api={main}
+		{handleVisibleLogicalRangeChange}
+		ind_type={type}
+	/>
+	{/each} 
+
 </div>
+
+<!--
+		<LineSeries lineWidth={1} data={my_macd} color={'red'} />
+		<LineSeries lineWidth={1} data={adx} color={'red'} />
+		<LineSeries lineWidth={1} data={macd[0]} />
+		<LineSeries lineWidth={1} data={macd[1]} color={"orange"} />
+		<HistogramSeries data={macd[2]}/>
+		<LineSeries lineWidth={1} data={long} color={'green'} />
+		<LineSeries lineWidth={1} data={short} color={'red'} />
+-->
