@@ -9,15 +9,9 @@ import type {
 
 type Fetch = (input: RequestInfo | URL, init?: RequestInit | undefined) => Promise<Response>;
 
-interface MongoTime {
-	$date: {
-		$numberLong: number;
-	};
-}
-
 interface Ohlc {
 	ticker: string;
-	time: MongoTime;
+	time: number;
 	open: number;
 	high: number;
 	low: number;
@@ -25,7 +19,7 @@ interface Ohlc {
 }
 
 interface DTValue<T> {
-	time: MongoTime;
+	time: number;
 	value: T;
 }
 
@@ -37,7 +31,7 @@ function null_to_nan(x: number | null): number {
 }
 
 function get_time<T>(x: Ohlc | DTValue<T>): UTCTimestamp {
-	return (x.time.$date.$numberLong / 1000) as UTCTimestamp;
+	return (x.time / 1000) as UTCTimestamp;
 }
 
 function to_svd(data: DTValue<number>[]): SingleValueData[] {
@@ -74,6 +68,7 @@ async function rsi_from(fetch: Fetch): Promise<LineData[]> {
 	const json = (await resp.json()) as DTValue<number>[];
 	return to_svd(json);
 }
+
 async function bb_from(fetch: Fetch): Promise<[LineData[], LineData[], LineData[]]> {
 	const resp = await fetch(
 		`http://127.0.0.1:8000/api/indicator/bb?symbol=${COIN}&interval=${INTERVAL}`
@@ -122,13 +117,6 @@ export const load: PageLoad = async ({ fetch }) => {
 	// this is hardcoded for now
 	const ohlc = await ohlc_from(fetch);
 	const [sma, lower, upper] = await bb_from(fetch);
-	/*
-	const rsi = await rsi_from(fetch);
-	const [long, short] = await fuzzy_from(fetch);
-	const macd = await macd_from(fetch);
-	const adx = await adx_from(fetch);
-	const mymacd = await mymacd_from(fetch);
-	*/
 
 	return {
 		ohlc: ohlc,
