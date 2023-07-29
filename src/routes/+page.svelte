@@ -2,7 +2,7 @@
 	import { CandlestickSeries, Chart, LineSeries, TimeScale } from 'svelte-lightweight-charts';
 	import type { PageData } from './$types';
 	import type { IChartApi, LogicalRange } from 'lightweight-charts';
-	import { priceFn } from '$lib/utils';
+	import { COIN, INTERVAL, priceFn } from '$lib/utils';
 	import SingleLineChart from '$lib/SingleLineChart.svelte';
 	import MacdChart from '$lib/MacdChart.svelte';
 
@@ -65,6 +65,7 @@
 		localization={{ priceFormatter: priceFn }}
 	>
 		<div class="absolute z-10 top-0 left-0 p-2 ">
+      {COIN}  {INTERVAL}
 			<div>
 				<input type="checkbox" bind:checked={bb} />
 				BB

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { HistogramData, IChartApi, LineData, LogicalRange } from 'lightweight-charts';
 	import { Chart, HistogramSeries, LineSeries, TimeScale } from 'svelte-lightweight-charts';
-	import { type DTValue, api_url, toSingleValueDataOfIdx } from './utils';
+	import { type DTValue, toSingleValueDataOfIdx, COIN, INTERVAL, API_URL } from './utils';
 
 	export let mainChart: IChartApi | null;
 	export let handleVisibleLogicalRangeChange: (
@@ -12,7 +12,7 @@
 	export let offsetStyle: string | undefined;
 
 	const getData = async () => {
-		const resp = await fetch(`${api_url}/api/indicator/macd?symbol=ETH/USDT&interval=1d`);
+		const resp = await fetch(`${API_URL}/api/indicator/macd?symbol=${COIN}&interval=${INTERVAL}`);
 		const json = (await resp.json()) as DTValue<[number, number, number]>[];
 		const macd_line: LineData[] = toSingleValueDataOfIdx(json, 0);
 		const signal_line: LineData[] = toSingleValueDataOfIdx(json, 1);

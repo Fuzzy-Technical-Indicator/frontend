@@ -46,4 +46,6 @@ export const formatterK: PriceFormatterFn = (price: BarPrice) => {
 	return `${value.toFixed(2)}K`.padEnd(10);
 };
 
-export const api_url = PUBLIC_API_URL;
+export const API_URL = PUBLIC_API_URL;
+export const COIN = 'ETH/USDT';
+export const INTERVAL = '1d';
