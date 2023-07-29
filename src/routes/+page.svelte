@@ -4,24 +4,28 @@
 	import type { IChartApi, LogicalRange } from 'lightweight-charts';
 	import { priceFn } from '$lib/utils';
 	import SingleLineChart from '$lib/SingleLineChart.svelte';
+	import MacdChart from '$lib/MacdChart.svelte';
 
 	export let data: PageData;
 	let ohlc = data.ohlc;
 	let [sma, bb_lower, bb_upper] = data.bb;
 
 	let main: IChartApi | null;
-	let offsetStyles: string[] = [];
+	let offsetStyles = new Map<string, string>();
 
-	const handleResize = (main: IChartApi | null, apis: (IChartApi | null)[]): string[] => {
-		const main_w = main ? main.priceScale('right').width() : 0;
+	const handleResize = (
+		main: IChartApi | null,
+		apis: Map<string, IChartApi | null>
+	): Map<string, string> => {
+		const mainW = main ? main.priceScale('right').width() : 0;
 
-		let offset_style = [];
-		for (const api of apis) {
+		let offsetStyle = new Map();
+		for (const [kind, api] of apis) {
 			let w = api ? api.priceScale('right').width() : 0;
-			const margin = Math.max(main_w, w) - Math.min(main_w, w);
-			offset_style.push(`width: calc(100% - ${margin}px)`);
+			const margin = Math.max(mainW, w) - Math.min(mainW, w);
+			offsetStyle.set(kind, `width: calc(100% - ${margin}px)`);
 		}
-		return offset_style;
+		return offsetStyle;
 	};
 
 	const handleVisibleLogicalRangeChange = (
@@ -40,20 +44,17 @@
 		}
 	};
 
-  let options = {
-    rsi: 'rsi',
-    adx: 'adx',
-    obv: 'obv'
-  }
+	let singleLineOptions = ['rsi', 'adx', 'obv'];
 
 	let bb = true;
-	let otherCharts: (IChartApi | null)[] = [];
-	let addedCharts: Set<string> = new Set();
+	let macd = false;
 
-	const handleAdd = (selected: string) => {
-		addedCharts.add(selected);
+	let otherCharts = new Map<string, IChartApi | null>();
+	let singleLineCharts: Set<string> = new Set();
+
+	const addSingleLineChart = (selected: string) => {
+		singleLineCharts.add(selected);
 	};
-
 </script>
 
 <div class="flex-row w-screen h-screen">
@@ -68,23 +69,29 @@
 				<input type="checkbox" bind:checked={bb} />
 				BB
 			</div>
+
+			{#each singleLineOptions as opt}
+				<div>
+					<input type="checkbox" on:click={(_) => addSingleLineChart(opt)} />
+					{opt.toUpperCase()}
+				</div>
+			{/each}
+
 			<div>
-				<input type="checkbox" on:click={(_) => handleAdd(options.rsi)}/>
-        {options.rsi.toUpperCase()}
-			</div>
-			<div>
-				<input type="checkbox" on:click={(_) => handleAdd(options.adx)}/>
-        {options.adx.toUpperCase()}
-			</div>
-			<div>
-				<input type="checkbox" on:click={(_) => handleAdd(options.obv)}/>
-        {options.obv.toUpperCase()}
+				<input
+					type="checkbox"
+					on:click={(_) => {
+						macd = !macd;
+					}}
+				/>
+				MACD
 			</div>
 		</div>
 
 		<TimeScale
 			visible={true}
-			on:visibleLogicalRangeChange={(e) => handleVisibleLogicalRangeChange(e, otherCharts)}
+			on:visibleLogicalRangeChange={(e) =>
+				handleVisibleLogicalRangeChange(e, Array.from(otherCharts.values()))}
 		/>
 		<CandlestickSeries data={ohlc} />
 		{#if bb}
@@ -94,23 +101,22 @@
 		{/if}
 	</Chart>
 
-	{#each Array.from(addedCharts) as kind, i}
+	{#each Array.from(singleLineCharts) as kind, i}
 		<SingleLineChart
-			ref={(ref) => otherCharts.push(ref)}
-			offsetStyle={offsetStyles[i]}
+			ref={(ref) => otherCharts.set(kind, ref)}
+			offsetStyle={offsetStyles.get(kind)}
 			mainChart={main}
 			{handleVisibleLogicalRangeChange}
-			kind={kind}
+			{kind}
 		/>
 	{/each}
-</div>
 
-<!--
-		<LineSeries lineWidth={1} data={my_macd} color={'red'} />
-		<LineSeries lineWidth={1} data={adx} color={'red'} />
-		<LineSeries lineWidth={1} data={macd[0]} />
-		<LineSeries lineWidth={1} data={macd[1]} color={"orange"} />
-		<HistogramSeries data={macd[2]}/>
-		<LineSeries lineWidth={1} data={long} color={'green'} />
-		<LineSeries lineWidth={1} data={short} color={'red'} />
--->
+	{#if macd}
+		<MacdChart
+			ref={(ref) => otherCharts.set('macd', ref)}
+			offsetStyle={offsetStyles.get('macd')}
+			mainChart={main}
+			{handleVisibleLogicalRangeChange}
+		/>
+	{/if}
+</div>

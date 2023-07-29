@@ -11,9 +11,9 @@
 	export let ref: (ref: IChartApi | null) => void;
 	export let kind: string;
 	export let color: string | undefined = undefined;
-	export let offsetStyle: string;
+	export let offsetStyle: string | undefined;
 
-	const get_data = async () => {
+	const getData = async () => {
 		const resp = await fetch(
 			`${api_url}/api/indicator/${kind.toLowerCase()}?symbol=ETH/USDT&interval=1d`
 		);
@@ -22,15 +22,13 @@
 	};
 </script>
 
-<Chart
-	{ref}
-	container={{ class: 'h-1/6 relative', style: offsetStyle }}
-	autoSize={true}
->
-	<div class="absolute z-10 top-0 left-0">close</div>
-	<TimeScale on:visibleLogicalRangeChange={(e) => handleVisibleLogicalRangeChange(e, [mainChart])} />
+<Chart {ref} container={{ class: 'h-1/6 relative', style: offsetStyle }} autoSize={true}>
+	<div class="absolute z-10 top-2 left-2">{kind.toUpperCase()}</div>
+	<TimeScale
+		on:visibleLogicalRangeChange={(e) => handleVisibleLogicalRangeChange(e, [mainChart])}
+	/>
 
-	{#await get_data() then dt}
+	{#await getData() then dt}
 		<LineSeries lastValueVisible={false} lineWidth={1} {color} data={dt} />
 	{/await}
 </Chart>
