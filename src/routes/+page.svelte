@@ -50,10 +50,18 @@
 	let macd = false;
 
 	let otherCharts = new Map<string, IChartApi | null>();
-	let singleLineCharts: Set<string> = new Set();
+	let singleLineCharts = new Map<string, boolean>();
 
-	const addSingleLineChart = (selected: string) => {
-		singleLineCharts.add(selected);
+	const addSingleLineChart = (kind: string) => {
+		if (singleLineCharts.has(kind)) {
+			let v = singleLineCharts.get(kind);
+			singleLineCharts.set(kind, !v);
+		} else {
+			singleLineCharts.set(kind, true);
+		}
+
+		// use this to make svelte update UI
+		singleLineCharts = singleLineCharts;
 	};
 </script>
 
@@ -65,7 +73,8 @@
 		localization={{ priceFormatter: priceFn }}
 	>
 		<div class="absolute z-10 top-0 left-0 p-2 ">
-      {COIN}  {INTERVAL}
+			{COIN}
+			{INTERVAL}
 			<div>
 				<input type="checkbox" bind:checked={bb} />
 				BB
@@ -102,14 +111,16 @@
 		{/if}
 	</Chart>
 
-	{#each Array.from(singleLineCharts) as kind, i}
-		<SingleLineChart
-			ref={(ref) => otherCharts.set(kind, ref)}
-			offsetStyle={offsetStyles.get(kind)}
-			mainChart={main}
-			{handleVisibleLogicalRangeChange}
-			{kind}
-		/>
+	{#each Array.from(singleLineCharts.entries()) as [kind, visible]}
+		{#if visible}
+			<SingleLineChart
+				ref={(ref) => otherCharts.set(kind, ref)}
+				offsetStyle={offsetStyles.get(kind)}
+				mainChart={main}
+				{handleVisibleLogicalRangeChange}
+				{kind}
+			/>
+		{/if}
 	{/each}
 
 	{#if macd}
