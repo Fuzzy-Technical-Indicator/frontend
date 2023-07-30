@@ -6,6 +6,7 @@
 	import SingleLineChart from '$lib/SingleLineChart.svelte';
 	import MacdChart from '$lib/MacdChart.svelte';
 	import FuzzyChart from '$lib/FuzzyChart.svelte';
+	import AroonChart from '$lib/AroonChart.svelte';
 
 	export let data: PageData;
 	let ohlc = data.ohlc;
@@ -50,6 +51,7 @@
 	let bb = true;
 	let macd = false;
 	let fuzzy = false;
+	let aroon = false;
 
 	let otherCharts = new Map<string, IChartApi | null>();
 	let singleLineCharts = new Map<string, boolean>();
@@ -108,6 +110,16 @@
 				/>
 				NORMAL FUZZY
 			</div>
+
+			<div>
+				<input
+					type="checkbox"
+					on:click={() => {
+						aroon = !aroon;
+					}}
+				/>
+				AROON
+			</div>
 		</div>
 
 		<TimeScale
@@ -148,6 +160,15 @@
 		<FuzzyChart
 			ref={(ref) => otherCharts.set('fuzzy', ref)}
 			offsetStyle={offsetStyles.get('fuzzy')}
+			mainChart={main}
+			{handleVisibleLogicalRangeChange}
+		/>
+	{/if}
+
+	{#if aroon}
+		<AroonChart
+			ref={(ref) => otherCharts.set('aroon', ref)}
+			offsetStyle={offsetStyles.get('aroon')}
 			mainChart={main}
 			{handleVisibleLogicalRangeChange}
 		/>
