@@ -1,6 +1,14 @@
 import type { PageLoad } from './$types';
 import type { CandlestickData, LineData } from 'lightweight-charts/dist/typings';
-import { getTime, type DTValue, type Ohlc, toSingleValueDataOfIdx, API_URL, COIN, INTERVAL } from '$lib/utils';
+import {
+	getTime,
+	type DTValue,
+	type Ohlc,
+	toSingleValueDataOfIdx,
+	API_URL,
+	COIN,
+	INTERVAL
+} from '$lib/utils';
 
 type Fetch = (input: RequestInfo | URL, init?: RequestInit | undefined) => Promise<Response>;
 

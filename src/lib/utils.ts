@@ -2,6 +2,7 @@ import type { BarPrice, PriceFormatterFn, SingleValueData, UTCTimestamp } from '
 import { PUBLIC_API_URL } from '$env/static/public';
 
 const K = 1000;
+const M = 1000 * K;
 
 export interface DTValue<T> {
 	time: number;
@@ -41,9 +42,9 @@ export const priceFn: PriceFormatterFn = (price: BarPrice) => {
 	return `${price.toFixed(2).padEnd(10)}`;
 };
 
-export const formatterK: PriceFormatterFn = (price: BarPrice) => {
-	const value = price / K;
-	return `${value.toFixed(2)}K`.padEnd(10);
+export const formatterM: PriceFormatterFn = (price: BarPrice) => {
+	const value = price / M;
+	return `${value.toFixed(2)}M`.padEnd(10);
 };
 
 export const API_URL = PUBLIC_API_URL;
