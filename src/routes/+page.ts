@@ -37,14 +37,6 @@ async function bb_from(fetch: Fetch): Promise<[LineData[], LineData[], LineData[
 	];
 }
 
-async function fuzzy_from(fetch: Fetch): Promise<[LineData[], LineData[]]> {
-	const resp = await fetch(`${API_URL}/api/fuzzy?symbol=${COIN}&interval=${INTERVAL}`);
-	const json = (await resp.json()) as DTValue<number[]>[];
-	const dt1: LineData[] = toSingleValueDataOfIdx(json, 0);
-	const dt2: LineData[] = toSingleValueDataOfIdx(json, 1);
-	return [dt1, dt2];
-}
-
 export const load: PageLoad = async ({ fetch }) => {
 	const ohlc = await ohlc_from(fetch);
 	const [sma, lower, upper] = await bb_from(fetch);

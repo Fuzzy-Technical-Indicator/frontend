@@ -5,6 +5,7 @@
 	import { COIN, INTERVAL, priceFn } from '$lib/utils';
 	import SingleLineChart from '$lib/SingleLineChart.svelte';
 	import MacdChart from '$lib/MacdChart.svelte';
+	import FuzzyChart from '$lib/FuzzyChart.svelte';
 
 	export let data: PageData;
 	let ohlc = data.ohlc;
@@ -48,6 +49,7 @@
 
 	let bb = true;
 	let macd = false;
+	let fuzzy = false;
 
 	let otherCharts = new Map<string, IChartApi | null>();
 	let singleLineCharts = new Map<string, boolean>();
@@ -82,7 +84,7 @@
 
 			{#each singleLineOptions as opt}
 				<div>
-					<input type="checkbox" on:click={(_) => addSingleLineChart(opt)} />
+					<input type="checkbox" on:click={() => addSingleLineChart(opt)} />
 					{opt.toUpperCase()}
 				</div>
 			{/each}
@@ -90,11 +92,21 @@
 			<div>
 				<input
 					type="checkbox"
-					on:click={(_) => {
+					on:click={() => {
 						macd = !macd;
 					}}
 				/>
 				MACD
+			</div>
+
+			<div>
+				<input
+					type="checkbox"
+					on:click={() => {
+						fuzzy = !fuzzy;
+					}}
+				/>
+				NORMAL FUZZY
 			</div>
 		</div>
 
@@ -127,6 +139,15 @@
 		<MacdChart
 			ref={(ref) => otherCharts.set('macd', ref)}
 			offsetStyle={offsetStyles.get('macd')}
+			mainChart={main}
+			{handleVisibleLogicalRangeChange}
+		/>
+	{/if}
+
+	{#if fuzzy}
+		<FuzzyChart
+			ref={(ref) => otherCharts.set('fuzzy', ref)}
+			offsetStyle={offsetStyles.get('fuzzy')}
 			mainChart={main}
 			{handleVisibleLogicalRangeChange}
 		/>
