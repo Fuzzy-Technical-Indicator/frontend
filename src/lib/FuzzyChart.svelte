@@ -21,7 +21,7 @@
 </script>
 
 <Chart {ref} container={{ class: 'h-1/6 relative', style: offsetStyle }} autoSize={true}>
-	<div class="absolute z-10 top-2 left-2">MACD</div>
+	<div class="absolute z-10 top-2 left-2">FUZZY</div>
 	<TimeScale
 		on:visibleLogicalRangeChange={(e) => handleVisibleLogicalRangeChange(e, [mainChart])}
 	/>
