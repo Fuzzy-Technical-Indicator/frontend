@@ -46,9 +46,9 @@
 		}
 	};
 
-	let singleLineOptions = ['rsi', 'adx', 'obv'];
+	let singleLineOptions = ['rsi', 'adx', 'obv', 'accumdist'];
 
-	let bb = true;
+	let bb = false;
 	let macd = false;
 	let fuzzy = false;
 	let aroon = false;
@@ -105,20 +105,20 @@
 				<input
 					type="checkbox"
 					on:click={() => {
-						fuzzy = !fuzzy;
+						aroon = !aroon;
 					}}
 				/>
-				NORMAL FUZZY
+				AROON
 			</div>
 
 			<div>
 				<input
 					type="checkbox"
 					on:click={() => {
-						aroon = !aroon;
+						fuzzy = !fuzzy;
 					}}
 				/>
-				AROON
+				NORMAL FUZZY
 			</div>
 		</div>
 
@@ -156,19 +156,19 @@
 		/>
 	{/if}
 
-	{#if fuzzy}
-		<FuzzyChart
-			ref={(ref) => otherCharts.set('fuzzy', ref)}
-			offsetStyle={offsetStyles.get('fuzzy')}
+	{#if aroon}
+		<AroonChart
+			ref={(ref) => otherCharts.set('aroon', ref)}
+			offsetStyle={offsetStyles.get('aroon')}
 			mainChart={main}
 			{handleVisibleLogicalRangeChange}
 		/>
 	{/if}
 
-	{#if aroon}
-		<AroonChart
-			ref={(ref) => otherCharts.set('aroon', ref)}
-			offsetStyle={offsetStyles.get('aroon')}
+	{#if fuzzy}
+		<FuzzyChart
+			ref={(ref) => otherCharts.set('fuzzy', ref)}
+			offsetStyle={offsetStyles.get('fuzzy')}
 			mainChart={main}
 			{handleVisibleLogicalRangeChange}
 		/>
