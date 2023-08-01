@@ -7,6 +7,7 @@
 	import MacdChart from '$lib/MacdChart.svelte';
 	import FuzzyChart from '$lib/FuzzyChart.svelte';
 	import AroonChart from '$lib/AroonChart.svelte';
+	import StochChart from '$lib/StochChart.svelte';
 
 	export let data: PageData;
 	let ohlc = data.ohlc;
@@ -52,6 +53,7 @@
 	let macd = false;
 	let fuzzy = false;
 	let aroon = false;
+	let stoch = false;
 
 	let otherCharts = new Map<string, IChartApi | null>();
 	let singleLineCharts = new Map<string, boolean>();
@@ -115,6 +117,16 @@
 				<input
 					type="checkbox"
 					on:click={() => {
+						stoch = !stoch;
+					}}
+				/>
+				STOCH
+			</div>
+
+			<div>
+				<input
+					type="checkbox"
+					on:click={() => {
 						fuzzy = !fuzzy;
 					}}
 				/>
@@ -160,6 +172,15 @@
 		<AroonChart
 			ref={(ref) => otherCharts.set('aroon', ref)}
 			offsetStyle={offsetStyles.get('aroon')}
+			mainChart={main}
+			{handleVisibleLogicalRangeChange}
+		/>
+	{/if}
+
+	{#if stoch}
+		<StochChart
+			ref={(ref) => otherCharts.set('stoch', ref)}
+			offsetStyle={offsetStyles.get('stoch')}
 			mainChart={main}
 			{handleVisibleLogicalRangeChange}
 		/>
