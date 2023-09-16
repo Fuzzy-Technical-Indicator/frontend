@@ -47,7 +47,7 @@
 		}
 	};
 
-	let singleLineOptions = ['rsi', 'adx', 'obv', 'accumdist'];
+	let singleLineOptions = ['rsi', 'adx', 'obv', 'accumdist', 'naranjomacd'];
 
 	let bb = false;
 	let macd = false;
@@ -78,7 +78,7 @@
 		autoSize={true}
 		localization={{ priceFormatter: priceFn }}
 	>
-		<div class="absolute z-10 top-0 left-0 p-2 ">
+		<div class="absolute z-10 top-0 left-0 p-2">
 			{COIN}
 			{INTERVAL}
 			<div>
