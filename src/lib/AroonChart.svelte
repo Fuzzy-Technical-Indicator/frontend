@@ -1,7 +1,6 @@
 <script lang="ts">
 	import type { IChartApi, LineData, LogicalRange } from 'lightweight-charts';
 	import { Chart, LineSeries, TimeScale } from 'svelte-lightweight-charts';
-	import { type DTValue, toSingleValueDataOfIdx, COIN, INTERVAL, API_URL } from './utils';
 
 	export let mainChart: IChartApi | null;
 	export let handleVisibleLogicalRangeChange: (
@@ -12,11 +11,9 @@
 	export let offsetStyle: string | undefined;
 
 	const getData = async () => {
-		const resp = await fetch(`${API_URL}/api/indicator/aroon?symbol=${COIN}&interval=${INTERVAL}`);
-		const json = (await resp.json()) as DTValue<[number, number, number]>[];
-		const upper: LineData[] = toSingleValueDataOfIdx(json, 0);
-		const lower: LineData[] = toSingleValueDataOfIdx(json, 1);
-		return [upper, lower];
+		const resp = await fetch(`/api/aroon`);
+		const data = (await resp.json()) as { upper: LineData[]; lower: LineData[] };
+		return data;
 	};
 </script>
 
@@ -27,7 +24,7 @@
 	/>
 
 	{#await getData() then dt}
-		<LineSeries lastValueVisible={false} lineWidth={1} color={'orange'} data={dt[0]} />
-		<LineSeries lastValueVisible={false} lineWidth={1} data={dt[1]} />
+		<LineSeries lastValueVisible={false} lineWidth={1} color={'orange'} data={dt.upper} />
+		<LineSeries lastValueVisible={false} lineWidth={1} data={dt.lower} />
 	{/await}
 </Chart>
