@@ -2,7 +2,7 @@
 	import { CandlestickSeries, Chart, LineSeries, TimeScale } from 'svelte-lightweight-charts';
 	import type { PageData } from './$types';
 	import type { IChartApi, LogicalRange } from 'lightweight-charts';
-	import { COIN, INTERVAL, priceFn } from '$lib/utils';
+	import { priceFn } from '$lib/utils';
 	import SingleLineChart from '$lib/SingleLineChart.svelte';
 	import MacdChart from '$lib/MacdChart.svelte';
 	import FuzzyChart from '$lib/FuzzyChart.svelte';
@@ -12,6 +12,7 @@
 	export let data: PageData;
 	let ohlc = data.ohlc;
 	let [sma, bb_lower, bb_upper] = data.bb;
+	let apiClient = data.apiClient;
 
 	let main: IChartApi | null;
 	let offsetStyles = new Map<string, string>();
@@ -47,7 +48,7 @@
 		}
 	};
 
-	let singleLineOptions = ['rsi', 'adx', 'obv', 'accumdist', 'naranjomacd'];
+	let singleLineOptions = ['rsi', 'adx', 'obv', 'accumdist'];
 
 	let bb = false;
 	let macd = false;
@@ -79,8 +80,8 @@
 		localization={{ priceFormatter: priceFn }}
 	>
 		<div class="absolute z-10 top-0 left-0 p-2">
-			{COIN}
-			{INTERVAL}
+			{apiClient.getTicker()}
+			{apiClient.getInterval()}
 			<div>
 				<input type="checkbox" bind:checked={bb} />
 				BB
@@ -153,6 +154,7 @@
 				ref={(ref) => otherCharts.set(kind, ref)}
 				offsetStyle={offsetStyles.get(kind)}
 				mainChart={main}
+				{apiClient}
 				{handleVisibleLogicalRangeChange}
 				{kind}
 			/>
@@ -164,6 +166,7 @@
 			ref={(ref) => otherCharts.set('macd', ref)}
 			offsetStyle={offsetStyles.get('macd')}
 			mainChart={main}
+			{apiClient}
 			{handleVisibleLogicalRangeChange}
 		/>
 	{/if}
@@ -173,6 +176,7 @@
 			ref={(ref) => otherCharts.set('aroon', ref)}
 			offsetStyle={offsetStyles.get('aroon')}
 			mainChart={main}
+			{apiClient}
 			{handleVisibleLogicalRangeChange}
 		/>
 	{/if}
@@ -182,6 +186,7 @@
 			ref={(ref) => otherCharts.set('stoch', ref)}
 			offsetStyle={offsetStyles.get('stoch')}
 			mainChart={main}
+			{apiClient}
 			{handleVisibleLogicalRangeChange}
 		/>
 	{/if}
@@ -191,6 +196,7 @@
 			ref={(ref) => otherCharts.set('fuzzy', ref)}
 			offsetStyle={offsetStyles.get('fuzzy')}
 			mainChart={main}
+			{apiClient}
 			{handleVisibleLogicalRangeChange}
 		/>
 	{/if}

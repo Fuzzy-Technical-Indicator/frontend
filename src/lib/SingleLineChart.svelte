@@ -1,7 +1,8 @@
 <script lang="ts">
-	import type { IChartApi, LogicalRange } from 'lightweight-charts';
+	import type { IChartApi, LineData, LogicalRange } from 'lightweight-charts';
 	import { Chart, LineSeries, TimeScale } from 'svelte-lightweight-charts';
-	import { toSingleValueData, type DTValue, INTERVAL, COIN, API_URL, formatterM } from './utils';
+	import { formatterM } from './utils';
+	import type { ApiClient } from './apiClient';
 
 	export let mainChart: IChartApi | null;
 	export let handleVisibleLogicalRangeChange: (
@@ -12,28 +13,31 @@
 	export let kind: string;
 	export let color: string | undefined = undefined;
 	export let offsetStyle: string | undefined;
+	export let apiClient: ApiClient;
 
 	let exceed1M = false;
 	const getData = async () => {
-		const resp = await fetch(
-			`${API_URL}/api/indicator/${kind.toLowerCase()}?symbol=${COIN}&interval=${INTERVAL}`
-		);
-		const json = (await resp.json()) as DTValue<number>[];
-		let result = toSingleValueData(json);
-
-		let maxValue = Number.MIN_VALUE;
-		for (let i = 0; i < result.length; i++) {
-			let v = Math.abs(result[i].value);
-			if (v > maxValue) {
-				maxValue = v;
-			}
-
-			if (maxValue > 1000000) {
-				exceed1M = true;
-				break;
-			}
+		if (kind === 'rsi') {
+			return apiClient.rsi(14);
 		}
-		return result;
+
+		if (kind === 'adx') {
+			return apiClient.adx(14);
+		}
+
+		if (kind === 'obv') {
+			let [result, isExceed1M] = await apiClient.obv();
+			exceed1M = isExceed1M;
+			return result;
+		}
+
+		if (kind === 'accumdist') {
+			let [result, isExceed1M] = await apiClient.accumdist();
+			exceed1M = isExceed1M;
+			return result;
+		}
+
+		return [] as LineData[];
 	};
 </script>
 

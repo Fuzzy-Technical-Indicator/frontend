@@ -1,6 +1,7 @@
 <script lang="ts">
-	import type { IChartApi, LineData, LogicalRange } from 'lightweight-charts';
+	import type { IChartApi, LogicalRange } from 'lightweight-charts';
 	import { Chart, LineSeries, TimeScale } from 'svelte-lightweight-charts';
+	import type { ApiClient } from './apiClient';
 
 	export let mainChart: IChartApi | null;
 	export let handleVisibleLogicalRangeChange: (
@@ -9,11 +10,10 @@
 	) => void;
 	export let ref: (ref: IChartApi | null) => void;
 	export let offsetStyle: string | undefined;
+	export let apiClient: ApiClient;
 
 	const getData = async () => {
-		const resp = await fetch(`/api/aroon`);
-		const data = (await resp.json()) as { upper: LineData[]; lower: LineData[] };
-		return data;
+		return apiClient.aroon(14);
 	};
 </script>
 

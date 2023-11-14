@@ -1,7 +1,7 @@
 <script lang="ts">
-	import type { IChartApi, LineData, LogicalRange } from 'lightweight-charts';
+	import type { IChartApi, LogicalRange } from 'lightweight-charts';
 	import { Chart, LineSeries, TimeScale } from 'svelte-lightweight-charts';
-	import { type DTValue, toSingleValueDataOfIdx, COIN, INTERVAL, API_URL } from './utils';
+	import type { ApiClient } from './apiClient';
 
 	export let mainChart: IChartApi | null;
 	export let handleVisibleLogicalRangeChange: (
@@ -10,13 +10,10 @@
 	) => void;
 	export let ref: (ref: IChartApi | null) => void;
 	export let offsetStyle: string | undefined;
+	export let apiClient: ApiClient;
 
 	const getData = async () => {
-		const resp = await fetch(`${API_URL}/api/indicator/stoch?symbol=${COIN}&interval=${INTERVAL}`);
-		const json = (await resp.json()) as DTValue<[number, number, number]>[];
-		const k: LineData[] = toSingleValueDataOfIdx(json, 0);
-		const d: LineData[] = toSingleValueDataOfIdx(json, 1);
-		return [k, d];
+		return apiClient.stoch(14, 3, 1);
 	};
 </script>
 
