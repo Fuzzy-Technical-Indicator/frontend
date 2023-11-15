@@ -1,15 +1,24 @@
-FROM oven/bun:latest
+# build stage
+FROM oven/bun as builder
 
 WORKDIR /app
 
 COPY . .
 
-RUN bun install; exit 0
+ENV HUSKY 0
+
+RUN bun install
 
 RUN bun run build
 
+# prod stage
+
+FROM oven/bun:slim
+
+COPY --from=builder /app/build /app
+
 EXPOSE 3000
 
-WORKDIR build 
+WORKDIR /app
 
-CMD ["bun", "run", "start"]
+ENTRYPOINT ["bun", "./index.js"]
