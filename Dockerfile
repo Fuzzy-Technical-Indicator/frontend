@@ -21,4 +21,6 @@ EXPOSE 3000
 
 WORKDIR /app
 
+RUN echo "PORT=4000" >> .env
+
 ENTRYPOINT ["bun", "./index.js"]

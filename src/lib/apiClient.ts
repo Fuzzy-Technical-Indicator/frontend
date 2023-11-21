@@ -27,6 +27,38 @@ export enum Interval {
 	OneDay = '1d'
 }
 
+export interface FuzzySet {
+	type: string;
+	parameters: Record<string, number>;
+	data: number[];
+}
+
+export interface LinguisticVariable {
+	labels: number[];
+	upperBoundary: number;
+	lowerBoundary: number;
+	graphs: Record<string, FuzzySet>;
+}
+
+export type UpdateLinguisticVariable = Record<
+	string,
+	{
+		upperBoundary: number;
+		lowerBoundary: number;
+		shapes: Record<
+			string,
+			{
+				shapeType: string;
+				parameters: Record<string, number>;
+			}
+		>;
+	}
+>;
+
+export interface Settings {
+	linguisticVariables: Record<string, LinguisticVariable>;
+}
+
 function nullToNan(x: number | null): number {
 	return x == null ? NaN : x;
 }
@@ -60,7 +92,7 @@ export class ApiClient {
 		this.fetchClient = fetchClient;
 	}
 
-	public updateSetting(ticker: string, interval: Interval) {
+	public updateConfig(ticker: string, interval: Interval) {
 		this.ticker = ticker;
 		this.interval = interval;
 	}
@@ -214,5 +246,25 @@ export class ApiClient {
 		const long: LineData[] = toSingleValueDataOfIdx(json, 0);
 		const short: LineData[] = toSingleValueDataOfIdx(json, 1);
 		return [long, short];
+	}
+
+	public async getSettings() {
+		const resp = await this.fetchClient(`${PUBLIC_API_URL}/api/settings`);
+		const json = (await resp.json()) as Settings;
+		return json;
+	}
+
+	public async updateSettings(linguisticVariables: UpdateLinguisticVariable) {
+		const resp = await this.fetchClient(`${PUBLIC_API_URL}/api/settings`, {
+			method: 'PUT',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({
+				username: 'tanat',
+				linguisticVariables
+			})
+		});
+		console.log(resp);
 	}
 }
