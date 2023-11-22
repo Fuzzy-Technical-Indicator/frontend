@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { CandlestickSeries, Chart, LineSeries, TimeScale } from 'svelte-lightweight-charts';
-	import type { PageData } from './$types';
 	import type { IChartApi, LogicalRange } from 'lightweight-charts';
 	import { priceFn } from '$lib/utils';
 	import SingleLineChart from '$lib/SingleLineChart.svelte';
@@ -8,11 +7,18 @@
 	import FuzzyChart from '$lib/FuzzyChart.svelte';
 	import AroonChart from '$lib/AroonChart.svelte';
 	import StochChart from '$lib/StochChart.svelte';
+	import { createQuery } from '@tanstack/svelte-query';
+	import { api, getQueryKey, chartSettings } from '$lib/apiClient';
 
-	export let data: PageData;
-	let ohlc = data.ohlc;
-	let [sma, bb_lower, bb_upper] = data.bb;
-	let apiClient = data.apiClient;
+	const ohlc = createQuery({
+		queryKey: getQueryKey(['ohlc']),
+		queryFn: () => api().ohlc()
+	});
+
+	const bbData = createQuery({
+		queryKey: getQueryKey(['bb']),
+		queryFn: () => api().bb()
+	});
 
 	let main: IChartApi | null;
 	let offsetStyles = new Map<string, string>();
@@ -80,8 +86,8 @@
 		localization={{ priceFormatter: priceFn }}
 	>
 		<div class="absolute z-10 top-0 left-0 p-2">
-			{apiClient.getTicker()}
-			{apiClient.getInterval()}
+			{$chartSettings.symbol}
+			{$chartSettings.interval}
 			<div>
 				<input type="checkbox" bind:checked={bb} />
 				BB
@@ -140,11 +146,11 @@
 			on:visibleLogicalRangeChange={(e) =>
 				handleVisibleLogicalRangeChange(e, Array.from(otherCharts.values()))}
 		/>
-		<CandlestickSeries data={ohlc} />
-		{#if bb}
-			<LineSeries lineWidth={1} data={sma} />
-			<LineSeries lineWidth={1} color={'blue'} data={bb_lower} />
-			<LineSeries lineWidth={1} color={'blue'} data={bb_upper} />
+		<CandlestickSeries data={$ohlc.data ? $ohlc.data : []} />
+		{#if bb && $bbData.isSuccess}
+			<LineSeries lineWidth={1} data={$bbData.data.sma} />
+			<LineSeries lineWidth={1} color={'blue'} data={$bbData.data.lower} />
+			<LineSeries lineWidth={1} color={'blue'} data={$bbData.data.upper} />
 		{/if}
 	</Chart>
 
@@ -154,7 +160,6 @@
 				ref={(ref) => otherCharts.set(kind, ref)}
 				offsetStyle={offsetStyles.get(kind)}
 				mainChart={main}
-				{apiClient}
 				{handleVisibleLogicalRangeChange}
 				{kind}
 			/>
@@ -166,7 +171,6 @@
 			ref={(ref) => otherCharts.set('macd', ref)}
 			offsetStyle={offsetStyles.get('macd')}
 			mainChart={main}
-			{apiClient}
 			{handleVisibleLogicalRangeChange}
 		/>
 	{/if}
@@ -176,7 +180,6 @@
 			ref={(ref) => otherCharts.set('aroon', ref)}
 			offsetStyle={offsetStyles.get('aroon')}
 			mainChart={main}
-			{apiClient}
 			{handleVisibleLogicalRangeChange}
 		/>
 	{/if}
@@ -186,7 +189,6 @@
 			ref={(ref) => otherCharts.set('stoch', ref)}
 			offsetStyle={offsetStyles.get('stoch')}
 			mainChart={main}
-			{apiClient}
 			{handleVisibleLogicalRangeChange}
 		/>
 	{/if}
@@ -196,7 +198,6 @@
 			ref={(ref) => otherCharts.set('fuzzy', ref)}
 			offsetStyle={offsetStyles.get('fuzzy')}
 			mainChart={main}
-			{apiClient}
 			{handleVisibleLogicalRangeChange}
 		/>
 	{/if}

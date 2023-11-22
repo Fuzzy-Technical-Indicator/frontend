@@ -1,7 +1,8 @@
 <script lang="ts">
+	import { createQuery } from '@tanstack/svelte-query';
 	import type { IChartApi, LogicalRange } from 'lightweight-charts';
 	import { Chart, LineSeries, TimeScale } from 'svelte-lightweight-charts';
-	import type { ApiClient } from './apiClient';
+	import { api, getQueryKey } from './apiClient';
 
 	export let mainChart: IChartApi | null;
 	export let handleVisibleLogicalRangeChange: (
@@ -10,11 +11,11 @@
 	) => void;
 	export let ref: (ref: IChartApi | null) => void;
 	export let offsetStyle: string | undefined;
-	export let apiClient: ApiClient;
 
-	const getData = async () => {
-		return apiClient.aroon(14);
-	};
+	const aroon = createQuery({
+		queryKey: getQueryKey(['aroon']),
+		queryFn: () => api().aroon()
+	});
 </script>
 
 <Chart {ref} container={{ class: 'h-1/6 relative', style: offsetStyle }} autoSize={true}>
@@ -23,8 +24,8 @@
 		on:visibleLogicalRangeChange={(e) => handleVisibleLogicalRangeChange(e, [mainChart])}
 	/>
 
-	{#await getData() then dt}
-		<LineSeries lastValueVisible={false} lineWidth={1} color={'orange'} data={dt.upper} />
-		<LineSeries lastValueVisible={false} lineWidth={1} data={dt.lower} />
-	{/await}
+	{#if $aroon.isSuccess}
+		<LineSeries lastValueVisible={false} lineWidth={1} color={'orange'} data={$aroon.data.upper} />
+		<LineSeries lastValueVisible={false} lineWidth={1} data={$aroon.data.lower} />
+	{/if}
 </Chart>

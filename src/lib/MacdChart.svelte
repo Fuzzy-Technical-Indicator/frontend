@@ -1,7 +1,8 @@
 <script lang="ts">
 	import type { IChartApi, LogicalRange } from 'lightweight-charts';
 	import { Chart, HistogramSeries, LineSeries, TimeScale } from 'svelte-lightweight-charts';
-	import type { ApiClient } from './apiClient';
+	import { createQuery } from '@tanstack/svelte-query';
+	import { api, getQueryKey } from './apiClient';
 
 	export let mainChart: IChartApi | null;
 	export let handleVisibleLogicalRangeChange: (
@@ -10,11 +11,11 @@
 	) => void;
 	export let ref: (ref: IChartApi | null) => void;
 	export let offsetStyle: string | undefined;
-	export let apiClient: ApiClient;
 
-	const getData = async () => {
-		return apiClient.macd(12, 26, 9);
-	};
+	const macd = createQuery({
+		queryKey: getQueryKey(['macd']),
+		queryFn: () => api().macd()
+	});
 </script>
 
 <Chart {ref} container={{ class: 'h-1/6 relative', style: offsetStyle }} autoSize={true}>
@@ -23,9 +24,14 @@
 		on:visibleLogicalRangeChange={(e) => handleVisibleLogicalRangeChange(e, [mainChart])}
 	/>
 
-	{#await getData() then dt}
-		<LineSeries lastValueVisible={false} lineWidth={1} data={dt[0]} />
-		<LineSeries lastValueVisible={false} lineWidth={1} color={'orange'} data={dt[1]} />
-		<HistogramSeries data={dt[2]} />
-	{/await}
+	{#if $macd.isSuccess}
+		<LineSeries lastValueVisible={false} lineWidth={1} data={$macd.data.macdLine} />
+		<LineSeries
+			lastValueVisible={false}
+			lineWidth={1}
+			color={'orange'}
+			data={$macd.data.signalLine}
+		/>
+		<HistogramSeries data={$macd.data.histogram} />
+	{/if}
 </Chart>

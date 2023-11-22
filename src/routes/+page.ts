@@ -1,11 +1,11 @@
-import { ApiClient } from '$lib/apiClient';
+import { api, getQueryKey } from '$lib/apiClient';
 import type { PageLoad } from './$types';
 
-export const load: PageLoad = async ({ fetch }) => {
-	const apiClient = new ApiClient(fetch);
-	return {
-		ohlc: await apiClient.ohlc(),
-		bb: await apiClient.bb(),
-		apiClient: apiClient
-	};
+export const load: PageLoad = async ({ parent, fetch }) => {
+	const { queryClient } = await parent();
+
+	await queryClient.prefetchQuery({
+		queryKey: getQueryKey(['ohlc']),
+		queryFn: () => api(fetch).ohlc()
+	});
 };

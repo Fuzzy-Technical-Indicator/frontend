@@ -1,12 +1,17 @@
 <script lang="ts">
-	import type { ApiClient, FuzzySet, Settings } from '$lib/apiClient';
+	import { api, type FuzzySet, type Settings } from '$lib/apiClient';
+	import { createMutation, useQueryClient } from '@tanstack/svelte-query';
+	import { omit } from 'ramda';
 
 	export let info: Settings['linguisticVariables'][keyof Settings['linguisticVariables']];
-	export let apiClient: ApiClient;
 
 	let lowerBoundary = info.lowerBoundary;
 	let upperBoundary = info.upperBoundary;
 	let graphs: Record<string, Omit<FuzzySet, 'data'>> = info.graphs;
+
+	const handleRemoveFuzzySet = (name: string) => {
+		graphs = omit([name], graphs);
+	};
 
 	let newFuzzySetType = 'triangle';
 	let newFuzzySetName = '';
@@ -21,19 +26,22 @@
 		}
 	};
 
-	const handleOnSave = async () => {
-		await apiClient.updateSettings({
-			rsi: {
-				lowerBoundary,
-				upperBoundary,
-				shapes: Object.fromEntries(
-					Object.entries(graphs).map(([k, v]) => {
-						return [k, { shapeType: v.type, parameters: v.parameters }];
-					})
-				)
-			}
-		});
-	};
+	const client = useQueryClient();
+	const updateMutation = createMutation({
+		mutationFn: () =>
+			api().updateSettings({
+				rsi: {
+					lowerBoundary,
+					upperBoundary,
+					shapes: Object.fromEntries(
+						Object.entries(graphs).map(([k, v]) => {
+							return [k, { shapeType: v.type, parameters: v.parameters }];
+						})
+					)
+				}
+			}),
+		onSuccess: () => client.invalidateQueries({ queryKey: ['settings'] })
+	});
 </script>
 
 <div>
@@ -49,7 +57,7 @@
 		</label>
 	</div>
 
-	{#each Object.entries(info.graphs) as [name, shape]}
+	{#each Object.entries(graphs) as [name, shape] (name)}
 		{#if shape.type === 'triangle'}
 			<div class="flex space-x-5 mt-2">
 				<p>{`${name}, ${shape.type}: `}</p>
@@ -77,6 +85,9 @@
 						class="border-black border"
 					/>
 				</label>
+				<button class="border border-black" on:click={() => handleRemoveFuzzySet(name)}
+					>remove</button
+				>
 			</div>
 		{/if}
 	{/each}
@@ -113,5 +124,10 @@
 			</label>
 		{/if}
 	</div>
-	<button class="border-black border p-1" on:click={handleOnSave}>save</button>
+	<button
+		class="border-black border p-1"
+		on:click={() => {
+			$updateMutation.mutate();
+		}}>save</button
+	>
 </div>

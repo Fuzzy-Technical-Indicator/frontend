@@ -1,8 +1,9 @@
 <script lang="ts">
-	import type { IChartApi, LineData, LogicalRange } from 'lightweight-charts';
+	import type { IChartApi, LogicalRange } from 'lightweight-charts';
 	import { Chart, LineSeries, TimeScale } from 'svelte-lightweight-charts';
 	import { formatterM } from './utils';
-	import type { ApiClient } from './apiClient';
+	import { getQueryKey, api } from './apiClient';
+	import { createQuery } from '@tanstack/svelte-query';
 
 	export let mainChart: IChartApi | null;
 	export let handleVisibleLogicalRangeChange: (
@@ -13,32 +14,32 @@
 	export let kind: string;
 	export let color: string | undefined = undefined;
 	export let offsetStyle: string | undefined;
-	export let apiClient: ApiClient;
 
 	let exceed1M = false;
-	const getData = async () => {
-		if (kind === 'rsi') {
-			return apiClient.rsi(14);
-		}
+	const line = createQuery({
+		queryKey: getQueryKey([kind]),
+		queryFn: async () => {
+			if (kind === 'rsi') {
+				return api().rsi(14);
+			}
+			if (kind === 'adx') {
+				return api().adx(14);
+			}
+			if (kind === 'obv') {
+				let [result, isExceed1M] = await api().obv();
+				exceed1M = isExceed1M;
+				return result;
+			}
 
-		if (kind === 'adx') {
-			return apiClient.adx(14);
-		}
+			if (kind === 'accumdist') {
+				let [result, isExceed1M] = await api().accumdist();
+				exceed1M = isExceed1M;
+				return result;
+			}
 
-		if (kind === 'obv') {
-			let [result, isExceed1M] = await apiClient.obv();
-			exceed1M = isExceed1M;
-			return result;
+			throw Error('something wrong');
 		}
-
-		if (kind === 'accumdist') {
-			let [result, isExceed1M] = await apiClient.accumdist();
-			exceed1M = isExceed1M;
-			return result;
-		}
-
-		return [] as LineData[];
-	};
+	});
 </script>
 
 <Chart
@@ -52,7 +53,7 @@
 		on:visibleLogicalRangeChange={(e) => handleVisibleLogicalRangeChange(e, [mainChart])}
 	/>
 
-	{#await getData() then dt}
-		<LineSeries lastValueVisible={false} lineWidth={1} {color} data={dt} />
-	{/await}
+	{#if $line.isSuccess}
+		<LineSeries lastValueVisible={false} lineWidth={1} {color} data={$line.data} />
+	{/if}
 </Chart>

@@ -11,12 +11,15 @@
 		CategoryScale,
 		Colors
 	} from 'chart.js';
-	import type { PageData } from './$types';
 	import LinguisticVar from '$lib/components/LinguisticVar.svelte';
+	import { invalidateAll } from '$app/navigation';
+	import { createQuery } from '@tanstack/svelte-query';
+	import { api } from '$lib/apiClient';
 
-	export let data: PageData;
-
-	const { apiClient, settings } = data;
+	const settings = createQuery({
+		queryKey: ['settings'],
+		queryFn: () => api().getSettings()
+	});
 
 	ChartJS.register(
 		Title,
@@ -34,18 +37,25 @@
 	<h1 class="text-xl">Username</h1>
 	<div>
 		<h1 class="text-xl">Linguistic Variables</h1>
-		{#each Object.entries(settings.linguisticVariables) as [name, info]}
-			<h3 class="text-lg text-center">{name}</h3>
-			<Line
-				data={{
-					labels: info.labels,
-					datasets: Object.entries(info.graphs).map(([k, v]) => {
-						return { label: k, data: v.data, pointStyle: false };
-					})
-				}}
-				options={{ responsive: true }}
-			/>
-			<LinguisticVar {info} {apiClient} />
-		{/each}
+		{#if $settings.isSuccess}
+			{#each Object.entries($settings.data.linguisticVariables) as [name, info]}
+				<h3 class="text-lg text-center">{name}</h3>
+				<Line
+					data={{
+						labels: info.labels,
+						datasets: Object.entries(info.graphs).map(([k, v]) => {
+							return { label: k, data: v.data, pointStyle: false };
+						})
+					}}
+					options={{ responsive: true }}
+				/>
+				<LinguisticVar
+					{info}
+					on:update={() => {
+						invalidateAll();
+					}}
+				/>
+			{/each}
+		{/if}
 	</div>
 </div>
