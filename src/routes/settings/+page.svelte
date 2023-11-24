@@ -13,7 +13,8 @@
 	} from 'chart.js';
 	import LinguisticVar from '$lib/components/LinguisticVar.svelte';
 	import { createMutation, createQuery, useQueryClient } from '@tanstack/svelte-query';
-	import { api, type UpdateLinguisticVariable } from '$lib/apiClient';
+	import { api } from '$lib/apiClient';
+	import type { UpdateLinguisticVariable } from '$lib/types';
 
 	const settings = createQuery({
 		queryKey: ['settings'],
@@ -69,7 +70,7 @@
 					}}
 					options={{ responsive: true }}
 				/>
-				<LinguisticVar {info} />
+				<LinguisticVar {info} {name} />
 			{/each}
 		{/if}
 

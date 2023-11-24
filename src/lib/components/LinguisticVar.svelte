@@ -1,9 +1,13 @@
 <script lang="ts">
-	import { api, type FuzzySet, type Settings } from '$lib/apiClient';
+	import { api } from '$lib/apiClient';
+	import { ShapeType, type FuzzySet, type LinguisticVariable } from '$lib/types';
 	import { createMutation, useQueryClient } from '@tanstack/svelte-query';
 	import { omit } from 'ramda';
+	import TriangleInputs from './TriangleInputs.svelte';
+	import TrapezoidInputs from './TrapezoidInputs.svelte';
 
-	export let info: Settings['linguisticVariables'][keyof Settings['linguisticVariables']];
+	export let info: LinguisticVariable;
+	export let name: string;
 
 	let lowerBoundary = info.lowerBoundary;
 	let upperBoundary = info.upperBoundary;
@@ -13,7 +17,7 @@
 		graphs = omit([name], graphs);
 	};
 
-	let newFuzzySetType = 'triangle';
+	let newFuzzySetType = ShapeType.Triangle;
 	let newFuzzySetName = '';
 	let newFuzzySetParameters: Record<string, number> = {};
 
@@ -30,7 +34,7 @@
 	const updateMutation = createMutation({
 		mutationFn: () =>
 			api().updateSettings({
-				rsi: {
+				[name]: {
 					lowerBoundary,
 					upperBoundary,
 					shapes: Object.fromEntries(
@@ -58,70 +62,32 @@
 	</div>
 
 	{#each Object.entries(graphs) as [name, shape] (name)}
-		{#if shape.type === 'triangle'}
-			<div class="flex space-x-5 mt-2">
-				<p>{`${name}, ${shape.type}: `}</p>
-				<label>
-					center
-					<input
-						type="number"
-						bind:value={graphs[name].parameters.center}
-						class="border-black border"
-					/>
-				</label>
-				<label>
-					width
-					<input
-						type="number"
-						bind:value={graphs[name].parameters.width}
-						class="border-black border"
-					/>
-				</label>
-				<label>
-					height
-					<input
-						type="number"
-						bind:value={graphs[name].parameters.height}
-						class="border-black border"
-					/>
-				</label>
-				<button class="border border-black" on:click={() => handleRemoveFuzzySet(name)}
-					>remove</button
-				>
-			</div>
-		{/if}
+		<div class="flex space-x-5 mt-2">
+			<p>{`${name}, ${shape.type}: `}</p>
+			{#if shape.type === ShapeType.Triangle}
+				<TriangleInputs bind:parameters={graphs[name].parameters} />
+			{:else if shape.type === ShapeType.Trapezoid}
+				<TrapezoidInputs bind:parameters={graphs[name].parameters} />
+			{/if}
+			<button class="border border-black" on:click={() => handleRemoveFuzzySet(name)}>remove</button
+			>
+		</div>
 	{/each}
 	<div class="my-3">
-		<button class="border border-black" on:click={handleAddNewFuzzySet}>Add new fuzzy set</button>
+		<button class="border border-black" on:click={handleAddNewFuzzySet}>Add new Fuzzy Set</button>
 		<label>
 			name
 			<input type="text" bind:value={newFuzzySetName} class="border border-black" />
 		</label>
 		<select bind:value={newFuzzySetType}>
-			<option value="triangle">triangle</option>
-			<option value="trep">trep</option>
+			{#each Object.values(ShapeType) as t}
+				<option value={t}>{t}</option>
+			{/each}
 		</select>
-		{#if newFuzzySetType === 'triangle'}
-			<label>
-				center
-				<input
-					type="number"
-					bind:value={newFuzzySetParameters.center}
-					class="border-black border"
-				/>
-			</label>
-			<label>
-				width
-				<input type="number" bind:value={newFuzzySetParameters.width} class="border-black border" />
-			</label>
-			<label>
-				height
-				<input
-					type="number"
-					bind:value={newFuzzySetParameters.height}
-					class="border-black border"
-				/>
-			</label>
+		{#if newFuzzySetType === ShapeType.Triangle}
+			<TriangleInputs bind:parameters={newFuzzySetParameters} />
+		{:else if newFuzzySetType === ShapeType.Trapezoid}
+			<TrapezoidInputs bind:parameters={newFuzzySetParameters} />
 		{/if}
 	</div>
 	<button

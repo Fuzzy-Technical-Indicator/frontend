@@ -7,58 +7,13 @@ import type {
 	UTCTimestamp
 } from 'lightweight-charts';
 import { get, writable } from 'svelte/store';
-
-export interface DTValue<T> {
-	time: number;
-	value: T;
-}
-
-export interface Ohlc {
-	ticker: string;
-	time: number;
-	open: number;
-	high: number;
-	low: number;
-	close: number;
-}
-
-export enum Interval {
-	OneHour = '1h',
-	FourHour = '4h',
-	OneDay = '1d'
-}
-
-export interface FuzzySet {
-	type: string;
-	parameters: Record<string, number>;
-	data: number[];
-}
-
-export interface LinguisticVariable {
-	labels: number[];
-	upperBoundary: number;
-	lowerBoundary: number;
-	graphs: Record<string, FuzzySet>;
-}
-
-export type UpdateLinguisticVariable = Record<
-	string,
-	{
-		upperBoundary: number;
-		lowerBoundary: number;
-		shapes: Record<
-			string,
-			{
-				shapeType: string;
-				parameters: Record<string, number>;
-			}
-		>;
-	}
->;
-
-export interface Settings {
-	linguisticVariables: Record<string, LinguisticVariable>;
-}
+import {
+	Interval,
+	type DTValue,
+	type Ohlc,
+	type Settings,
+	type UpdateLinguisticVariable
+} from './types';
 
 function nullToNan(x: number | null): number {
 	return x == null ? NaN : x;
