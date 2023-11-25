@@ -27,6 +27,7 @@ export interface FuzzySet {
 	type: ShapeType;
 	parameters: Record<string, number>;
 	data: number[];
+	latex: string[];
 }
 
 export interface LinguisticVariable {

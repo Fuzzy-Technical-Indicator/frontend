@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { Line } from 'svelte-chartjs';
 	import {
 		Chart as ChartJS,
 		Title,
@@ -11,18 +10,20 @@
 		CategoryScale,
 		Colors
 	} from 'chart.js';
-	import LinguisticVar from '$lib/components/LinguisticVar.svelte';
 	import { createMutation, createQuery, useQueryClient } from '@tanstack/svelte-query';
 	import { api } from '$lib/apiClient';
 	import type { UpdateLinguisticVariable } from '$lib/types';
+	import LinguisticVar from '$lib/linguistic_varaibles/LinguisticVar.svelte';
+	import Desmos from '$lib/desmos/Desmos.svelte';
 
 	const settings = createQuery({
 		queryKey: ['settings'],
 		queryFn: () => api().getSettings()
 	});
 
-	const linguisticVarOptions = ['rsi', 'bb'];
+	const linguisticVarOptions = ['rsi', 'bb', 'custom'];
 	let currLinguisticVarOpt = linguisticVarOptions[0];
+	let customName = '';
 
 	const client = useQueryClient();
 	const updateMutation = createMutation({
@@ -36,8 +37,13 @@
 			!Object.keys($settings.data.linguisticVariables).includes(currLinguisticVarOpt)
 		) {
 			const data = {
-				[currLinguisticVarOpt]: { lowerBoundary: 0, upperBoundary: 0, shapes: {} }
+				[currLinguisticVarOpt === 'custom' ? customName : currLinguisticVarOpt]: {
+					lowerBoundary: 0,
+					upperBoundary: 0,
+					shapes: {}
+				}
 			};
+
 			$updateMutation.mutate(data);
 		}
 	};
@@ -61,14 +67,11 @@
 		{#if $settings.isSuccess}
 			{#each Object.entries($settings.data.linguisticVariables) as [name, info]}
 				<h3 class="text-lg text-center">{name}</h3>
-				<Line
-					data={{
-						labels: info.labels,
-						datasets: Object.entries(info.graphs).map(([k, v]) => {
-							return { label: k, data: v.data, pointStyle: false };
-						})
-					}}
-					options={{ responsive: true }}
+				<Desmos
+					graphId={name}
+					boundary={{ left: info.lowerBoundary, right: info.upperBoundary }}
+					graphs={Object.values(info.graphs).map((v) => v.latex)}
+					names={Object.keys(info.graphs)}
 				/>
 				<LinguisticVar {info} {name} />
 			{/each}
@@ -83,6 +86,15 @@
 					<option value={opt}>{opt}</option>
 				{/each}
 			</select>
+			{#if currLinguisticVarOpt === 'custom'}
+				<label>
+					name
+					<input type="text" bind:value={customName} class="border border-black" />
+				</label>
+			{/if}
 		</div>
+	</div>
+	<div class="mt-5">
+		<h1 class="text-xl">Rules</h1>
 	</div>
 </div>

@@ -11,7 +11,7 @@
 
 	let lowerBoundary = info.lowerBoundary;
 	let upperBoundary = info.upperBoundary;
-	let graphs: Record<string, Omit<FuzzySet, 'data'>> = info.graphs;
+	let graphs: Record<string, Omit<FuzzySet, 'data' | 'latex'>> = info.graphs;
 
 	const handleRemoveFuzzySet = (name: string) => {
 		graphs = omit([name], graphs);
