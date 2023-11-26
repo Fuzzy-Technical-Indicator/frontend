@@ -15,6 +15,21 @@
 	import type { UpdateLinguisticVariable } from '$lib/types';
 	import LinguisticVar from '$lib/linguistic_varaibles/LinguisticVar.svelte';
 	import Desmos from '$lib/desmos/Desmos.svelte';
+	import { onMount } from 'svelte';
+
+	onMount(() => {
+		// to make the script always rerun, and add the stylesheet
+		const script = document.getElementById('desmos-script');
+		if (script) {
+			script.remove();
+		}
+
+		const newScript = document.createElement('script');
+		newScript.id = 'desmos-script';
+		newScript.src =
+			'https://www.desmos.com/api/v1.8/calculator.js?apiKey=dcb31709b452b1cf9dc26972add0fda6';
+		document.head.appendChild(newScript);
+	});
 
 	const settings = createQuery({
 		queryKey: ['settings'],
@@ -60,6 +75,14 @@
 	);
 </script>
 
+<svelte:head>
+	<script
+		id="desmos-script"
+		src="https://www.desmos.com/api/v1.8/calculator.js?apiKey=dcb31709b452b1cf9dc26972add0fda6"
+	>
+	</script>
+</svelte:head>
+
 <div class="p-10">
 	<h1 class="text-xl">Username</h1>
 	<div>
@@ -70,8 +93,8 @@
 				<Desmos
 					graphId={name}
 					boundary={{ left: info.lowerBoundary, right: info.upperBoundary }}
-					graphs={Object.values(info.graphs).map((v) => v.latex)}
-					names={Object.keys(info.graphs)}
+					graphs={Object.values(info.shapes).map((v) => v.latex)}
+					names={Object.keys(info.shapes)}
 				/>
 				<LinguisticVar {info} {name} />
 			{/each}

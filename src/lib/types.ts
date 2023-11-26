@@ -26,15 +26,13 @@ export enum ShapeType {
 export interface FuzzySet {
 	type: ShapeType;
 	parameters: Record<string, number>;
-	data: number[];
 	latex: string[];
 }
 
 export interface LinguisticVariable {
-	labels: number[];
 	upperBoundary: number;
 	lowerBoundary: number;
-	graphs: Record<string, FuzzySet>;
+	shapes: Record<string, FuzzySet>;
 }
 
 export type UpdateLinguisticVariable = Record<

@@ -2,7 +2,7 @@
 	import { api } from '$lib/apiClient';
 	import { ShapeType, type FuzzySet, type LinguisticVariable } from '$lib/types';
 	import { createMutation, useQueryClient } from '@tanstack/svelte-query';
-	import { omit } from 'ramda';
+	import omit from 'ramda/src/omit';
 	import TriangleInputs from './TriangleInputs.svelte';
 	import TrapezoidInputs from './TrapezoidInputs.svelte';
 
@@ -11,10 +11,10 @@
 
 	let lowerBoundary = info.lowerBoundary;
 	let upperBoundary = info.upperBoundary;
-	let graphs: Record<string, Omit<FuzzySet, 'data' | 'latex'>> = info.graphs;
+	let shapes: Record<string, Omit<FuzzySet, 'data' | 'latex'>> = info.shapes;
 
 	const handleRemoveFuzzySet = (name: string) => {
-		graphs = omit([name], graphs);
+		shapes = omit([name], shapes);
 	};
 
 	let newFuzzySetType = ShapeType.Triangle;
@@ -22,8 +22,8 @@
 	let newFuzzySetParameters: Record<string, number> = {};
 
 	const handleAddNewFuzzySet = () => {
-		if (!(newFuzzySetName in graphs)) {
-			graphs[newFuzzySetName] = {
+		if (!(newFuzzySetName in shapes)) {
+			shapes[newFuzzySetName] = {
 				type: newFuzzySetType,
 				parameters: newFuzzySetParameters
 			};
@@ -38,7 +38,7 @@
 					lowerBoundary,
 					upperBoundary,
 					shapes: Object.fromEntries(
-						Object.entries(graphs).map(([k, v]) => {
+						Object.entries(shapes).map(([k, v]) => {
 							return [k, { shapeType: v.type, parameters: v.parameters }];
 						})
 					)
@@ -61,13 +61,13 @@
 		</label>
 	</div>
 
-	{#each Object.entries(graphs) as [name, shape] (name)}
+	{#each Object.entries(shapes) as [name, shape] (name)}
 		<div class="flex space-x-5 mt-2">
 			<p>{`${name}, ${shape.type}: `}</p>
 			{#if shape.type === ShapeType.Triangle}
-				<TriangleInputs bind:parameters={graphs[name].parameters} />
+				<TriangleInputs bind:parameters={shapes[name].parameters} />
 			{:else if shape.type === ShapeType.Trapezoid}
-				<TrapezoidInputs bind:parameters={graphs[name].parameters} />
+				<TrapezoidInputs bind:parameters={shapes[name].parameters} />
 			{/if}
 			<button class="border border-black" on:click={() => handleRemoveFuzzySet(name)}>remove</button
 			>

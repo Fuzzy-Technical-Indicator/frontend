@@ -26,9 +26,7 @@
 			expressions: false,
 			lockViewport: true,
 			settingsMenu: false,
-			keypad: false,
-			xAxisLabel: 'X',
-			yAxisLabel: 'Membership Value'
+			keypad: false
 		});
 
 		g.setMathBounds({
@@ -56,15 +54,8 @@
 	});
 </script>
 
-<svelte:head>
-	<script
-		src="https://www.desmos.com/api/v1.8/calculator.js?apiKey=dcb31709b452b1cf9dc26972add0fda6"
-	>
-	</script>
-</svelte:head>
-
 <div>
-	<div class="mx-auto flex space-x-3">
+	<div class="flex justify-center space-x-3">
 		{#each names as name, i}
 			<div class="flex space-x-1">
 				<span class="p-4" style={`background-color: ${colors[i % colors.length]}`} />
