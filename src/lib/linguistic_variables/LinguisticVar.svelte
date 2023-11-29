@@ -27,6 +27,7 @@
 				type: newFuzzySetType,
 				parameters: newFuzzySetParameters
 			};
+			$updateMutation.mutate();
 		}
 	};
 
@@ -41,10 +42,22 @@
 						Object.entries(shapes).map(([k, v]) => {
 							return [k, { shapeType: v.type, parameters: v.parameters }];
 						})
-					)
+					),
+					kind: info.kind
 				}
 			}),
-		onSuccess: () => client.invalidateQueries({ queryKey: ['settings'] })
+		onSuccess: () => {
+			client.invalidateQueries({ queryKey: ['settings'] });
+			newFuzzySetName = '';
+			newFuzzySetParameters = {};
+		}
+	});
+
+	const deleteMutation = createMutation({
+		mutationFn: () => api().deleteLinguisticVar(name),
+		onSuccess: () => {
+			client.invalidateQueries({ queryKey: ['settings'] });
+		}
 	});
 </script>
 
@@ -96,4 +109,12 @@
 			$updateMutation.mutate();
 		}}>save</button
 	>
+	<button
+		class="border-black border p-1"
+		on:click={() => {
+			$deleteMutation.mutate();
+		}}
+	>
+		remove
+	</button>
 </div>

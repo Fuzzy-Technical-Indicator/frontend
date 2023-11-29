@@ -12,10 +12,11 @@
 	} from 'chart.js';
 	import { createMutation, createQuery, useQueryClient } from '@tanstack/svelte-query';
 	import { api } from '$lib/apiClient';
-	import type { UpdateLinguisticVariable } from '$lib/types';
-	import LinguisticVar from '$lib/linguistic_varaibles/LinguisticVar.svelte';
+	import { LinguisticVarKind, type UpdateLinguisticVariable } from '$lib/types';
+	import LinguisticVar from '$lib/linguistic_variables/LinguisticVar.svelte';
 	import Desmos from '$lib/desmos/Desmos.svelte';
 	import { onMount } from 'svelte';
+	import RulesTable from '$lib/fuzzy_rules/RulesTable.svelte';
 
 	onMount(() => {
 		// to make the script always rerun, and add the stylesheet
@@ -51,11 +52,14 @@
 			$settings.isSuccess &&
 			!Object.keys($settings.data.linguisticVariables).includes(currLinguisticVarOpt)
 		) {
+			const kind =
+				currLinguisticVarOpt === 'custom' ? LinguisticVarKind.Output : LinguisticVarKind.Input;
 			const data = {
 				[currLinguisticVarOpt === 'custom' ? customName : currLinguisticVarOpt]: {
 					lowerBoundary: 0,
-					upperBoundary: 0,
-					shapes: {}
+					upperBoundary: 100,
+					shapes: {},
+					kind
 				}
 			};
 
@@ -85,11 +89,11 @@
 
 <div class="p-10">
 	<h1 class="text-xl">Username</h1>
-	<div>
-		<h1 class="text-xl">Linguistic Variables</h1>
-		{#if $settings.isSuccess}
+	{#if $settings.isSuccess}
+		<div>
+			<h1 class="text-xl">Linguistic Variables</h1>
 			{#each Object.entries($settings.data.linguisticVariables) as [name, info]}
-				<h3 class="text-lg text-center">{name}</h3>
+				<h3 class="text-lg text-center">{name} ({info.kind})</h3>
 				<Desmos
 					graphId={name}
 					boundary={{ left: info.lowerBoundary, right: info.upperBoundary }}
@@ -98,26 +102,30 @@
 				/>
 				<LinguisticVar {info} {name} />
 			{/each}
-		{/if}
 
-		<div class="mt-5">
-			<button class="border border-black" on:click={handleAddLinguisticVar}
-				>Add new Linguistic Variable</button
-			>
-			<select bind:value={currLinguisticVarOpt}>
-				{#each linguisticVarOptions as opt}
-					<option value={opt}>{opt}</option>
-				{/each}
-			</select>
-			{#if currLinguisticVarOpt === 'custom'}
-				<label>
-					name
-					<input type="text" bind:value={customName} class="border border-black" />
-				</label>
-			{/if}
+			<div class="mt-5">
+				<button class="border border-black" on:click={handleAddLinguisticVar}
+					>Add new Linguistic Variable</button
+				>
+				<select bind:value={currLinguisticVarOpt}>
+					{#each linguisticVarOptions as opt}
+						<option value={opt}>{opt}</option>
+					{/each}
+				</select>
+				{#if currLinguisticVarOpt === 'custom'}
+					<label>
+						name
+						<input type="text" bind:value={customName} class="border border-black" />
+					</label>
+				{/if}
+			</div>
 		</div>
-	</div>
-	<div class="mt-5">
-		<h1 class="text-xl">Rules</h1>
-	</div>
+		<div class="mt-5">
+			<h1 class="text-xl">Rules</h1>
+			<RulesTable linguisticVariables={$settings.data.linguisticVariables} />
+			<div class="flex space-x-2">
+				<button class="border border-black">add rule</button>
+			</div>
+		</div>
+	{/if}
 </div>

@@ -56,5 +56,8 @@
 			"prettier --check --plugin-search-dir .",
 			"eslint --fix"
 		]
+	},
+	"dependencies": {
+		"@tanstack/svelte-table": "^8.10.7"
 	}
 }

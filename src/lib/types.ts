@@ -23,6 +23,11 @@ export enum ShapeType {
 	Trapezoid = 'trapezoid'
 }
 
+export enum LinguisticVarKind {
+	Input = 'input',
+	Output = 'output'
+}
+
 export interface FuzzySet {
 	type: ShapeType;
 	parameters: Record<string, number>;
@@ -33,6 +38,7 @@ export interface LinguisticVariable {
 	upperBoundary: number;
 	lowerBoundary: number;
 	shapes: Record<string, FuzzySet>;
+	kind: LinguisticVarKind;
 }
 
 export type UpdateLinguisticVariable = Record<
@@ -47,6 +53,7 @@ export type UpdateLinguisticVariable = Record<
 				parameters: Record<string, number>;
 			}
 		>;
+		kind: LinguisticVarKind;
 	}
 >;
 

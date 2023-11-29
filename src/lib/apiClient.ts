@@ -195,6 +195,13 @@ export const api = (customFetch = fetch) => ({
 				linguisticVariables
 			})
 		});
-		console.log(resp);
+		//console.log(resp);
+		return resp;
+	},
+	deleteLinguisticVar: async (name: string) => {
+		const resp = await customFetch(`${PUBLIC_API_URL}/api/settings/linguisticvar/${name}`, {
+			method: 'DELETE'
+		});
+		return resp;
 	}
 });
