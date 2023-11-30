@@ -1,22 +1,204 @@
 <script lang="ts">
-	import { Chart, LineSeries } from 'svelte-lightweight-charts';
-	const data = [
-		{ time: '2019-04-11', value: 80.01 },
-		{ time: '2019-04-12', value: 96.63 },
-		{ time: '2019-04-13', value: 76.64 },
-		{ time: '2019-04-14', value: 81.89 },
-		{ time: '2019-04-15', value: 74.43 },
-		{ time: '2019-04-16', value: 80.01 },
-		{ time: '2019-04-17', value: 96.63 },
-		{ time: '2019-04-18', value: 76.64 },
-		{ time: '2019-04-19', value: 81.89 },
-		{ time: '2019-04-20', value: 74.43 }
-	];
+	import { CandlestickSeries, Chart, LineSeries, TimeScale } from 'svelte-lightweight-charts';
+	import type { IChartApi, LogicalRange } from 'lightweight-charts';
+	import { priceFn } from '$lib/utils';
+	import SingleLineChart from '$lib/SingleLineChart.svelte';
+	import MacdChart from '$lib/MacdChart.svelte';
+	import FuzzyChart from '$lib/FuzzyChart.svelte';
+	import AroonChart from '$lib/AroonChart.svelte';
+	import StochChart from '$lib/StochChart.svelte';
+	import { createQuery } from '@tanstack/svelte-query';
+	import { api, getQueryKey, chartSettings } from '$lib/apiClient';
+
+	const ohlc = createQuery({
+		queryKey: getQueryKey(['ohlc']),
+		queryFn: () => api().ohlc()
+	});
+
+	const bbData = createQuery({
+		queryKey: getQueryKey(['bb']),
+		queryFn: () => api().bb()
+	});
+
+	let main: IChartApi | null;
+	let offsetStyles = new Map<string, string>();
+
+	const handleResize = (
+		main: IChartApi | null,
+		apis: Map<string, IChartApi | null>
+	): Map<string, string> => {
+		const mainW = main ? main.priceScale('right').width() : 0;
+
+		let offsetStyle = new Map();
+		for (const [kind, api] of apis) {
+			let w = api ? api.priceScale('right').width() : 0;
+			const margin = Math.max(mainW, w) - Math.min(mainW, w);
+			offsetStyle.set(kind, `width: calc(100% - ${margin}px)`);
+		}
+		return offsetStyle;
+	};
+
+	const handleVisibleLogicalRangeChange = (
+		e: CustomEvent<LogicalRange | null> & { type: 'visibleLogicalRangeChange' },
+		apis: (IChartApi | null)[]
+	) => {
+		offsetStyles = handleResize(main, otherCharts); // a hack
+
+		const range = e.detail;
+		if (!range) return;
+
+		for (const api of apis) {
+			if (api) {
+				api.timeScale().setVisibleLogicalRange(range);
+			}
+		}
+	};
+
+	let singleLineOptions = ['rsi', 'adx', 'obv', 'accumdist'];
+
+	let bb = false;
+	let macd = false;
+	let fuzzy = false;
+	let aroon = false;
+	let stoch = false;
+
+	let otherCharts = new Map<string, IChartApi | null>();
+	let singleLineCharts = new Map<string, boolean>();
+
+	const addSingleLineChart = (kind: string) => {
+		if (singleLineCharts.has(kind)) {
+			let v = singleLineCharts.get(kind);
+			singleLineCharts.set(kind, !v);
+		} else {
+			singleLineCharts.set(kind, true);
+		}
+
+		// use this to make svelte update UI
+		singleLineCharts = singleLineCharts;
+	};
 </script>
 
-<h1>Welcome to SvelteKit</h1>
-<p>Visit <a href="https://kit.svelte.dev">kit.svelte.dev</a> to read the documentation</p>
+<div class="flex-row w-screen h-screen">
+	<Chart
+		ref={(ref) => (main = ref)}
+		container={{ class: 'relative h-4/6' }}
+		autoSize={true}
+		localization={{ priceFormatter: priceFn }}
+	>
+		<div class="absolute z-10 top-0 left-0 p-2">
+			{$chartSettings.symbol}
+			{$chartSettings.interval}
+			<div>
+				<input type="checkbox" bind:checked={bb} />
+				BB
+			</div>
 
-<Chart width={800} height={600}>
-	<LineSeries {data} />
-</Chart>
+			{#each singleLineOptions as opt}
+				<div>
+					<input type="checkbox" on:click={() => addSingleLineChart(opt)} />
+					{opt.toUpperCase()}
+				</div>
+			{/each}
+
+			<div>
+				<input
+					type="checkbox"
+					on:click={() => {
+						macd = !macd;
+					}}
+				/>
+				MACD
+			</div>
+
+			<div>
+				<input
+					type="checkbox"
+					on:click={() => {
+						aroon = !aroon;
+					}}
+				/>
+				AROON
+			</div>
+
+			<div>
+				<input
+					type="checkbox"
+					on:click={() => {
+						stoch = !stoch;
+					}}
+				/>
+				STOCH
+			</div>
+
+			<div>
+				<input
+					type="checkbox"
+					on:click={() => {
+						fuzzy = !fuzzy;
+					}}
+				/>
+				NORMAL FUZZY
+			</div>
+		</div>
+
+		<TimeScale
+			visible={true}
+			on:visibleLogicalRangeChange={(e) =>
+				handleVisibleLogicalRangeChange(e, Array.from(otherCharts.values()))}
+		/>
+		<CandlestickSeries data={$ohlc.data ? $ohlc.data : []} />
+		{#if bb && $bbData.isSuccess}
+			<LineSeries lineWidth={1} data={$bbData.data.sma} />
+			<LineSeries lineWidth={1} color={'blue'} data={$bbData.data.lower} />
+			<LineSeries lineWidth={1} color={'blue'} data={$bbData.data.upper} />
+		{/if}
+	</Chart>
+
+	{#each Array.from(singleLineCharts.entries()) as [kind, visible]}
+		{#if visible}
+			<SingleLineChart
+				ref={(ref) => otherCharts.set(kind, ref)}
+				offsetStyle={offsetStyles.get(kind)}
+				mainChart={main}
+				{handleVisibleLogicalRangeChange}
+				{kind}
+			/>
+		{/if}
+	{/each}
+
+	{#if macd}
+		<MacdChart
+			ref={(ref) => otherCharts.set('macd', ref)}
+			offsetStyle={offsetStyles.get('macd')}
+			mainChart={main}
+			{handleVisibleLogicalRangeChange}
+		/>
+	{/if}
+
+	{#if aroon}
+		<AroonChart
+			ref={(ref) => otherCharts.set('aroon', ref)}
+			offsetStyle={offsetStyles.get('aroon')}
+			mainChart={main}
+			{handleVisibleLogicalRangeChange}
+		/>
+	{/if}
+
+	{#if stoch}
+		<StochChart
+			ref={(ref) => otherCharts.set('stoch', ref)}
+			offsetStyle={offsetStyles.get('stoch')}
+			mainChart={main}
+			{handleVisibleLogicalRangeChange}
+		/>
+	{/if}
+
+	{#if fuzzy}
+		<FuzzyChart
+			ref={(ref) => otherCharts.set('fuzzy', ref)}
+			offsetStyle={offsetStyles.get('fuzzy')}
+			mainChart={main}
+			{handleVisibleLogicalRangeChange}
+		/>
+	{/if}
+</div>
