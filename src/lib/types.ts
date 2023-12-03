@@ -29,7 +29,7 @@ export enum LinguisticVarKind {
 }
 
 export interface FuzzySet {
-	type: ShapeType;
+	shapeType: ShapeType;
 	parameters: Record<string, number>;
 	latex: string[];
 }
@@ -57,6 +57,13 @@ export type UpdateLinguisticVariable = Record<
 	}
 >;
 
+export interface FuzzyRule {
+	input: Record<string, string>;
+	output: Record<string, string>;
+	valid: boolean;
+}
+
 export interface Settings {
 	linguisticVariables: Record<string, LinguisticVariable>;
+	fuzzyRules: FuzzyRule[];
 }

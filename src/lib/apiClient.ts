@@ -184,22 +184,18 @@ export const api = (customFetch = fetch) => ({
 		const json = (await resp.json()) as Settings;
 		return json;
 	},
-	updateSettings: async (linguisticVariables: UpdateLinguisticVariable) => {
-		const resp = await customFetch(`${PUBLIC_API_URL}/api/settings`, {
+	updateLinguisticVars: async (linguisticVariables: UpdateLinguisticVariable) => {
+		const resp = await customFetch(`${PUBLIC_API_URL}/api/settings/linguisticvars`, {
 			method: 'PUT',
 			headers: {
 				'Content-Type': 'application/json'
 			},
-			body: JSON.stringify({
-				username: 'tanat',
-				linguisticVariables
-			})
+			body: JSON.stringify(linguisticVariables)
 		});
-		//console.log(resp);
 		return resp;
 	},
 	deleteLinguisticVar: async (name: string) => {
-		const resp = await customFetch(`${PUBLIC_API_URL}/api/settings/linguisticvar/${name}`, {
+		const resp = await customFetch(`${PUBLIC_API_URL}/api/settings/linguisticvars/${name}`, {
 			method: 'DELETE'
 		});
 		return resp;
