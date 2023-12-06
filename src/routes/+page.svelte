@@ -9,6 +9,8 @@
 	import StochChart from '$lib/StochChart.svelte';
 	import { createQuery } from '@tanstack/svelte-query';
 	import { api, getQueryKey, chartSettings } from '$lib/apiClient';
+	import { get } from 'svelte/store';
+	import { Interval } from '$lib/types';
 
 	const ohlc = createQuery({
 		queryKey: getQueryKey(['ohlc']),
@@ -54,7 +56,12 @@
 		}
 	};
 
-	let singleLineOptions = ['rsi', 'adx', 'obv', 'accumdist'];
+	let singleLineOptions = [
+		{ opt: 'rsi', use: false },
+		{ opt: 'adx', use: false },
+		{ opt: 'obv', use: false },
+		{ opt: 'accumdist', use: false }
+	];
 
 	let bb = false;
 	let macd = false;
@@ -76,129 +83,167 @@
 		// use this to make svelte update UI
 		singleLineCharts = singleLineCharts;
 	};
+
+	const handleSymbolChange = (e: any) => {
+		chartSettings.set({ symbol: e.target.value, interval: get(chartSettings).interval });
+		$ohlc.refetch();
+		$bbData.refetch();
+	};
+
+	const handleIntervalChange = (e: any) => {
+		chartSettings.set({ symbol: get(chartSettings).symbol, interval: e.target.value });
+		$ohlc.refetch();
+		$bbData.refetch();
+	};
 </script>
 
-<div class="flex-row w-screen h-screen">
-	<Chart
-		ref={(ref) => (main = ref)}
-		container={{ class: 'relative h-4/6' }}
-		autoSize={true}
-		localization={{ priceFormatter: priceFn }}
-	>
-		<div class="absolute z-10 top-0 left-0 p-2">
-			{$chartSettings.symbol}
-			{$chartSettings.interval}
-			<div>
-				<input type="checkbox" bind:checked={bb} />
-				BB
-			</div>
+<h1>Chart Selection:</h1>
+<select on:change={handleSymbolChange}>
+	<option value="ETH/USDT">ETH/USDT</option>
+	<option value="BTC/USDT">BTC/USDT</option>
+	<option value="BNB/USDT">BNB/USDT</option>
+	<option value="AAPL/USD">AAPL/USD</option>
+	<option value="IBM/USD">IBM/USD</option>
+	<option value="JPM/USD">JPM/USD</option>
+	<option value="MSFT/USD">MSFT/USD</option>
+	<option value="NKE/USD">NKE/USD</option>
+	<option value="TSLA/USD">TSLA/USD</option>
+</select>
 
-			{#each singleLineOptions as opt}
+<h1>Interval Selection:</h1>
+<select on:change={handleIntervalChange}>
+	<option value={Interval.OneDay}>1D</option>
+	<option value={Interval.FourHour}>4H</option>
+	<option value={Interval.OneHour}>1H</option>
+</select>
+
+{#key $ohlc.data && $bbData.data}
+	<div class="flex-row w-screen h-screen">
+		<Chart
+			ref={(ref) => (main = ref)}
+			container={{ class: 'relative h-4/6' }}
+			autoSize={true}
+			localization={{ priceFormatter: priceFn }}
+		>
+			<div class="absolute z-10 top-0 left-0 p-2">
+				{$chartSettings.symbol.toLocaleUpperCase()}
+				{$chartSettings.interval.toUpperCase()}
 				<div>
-					<input type="checkbox" on:click={() => addSingleLineChart(opt)} />
-					{opt.toUpperCase()}
+					<input type="checkbox" bind:checked={bb} />
+					BB
 				</div>
-			{/each}
 
-			<div>
-				<input
-					type="checkbox"
-					on:click={() => {
-						macd = !macd;
-					}}
-				/>
-				MACD
+				{#each singleLineOptions as { opt, use }}
+					<div>
+						<input type="checkbox" bind:checked={use} on:click={() => addSingleLineChart(opt)} />
+						{opt.toUpperCase()}
+					</div>
+				{/each}
+
+				<div>
+					<input
+						type="checkbox"
+						bind:checked={macd}
+						on:click={() => {
+							macd = !macd;
+						}}
+					/>
+					MACD
+				</div>
+
+				<div>
+					<input
+						type="checkbox"
+						bind:checked={aroon}
+						on:click={() => {
+							aroon = !aroon;
+						}}
+					/>
+					AROON
+				</div>
+
+				<div>
+					<input
+						type="checkbox"
+						bind:checked={stoch}
+						on:click={() => {
+							stoch = !stoch;
+						}}
+					/>
+					STOCH
+				</div>
+
+				<div>
+					<input
+						type="checkbox"
+						bind:checked={fuzzy}
+						on:click={() => {
+							fuzzy = !fuzzy;
+						}}
+					/>
+					NORMAL FUZZY
+				</div>
 			</div>
 
-			<div>
-				<input
-					type="checkbox"
-					on:click={() => {
-						aroon = !aroon;
-					}}
+			<TimeScale
+				visible={true}
+				on:visibleLogicalRangeChange={(e) =>
+					handleVisibleLogicalRangeChange(e, Array.from(otherCharts.values()))}
+			/>
+			<CandlestickSeries data={$ohlc.data ? $ohlc.data : []} />
+			{#if bb && $bbData.isSuccess}
+				<LineSeries lineWidth={1} data={$bbData.data.sma} />
+				<LineSeries lineWidth={1} color={'blue'} data={$bbData.data.lower} />
+				<LineSeries lineWidth={1} color={'blue'} data={$bbData.data.upper} />
+			{/if}
+		</Chart>
+
+		{#each Array.from(singleLineCharts.entries()) as [kind, visible]}
+			{#if visible}
+				<SingleLineChart
+					ref={(ref) => otherCharts.set(kind, ref)}
+					offsetStyle={offsetStyles.get(kind)}
+					mainChart={main}
+					{handleVisibleLogicalRangeChange}
+					{kind}
 				/>
-				AROON
-			</div>
+			{/if}
+		{/each}
 
-			<div>
-				<input
-					type="checkbox"
-					on:click={() => {
-						stoch = !stoch;
-					}}
-				/>
-				STOCH
-			</div>
-
-			<div>
-				<input
-					type="checkbox"
-					on:click={() => {
-						fuzzy = !fuzzy;
-					}}
-				/>
-				NORMAL FUZZY
-			</div>
-		</div>
-
-		<TimeScale
-			visible={true}
-			on:visibleLogicalRangeChange={(e) =>
-				handleVisibleLogicalRangeChange(e, Array.from(otherCharts.values()))}
-		/>
-		<CandlestickSeries data={$ohlc.data ? $ohlc.data : []} />
-		{#if bb && $bbData.isSuccess}
-			<LineSeries lineWidth={1} data={$bbData.data.sma} />
-			<LineSeries lineWidth={1} color={'blue'} data={$bbData.data.lower} />
-			<LineSeries lineWidth={1} color={'blue'} data={$bbData.data.upper} />
-		{/if}
-	</Chart>
-
-	{#each Array.from(singleLineCharts.entries()) as [kind, visible]}
-		{#if visible}
-			<SingleLineChart
-				ref={(ref) => otherCharts.set(kind, ref)}
-				offsetStyle={offsetStyles.get(kind)}
+		{#if macd}
+			<MacdChart
+				ref={(ref) => otherCharts.set('macd', ref)}
+				offsetStyle={offsetStyles.get('macd')}
 				mainChart={main}
 				{handleVisibleLogicalRangeChange}
-				{kind}
 			/>
 		{/if}
-	{/each}
 
-	{#if macd}
-		<MacdChart
-			ref={(ref) => otherCharts.set('macd', ref)}
-			offsetStyle={offsetStyles.get('macd')}
-			mainChart={main}
-			{handleVisibleLogicalRangeChange}
-		/>
-	{/if}
+		{#if aroon}
+			<AroonChart
+				ref={(ref) => otherCharts.set('aroon', ref)}
+				offsetStyle={offsetStyles.get('aroon')}
+				mainChart={main}
+				{handleVisibleLogicalRangeChange}
+			/>
+		{/if}
 
-	{#if aroon}
-		<AroonChart
-			ref={(ref) => otherCharts.set('aroon', ref)}
-			offsetStyle={offsetStyles.get('aroon')}
-			mainChart={main}
-			{handleVisibleLogicalRangeChange}
-		/>
-	{/if}
+		{#if stoch}
+			<StochChart
+				ref={(ref) => otherCharts.set('stoch', ref)}
+				offsetStyle={offsetStyles.get('stoch')}
+				mainChart={main}
+				{handleVisibleLogicalRangeChange}
+			/>
+		{/if}
 
-	{#if stoch}
-		<StochChart
-			ref={(ref) => otherCharts.set('stoch', ref)}
-			offsetStyle={offsetStyles.get('stoch')}
-			mainChart={main}
-			{handleVisibleLogicalRangeChange}
-		/>
-	{/if}
-
-	{#if fuzzy}
-		<FuzzyChart
-			ref={(ref) => otherCharts.set('fuzzy', ref)}
-			offsetStyle={offsetStyles.get('fuzzy')}
-			mainChart={main}
-			{handleVisibleLogicalRangeChange}
-		/>
-	{/if}
-</div>
+		{#if fuzzy}
+			<FuzzyChart
+				ref={(ref) => otherCharts.set('fuzzy', ref)}
+				offsetStyle={offsetStyles.get('fuzzy')}
+				mainChart={main}
+				{handleVisibleLogicalRangeChange}
+			/>
+		{/if}
+	</div>
+{/key}
