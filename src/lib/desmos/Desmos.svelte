@@ -13,8 +13,24 @@
 
 	const colors = ['#c74440', '#2d70b3', '#388c46', '#6042a6', '#fa7e19', '#000000'];
 
+	const loadDesmos = () => {
+		// FIX: SPA when change to settings page, Desmos not load
+		return new Promise((resolve, reject) => {
+			const script = document.createElement('script');
+			script.src =
+				'https://www.desmos.com/api/v1.8/calculator.js?apiKey=dcb31709b452b1cf9dc26972add0fda6';
+			script.id = 'desmos-script';
+			script.async = true;
+			script.onload = resolve;
+			script.onerror = reject;
+			document.head.appendChild(script);
+		});
+	};
+
 	let g: any;
-	afterUpdate(() => {
+	afterUpdate(async () => {
+		await loadDesmos();
+
 		if (g) {
 			g.destroy();
 		}
