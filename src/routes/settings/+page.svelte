@@ -43,7 +43,7 @@
 
 	const client = useQueryClient();
 	const updateMutation = createMutation({
-		mutationFn: (data: UpdateLinguisticVariable) => api().updateSettings(data),
+		mutationFn: (data: UpdateLinguisticVariable) => api().updateLinguisticVars(data),
 		onSuccess: () => client.invalidateQueries({ queryKey: ['settings'] })
 	});
 
@@ -122,7 +122,10 @@
 		</div>
 		<div class="mt-5">
 			<h1 class="text-xl">Rules</h1>
-			<RulesTable linguisticVariables={$settings.data.linguisticVariables} />
+			<RulesTable
+				linguisticVariables={$settings.data.linguisticVariables}
+				fuzzyRules={$settings.data.fuzzyRules}
+			/>
 			<div class="flex space-x-2">
 				<button class="border border-black">add rule</button>
 			</div>

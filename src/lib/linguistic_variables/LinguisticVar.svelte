@@ -24,7 +24,7 @@
 	const handleAddNewFuzzySet = () => {
 		if (!(newFuzzySetName in shapes)) {
 			shapes[newFuzzySetName] = {
-				type: newFuzzySetType,
+				shapeType: newFuzzySetType,
 				parameters: newFuzzySetParameters
 			};
 			$updateMutation.mutate();
@@ -34,13 +34,13 @@
 	const client = useQueryClient();
 	const updateMutation = createMutation({
 		mutationFn: () =>
-			api().updateSettings({
+			api().updateLinguisticVars({
 				[name]: {
 					lowerBoundary,
 					upperBoundary,
 					shapes: Object.fromEntries(
 						Object.entries(shapes).map(([k, v]) => {
-							return [k, { shapeType: v.type, parameters: v.parameters }];
+							return [k, { shapeType: v.shapeType, parameters: v.parameters }];
 						})
 					),
 					kind: info.kind
@@ -76,10 +76,10 @@
 
 	{#each Object.entries(shapes) as [name, shape] (name)}
 		<div class="flex space-x-5 mt-2">
-			<p>{`${name}, ${shape.type}: `}</p>
-			{#if shape.type === ShapeType.Triangle}
+			<p>{`${name}, ${shape.shapeType}: `}</p>
+			{#if shape.shapeType === ShapeType.Triangle}
 				<TriangleInputs bind:parameters={shapes[name].parameters} />
-			{:else if shape.type === ShapeType.Trapezoid}
+			{:else if shape.shapeType === ShapeType.Trapezoid}
 				<TrapezoidInputs bind:parameters={shapes[name].parameters} />
 			{/if}
 			<button class="border border-black" on:click={() => handleRemoveFuzzySet(name)}>remove</button

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { LinguisticVarKind, type LinguisticVariable } from '$lib/types';
+	import { LinguisticVarKind, type FuzzyRule, type LinguisticVariable } from '$lib/types';
 	import {
 		createSvelteTable,
 		flexRender,
@@ -7,9 +7,11 @@
 		type ColumnDef,
 		type TableOptions
 	} from '@tanstack/svelte-table';
+	import { mergeAll } from 'ramda';
 	import { writable } from 'svelte/store';
 
 	export let linguisticVariables: Record<string, LinguisticVariable>;
+	export let fuzzyRules: FuzzyRule[];
 
 	type Rules = {
 		[k: string]: string;
@@ -39,8 +41,10 @@
 		}
 	];
 
+	const data = fuzzyRules.map((r) => mergeAll([r.input, r.output]));
+
 	const options = writable<TableOptions<Rules>>({
-		data: [{ rsi: 'long', long: 'strong' }],
+		data,
 		columns: defaultColumns,
 		getCoreRowModel: getCoreRowModel()
 	});
