@@ -5,6 +5,9 @@
 	import Navbar from '$lib/Navbar.svelte';
 
 	export let data: PageData;
+
+	let desmosLoaded = false;
+	
 </script>
 
 <svelte:head>
@@ -13,13 +16,16 @@
 		async
 		id="desmos-script"
 		src="https://www.desmos.com/api/v1.8/calculator.js?apiKey=dcb31709b452b1cf9dc26972add0fda6"
+		on:load={() => desmosLoaded = true}
 	>
 	</script>
 </svelte:head>
 
-<QueryClientProvider client={data.queryClient}>
-	<Navbar />
-	<main>
-		<slot />
-	</main>
-</QueryClientProvider>
+{#if desmosLoaded}
+	<QueryClientProvider client={data.queryClient}>
+		<Navbar />
+		<main>
+			<slot />
+		</main>
+	</QueryClientProvider>
+{/if}
