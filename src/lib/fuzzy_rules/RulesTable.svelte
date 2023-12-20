@@ -1,5 +1,12 @@
 <script lang="ts">
-	import { LinguisticVarKind, type FuzzyRule, type LinguisticVariable } from '$lib/types';
+	import { api } from '$lib/apiClient';
+	import {
+		LinguisticVarKind,
+		type FuzzyRule,
+		type LinguisticVariable,
+		type NewFuzzyRule
+	} from '$lib/types';
+	import { createMutation, useQueryClient } from '@tanstack/svelte-query';
 	import {
 		createSvelteTable,
 		flexRender,
@@ -12,6 +19,19 @@
 
 	export let linguisticVariables: Record<string, LinguisticVariable>;
 	export let fuzzyRules: FuzzyRule[];
+
+	$: console.log(fuzzyRules);
+
+	const client = useQueryClient();
+	const deleteMutation = createMutation({
+		mutationFn: (id: unknown) => api().deleteFuzzyRule(id as string),
+		onSuccess: () => client.invalidateQueries({ queryKey: ['settings'] })
+	});
+
+	const addMutataion = createMutation({
+		mutationFn: (newRule: NewFuzzyRule) => api().addFuzzyRules(newRule),
+		onSuccess: () => client.invalidateQueries({ queryKey: ['settings'] })
+	});
 
 	type Rules = {
 		[k: string]: string;
@@ -38,16 +58,31 @@
 				accessorKey: name,
 				cell: (info) => info.getValue()
 			}))
+		},
+		{
+			header: 'Action',
+			id: 'actions',
+			accessorKey: 'id'
 		}
 	];
 
-	const data = fuzzyRules.map((r) => mergeAll([r.input, r.output]));
+	let newRule: NewFuzzyRule = { input: {}, output: {} };
+	const ruleOptions = inputVar
+		.map(([name, l]) => ({ kind: l.kind, name, options: Object.keys(l.shapes) }))
+		.concat(outputVar.map(([name, l]) => ({ kind: l.kind, name, options: Object.keys(l.shapes) })));
+
+	let data: { [x: string]: string; id: string }[];
+	$: data = fuzzyRules.map((r) => mergeAll([r.input, r.output, { id: r.id }]));
 
 	const options = writable<TableOptions<Rules>>({
 		data,
 		columns: defaultColumns,
 		getCoreRowModel: getCoreRowModel()
 	});
+	$: options.update((options) => ({
+		...options,
+		data
+	}));
 
 	const table = createSvelteTable(options);
 </script>
@@ -74,14 +109,35 @@
 				<tr>
 					{#each row.getVisibleCells() as cell}
 						<td>
-							<svelte:component this={flexRender(cell.column.columnDef.cell, cell.getContext())} />
+							{#if cell.column.columnDef.id === 'actions'}
+								<button on:click={() => $deleteMutation.mutate(cell.getValue())}>delete</button>
+							{:else}
+								<svelte:component
+									this={flexRender(cell.column.columnDef.cell, cell.getContext())}
+								/>
+							{/if}
 						</td>
 					{/each}
 				</tr>
 			{/each}
 		</tbody>
+		<tfoot>
+			<tr>
+				{#each ruleOptions as ruleOpt}
+					<th>
+						<select bind:value={newRule[ruleOpt.kind][ruleOpt.name]}>
+							{#each ruleOpt.options as opt}
+								<option value={opt}>{opt}</option>
+							{/each}
+						</select>
+					</th>
+				{/each}
+				<th>
+					<button on:click={() => $addMutataion.mutate(newRule)}>add</button>
+				</th>
+			</tr>
+		</tfoot>
 	</table>
-	<div class="h-4" />
 </div>
 
 <style>
