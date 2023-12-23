@@ -20,8 +20,6 @@
 	export let linguisticVariables: Record<string, LinguisticVariable>;
 	export let fuzzyRules: FuzzyRule[];
 
-	$: console.log(fuzzyRules);
-
 	const client = useQueryClient();
 	const deleteMutation = createMutation({
 		mutationFn: (id: unknown) => api().deleteFuzzyRule(id as string),
@@ -30,7 +28,14 @@
 
 	const addMutataion = createMutation({
 		mutationFn: (newRule: NewFuzzyRule) => api().addFuzzyRules(newRule),
-		onSuccess: () => client.invalidateQueries({ queryKey: ['settings'] })
+		onSuccess: async (resp) => {
+			if (resp.status === 200) {
+				client.invalidateQueries({ queryKey: ['settings'] });
+			} else {
+				const errMsg = await resp.text();
+				alert(errMsg);
+			}
+		}
 	});
 
 	type Rules = {
