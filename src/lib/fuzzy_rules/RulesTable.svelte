@@ -92,7 +92,7 @@
 	const table = createSvelteTable(options);
 </script>
 
-<div class="p-2">
+<div class="p-4">
 	<table>
 		<thead>
 			{#each $table.getHeaderGroups() as headerGroup}
@@ -115,7 +115,7 @@
 					{#each row.getVisibleCells() as cell}
 						<td>
 							{#if cell.column.columnDef.id === 'actions'}
-								<button on:click={() => $deleteMutation.mutate(cell.getValue())}>delete</button>
+								<button class="bg-[#ff3232] text-[#FFFFFF] border border-[#313131] rounded-md text-md font-thin px-2" on:click={() => $deleteMutation.mutate(cell.getValue())}>delete</button>
 							{:else}
 								<svelte:component
 									this={flexRender(cell.column.columnDef.cell, cell.getContext())}
@@ -130,7 +130,7 @@
 			<tr>
 				{#each ruleOptions as ruleOpt}
 					<th>
-						<select bind:value={newRule[ruleOpt.kind][ruleOpt.name]}>
+						<select class="bg-[#1A1A1A] text-[#A6A6A6] border border-[#313131] rounded-md" bind:value={newRule[ruleOpt.kind][ruleOpt.name]}>
 							{#each ruleOpt.options as opt}
 								<option value={opt}>{opt}</option>
 							{/each}
@@ -138,7 +138,7 @@
 					</th>
 				{/each}
 				<th>
-					<button on:click={() => $addMutataion.mutate(newRule)}>add</button>
+					<button class="bg-[#4e7ffa] text-[#FFFFFF] border border-[#313131] rounded-md text-md font-thin px-2" on:click={() => $addMutataion.mutate(newRule)}>add</button>
 				</th>
 			</tr>
 		</tfoot>

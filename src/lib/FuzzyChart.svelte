@@ -16,9 +16,28 @@
 		queryKey: getQueryKey(['fuzzy']),
 		queryFn: () => api().fuzzy()
 	});
+
+	const chartTheme = {
+		layout: {
+			background: {
+				color: '#1A1A1A'
+			},
+			lineColor: '#000000',
+			textColor: '#A6A6A6'
+		},
+		grid: {
+			vertLines: { color: '#313131' },
+			horzLines: { color: '#313131' }
+		}
+	};
 </script>
 
-<Chart {ref} container={{ class: 'h-1/6 relative', style: offsetStyle }} autoSize={true}>
+<Chart
+	{ref}
+	container={{ class: 'chart-container h-1/6 relative pt-2', style: offsetStyle }}
+	autoSize={true}
+	{...chartTheme}
+>
 	<div class="absolute z-10 top-2 left-2">FUZZY</div>
 	<TimeScale
 		on:visibleLogicalRangeChange={(e) => handleVisibleLogicalRangeChange(e, [mainChart])}

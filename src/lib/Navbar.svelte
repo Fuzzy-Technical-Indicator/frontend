@@ -3,13 +3,22 @@
 	const toggleNavbar = () => {
 		showMenu = !showMenu;
 	};
+	import { page } from '$app/stores';
 </script>
 
-<div>
-	<div>
-		<nav class="container px-6 py-8 mx-auto md:flex md:justify-between md:items-center">
+<div class="bg-black text-[#D4D4D4]">
+	<div class="bg-black text-[#D4D4D4]">
+		<nav
+			class="container max-w-8xl bg-black py-8 px-16 font-nunito mx-auto md:flex md:justify-between md:items-center"
+		>
 			<div class="flex items-center justify-between">
-				<a class="text-xl font-bold text-gray-800 md:text-2xl hover:text-blue-400" href="/">FZT</a>
+				<a
+					class="font-nunito text-lg inline-flex items-center font-extralight text-[#FFFFFF] md:text-lg"
+					href="/"
+				>
+					<img src="favicon.png" alt="fzt-logo" width="35" height="35" class="mr-2" />
+					<p>Fuzzy Technical Indicator</p>
+				</a>
 				<!-- Mobile menu button -->
 				<!-- svelte-ignore a11y-click-events-have-key-events -->
 				<div on:click={toggleNavbar} class="flex md:hidden">
@@ -37,12 +46,18 @@
 
 			<!-- Mobile Menu open: "block", Menu closed: "hidden" -->
 			<div
-				class="flex-col mt-8 space-y-4 md:flex md:space-y-0 md:flex-row md:items-center md:space-x-10 md:mt-0 {showMenu
+				class="flex-col ml-4 mt-8 space-y-4 md:flex md:space-y-0 md:flex-row md:items-center md:space-x-10 md:mt-0 {showMenu
 					? 'flex'
 					: 'hidden'}"
 			>
-				<a class="text-gray-800 hover:text-blue-400" href="/">Home</a>
-				<a class="text-gray-800 hover:text-blue-400" href="/settings">Settings</a>
+				<a class="font-nunito font-normal text-[#A6A6A6] text-l hover:text-[#FFFFFF]" href="/"
+					><span class:text-white={$page.url.pathname === '/'}>Chart</span></a
+				>
+				<a
+					class="font-nunito font-normal text-[#A6A6A6] text-l hover:text-[#FFFFFF]"
+					href="/settings"
+					><span class:text-white={$page.url.pathname.includes('/settings')}>Settings</span></a
+				>
 			</div>
 		</nav>
 	</div>
