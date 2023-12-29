@@ -17,6 +17,10 @@
 	import { mergeAll } from 'ramda';
 	import { writable } from 'svelte/store';
 
+	type Rules = {
+		[k: string]: string;
+	};
+
 	export let linguisticVariables: Record<string, LinguisticVariable>;
 	export let fuzzyRules: FuzzyRule[];
 
@@ -38,18 +42,26 @@
 		}
 	});
 
-	type Rules = {
-		[k: string]: string;
-	};
-
-	const inputVar = Object.entries(linguisticVariables).filter(
+	// this is so ugly but necessary for the options to work
+	let inputVar = Object.entries(linguisticVariables).filter(
 		([, info]) => info.kind === LinguisticVarKind.Input
 	);
-	const outputVar = Object.entries(linguisticVariables).filter(
+	let outputVar = Object.entries(linguisticVariables).filter(
+		([, info]) => info.kind === LinguisticVarKind.Output
+	);
+	$: inputVar = Object.entries(linguisticVariables).filter(
+		([, info]) => info.kind === LinguisticVarKind.Input
+	);
+	$: outputVar = Object.entries(linguisticVariables).filter(
 		([, info]) => info.kind === LinguisticVarKind.Output
 	);
 
 	const defaultColumns: ColumnDef<Rules>[] = [
+		{
+			header: 'Valid',
+			id: 'valid',
+			accessorKey: 'valid'
+		},
 		{
 			header: 'Input',
 			columns: inputVar.map(([name]) => ({
@@ -72,12 +84,28 @@
 	];
 
 	let newRule: NewFuzzyRule = { input: {}, output: {} };
-	const ruleOptions = inputVar
-		.map(([name, l]) => ({ kind: l.kind, name, options: Object.keys(l.shapes) }))
-		.concat(outputVar.map(([name, l]) => ({ kind: l.kind, name, options: Object.keys(l.shapes) })));
+	//$: console.log(newRule);
 
-	let data: { [x: string]: string; id: string }[];
-	$: data = fuzzyRules.map((r) => mergeAll([r.input, r.output, { id: r.id }]));
+	// inputVar and outputVar is not reactive -_-
+	$: ruleOptions = inputVar
+		.map(([name, linguisticVar]) => {
+			let options: (string | null)[] = Object.keys(linguisticVar.shapes);
+			options.push(null);
+			return {
+				kind: linguisticVar.kind,
+				name,
+				options
+			};
+		})
+		.concat(
+			outputVar.map(([name, linguisticVar]) => {
+				let options: (string | null)[] = Object.keys(linguisticVar.shapes);
+				options.push(null);
+				return { kind: linguisticVar.kind, name, options };
+			})
+		);
+
+	$: data = fuzzyRules.map((r) => mergeAll([r.input, r.output, { id: r.id }, { valid: r.valid }]));
 
 	const options = writable<TableOptions<Rules>>({
 		data,
@@ -128,6 +156,7 @@
 		</tbody>
 		<tfoot>
 			<tr>
+				<th />
 				{#each ruleOptions as ruleOpt}
 					<th>
 						<select bind:value={newRule[ruleOpt.kind][ruleOpt.name]}>
