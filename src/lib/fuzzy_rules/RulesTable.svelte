@@ -1,5 +1,12 @@
 <script lang="ts">
-	import { LinguisticVarKind, type FuzzyRule, type LinguisticVariable } from '$lib/types';
+	import { api } from '$lib/apiClient';
+	import {
+		LinguisticVarKind,
+		type FuzzyRule,
+		type LinguisticVariable,
+		type NewFuzzyRule
+	} from '$lib/types';
+	import { createMutation, useQueryClient } from '@tanstack/svelte-query';
 	import {
 		createSvelteTable,
 		flexRender,
@@ -10,21 +17,51 @@
 	import { mergeAll } from 'ramda';
 	import { writable } from 'svelte/store';
 
-	export let linguisticVariables: Record<string, LinguisticVariable>;
-	export let fuzzyRules: FuzzyRule[];
-
 	type Rules = {
 		[k: string]: string;
 	};
 
-	const inputVar = Object.entries(linguisticVariables).filter(
+	export let linguisticVariables: Record<string, LinguisticVariable>;
+	export let fuzzyRules: FuzzyRule[];
+
+	const client = useQueryClient();
+	const deleteMutation = createMutation({
+		mutationFn: (id: unknown) => api().deleteFuzzyRule(id as string),
+		onSuccess: () => client.invalidateQueries({ queryKey: ['settings'] })
+	});
+
+	const addMutataion = createMutation({
+		mutationFn: (newRule: NewFuzzyRule) => api().addFuzzyRules(newRule),
+		onSuccess: async (resp) => {
+			if (resp.status === 200) {
+				client.invalidateQueries({ queryKey: ['settings'] });
+			} else {
+				const errMsg = await resp.text();
+				alert(errMsg);
+			}
+		}
+	});
+
+	// this is so ugly but necessary for the options to work
+	let inputVar = Object.entries(linguisticVariables).filter(
 		([, info]) => info.kind === LinguisticVarKind.Input
 	);
-	const outputVar = Object.entries(linguisticVariables).filter(
+	let outputVar = Object.entries(linguisticVariables).filter(
+		([, info]) => info.kind === LinguisticVarKind.Output
+	);
+	$: inputVar = Object.entries(linguisticVariables).filter(
+		([, info]) => info.kind === LinguisticVarKind.Input
+	);
+	$: outputVar = Object.entries(linguisticVariables).filter(
 		([, info]) => info.kind === LinguisticVarKind.Output
 	);
 
 	const defaultColumns: ColumnDef<Rules>[] = [
+		{
+			header: 'Valid',
+			id: 'valid',
+			accessorKey: 'valid'
+		},
 		{
 			header: 'Input',
 			columns: inputVar.map(([name]) => ({
@@ -38,16 +75,47 @@
 				accessorKey: name,
 				cell: (info) => info.getValue()
 			}))
+		},
+		{
+			header: 'Action',
+			id: 'actions',
+			accessorKey: 'id'
 		}
 	];
 
-	const data = fuzzyRules.map((r) => mergeAll([r.input, r.output]));
+	let newRule: NewFuzzyRule = { input: {}, output: {} };
+	//$: console.log(newRule);
+
+	// inputVar and outputVar is not reactive -_-
+	$: ruleOptions = inputVar
+		.map(([name, linguisticVar]) => {
+			let options: (string | null)[] = Object.keys(linguisticVar.shapes);
+			options.push(null);
+			return {
+				kind: linguisticVar.kind,
+				name,
+				options
+			};
+		})
+		.concat(
+			outputVar.map(([name, linguisticVar]) => {
+				let options: (string | null)[] = Object.keys(linguisticVar.shapes);
+				options.push(null);
+				return { kind: linguisticVar.kind, name, options };
+			})
+		);
+
+	$: data = fuzzyRules.map((r) => mergeAll([r.input, r.output, { id: r.id }, { valid: r.valid }]));
 
 	const options = writable<TableOptions<Rules>>({
 		data,
 		columns: defaultColumns,
 		getCoreRowModel: getCoreRowModel()
 	});
+	$: options.update((options) => ({
+		...options,
+		data
+	}));
 
 	const table = createSvelteTable(options);
 </script>
@@ -74,14 +142,36 @@
 				<tr>
 					{#each row.getVisibleCells() as cell}
 						<td>
-							<svelte:component this={flexRender(cell.column.columnDef.cell, cell.getContext())} />
+							{#if cell.column.columnDef.id === 'actions'}
+								<button on:click={() => $deleteMutation.mutate(cell.getValue())}>delete</button>
+							{:else}
+								<svelte:component
+									this={flexRender(cell.column.columnDef.cell, cell.getContext())}
+								/>
+							{/if}
 						</td>
 					{/each}
 				</tr>
 			{/each}
 		</tbody>
+		<tfoot>
+			<tr>
+				<th />
+				{#each ruleOptions as ruleOpt}
+					<th>
+						<select bind:value={newRule[ruleOpt.kind][ruleOpt.name]}>
+							{#each ruleOpt.options as opt}
+								<option value={opt}>{opt}</option>
+							{/each}
+						</select>
+					</th>
+				{/each}
+				<th>
+					<button on:click={() => $addMutataion.mutate(newRule)}>add</button>
+				</th>
+			</tr>
+		</tfoot>
 	</table>
-	<div class="h-4" />
 </div>
 
 <style>

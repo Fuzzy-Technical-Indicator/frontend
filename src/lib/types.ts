@@ -58,9 +58,15 @@ export type UpdateLinguisticVariable = Record<
 >;
 
 export interface FuzzyRule {
+	id: string;
 	input: Record<string, string>;
 	output: Record<string, string>;
 	valid: boolean;
+}
+
+export interface NewFuzzyRule {
+	input: Record<string, string>;
+	output: Record<string, string>;
 }
 
 export interface Settings {

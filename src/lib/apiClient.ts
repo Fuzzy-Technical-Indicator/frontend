@@ -10,6 +10,7 @@ import { get, writable } from 'svelte/store';
 import {
 	Interval,
 	type DTValue,
+	type NewFuzzyRule,
 	type Ohlc,
 	type Settings,
 	type UpdateLinguisticVariable
@@ -196,6 +197,22 @@ export const api = (customFetch = fetch) => ({
 	},
 	deleteLinguisticVar: async (name: string) => {
 		const resp = await customFetch(`${PUBLIC_API_URL}/api/settings/linguisticvars/${name}`, {
+			method: 'DELETE'
+		});
+		return resp;
+	},
+	addFuzzyRules: async (data: NewFuzzyRule) => {
+		const resp = await customFetch(`${PUBLIC_API_URL}/api/settings/fuzzyrules`, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify(data)
+		});
+		return resp;
+	},
+	deleteFuzzyRule: async (id: string) => {
+		const resp = await customFetch(`${PUBLIC_API_URL}/api/settings/fuzzyrules/${id}`, {
 			method: 'DELETE'
 		});
 		return resp;
