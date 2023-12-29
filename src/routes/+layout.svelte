@@ -3,6 +3,7 @@
 	import '../app.css';
 	import type { PageData } from './$types';
 	import Navbar from '$lib/Navbar.svelte';
+	import Footer from '$lib/Footer.svelte';
 
 	export let data: PageData;
 
@@ -23,9 +24,12 @@
 
 {#if desmosLoaded}
 	<QueryClientProvider client={data.queryClient}>
-		<Navbar />
-		<main>
-			<slot />
+		<main class="bg-black text-[#D4D4D4]">
+			<Navbar />
+			<div class="container mx-auto max-w-7xl bg-black font-nunito">
+				<slot />
+			</div>
+			<Footer />
 		</main>
 	</QueryClientProvider>
 {/if}

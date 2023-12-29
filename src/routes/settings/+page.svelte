@@ -64,11 +64,11 @@
 	);
 </script>
 
-<div class="p-10">
-	<h1 class="text-xl">Username</h1>
+<div class="">
+	<h1 class="text-xl font-extralight">Username's settings</h1>
 	{#if $settings.isSuccess}
 		<div>
-			<h1 class="text-xl">Linguistic Variables</h1>
+			<h1 class="text-3xl font-bold text-center py-4">Linguistic Variables</h1>
 			{#each Object.entries($settings.data.linguisticVariables) as [name, info]}
 				<h3 class="text-lg text-center">{name} ({info.kind})</h3>
 				<Desmos
@@ -81,10 +81,10 @@
 			{/each}
 
 			<div class="mt-5">
-				<button class="border border-black" on:click={handleAddLinguisticVar}
+				<button class="bg-[#4e7ffa] text-[#FFFFFF] border border-[#313131] rounded-md px-2 text-md font-thin" on:click={handleAddLinguisticVar}
 					>Add new Linguistic Variable</button
 				>
-				<select bind:value={currLinguisticVarOpt}>
+				<select class="bg-[#1A1A1A] text-[#A6A6A6] border border-[#313131] rounded-md" bind:value={currLinguisticVarOpt}>
 					{#each linguisticVarOptions as opt}
 						<option value={opt}>{opt}</option>
 					{/each}
@@ -97,14 +97,14 @@
 				{/if}
 			</div>
 		</div>
-		<div class="mt-5">
-			<h1 class="text-xl">Rules</h1>
+		<div class="mt-10">
+			<h1 class="text-2xl">Rules</h1>
 			<RulesTable
 				linguisticVariables={$settings.data.linguisticVariables}
 				fuzzyRules={$settings.data.fuzzyRules}
 			/>
 			<div class="flex space-x-2">
-				<button class="border border-black">add rule</button>
+				<button class="bg-[#4e7ffa] text-[#FFFFFF] border border-[#313131] rounded-md px-2 text-md font-thin">Add rule</button>
 			</div>
 		</div>
 	{/if}

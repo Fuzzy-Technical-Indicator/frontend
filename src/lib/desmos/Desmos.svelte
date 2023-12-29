@@ -11,8 +11,8 @@
 
 	const gId = `${graphId}-desmos-graph`;
 
-	const colors = ['#c74440', '#2d70b3', '#388c46', '#6042a6', '#fa7e19', '#000000'];
-
+	const colors = ['#c74440', '#2d70b3', '#388c46', '#6042a6', '#fa7e19', '#ffffff'];
+	const colorsInvert = ['#38bbbf', '#d28f4c', '#c773b9', '#9fbd59', '#0581e6', '#000000']; // desmos dark-mode by myself
 	// const loadDesmos = () => {
 	// 	// FIX: SPA when change to settings page, Desmos not load
 	// 	return new Promise((resolve, reject) => {
@@ -42,7 +42,7 @@
 			expressions: false,
 			lockViewport: true,
 			settingsMenu: false,
-			keypad: false
+			keypad: false,
 		});
 
 		g.setMathBounds({
@@ -57,7 +57,7 @@
 				g.setExpression({
 					id: `g${i}${j}`,
 					latex: graphs[i][j],
-					color: colors[i % colors.length]
+					color: colorsInvert[i % colorsInvert.length]
 				});
 			}
 		}
@@ -73,8 +73,8 @@
 <div>
 	<div class="flex justify-center space-x-3">
 		{#each names as name, i}
-			<div class="flex space-x-1">
-				<span class="p-4" style={`background-color: ${colors[i % colors.length]}`} />
+			<div class="flex space-x-1 p-4">
+				<span class="p-4 rounded-lg" style={`background-color: ${colors[i % colors.length]}`} />
 				<p>{name}</p>
 			</div>
 		{/each}
