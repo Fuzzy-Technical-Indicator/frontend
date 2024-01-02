@@ -8,4 +8,9 @@ export const load: PageLoad = async ({ parent, fetch }) => {
 		queryKey: getQueryKey(['ohlc']),
 		queryFn: () => api(fetch).ohlc()
 	});
+
+	await queryClient.prefetchQuery({
+		queryKey: ['presets'],
+		queryFn: () => api().getPresets()
+	});
 };

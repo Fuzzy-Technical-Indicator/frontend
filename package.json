@@ -4,9 +4,13 @@
 	"type": "module",
 	"private": true,
 	"devDependencies": {
+		"@smui/button": "^7.0.0-beta.16",
+		"@smui/circular-progress": "^7.0.0-beta.16",
+		"@smui/dialog": "^7.0.0-beta.16",
 		"@sveltejs/adapter-auto": "next",
 		"@sveltejs/kit": "next",
 		"@tanstack/svelte-query": "^5.8.4",
+		"@tanstack/svelte-table": "^8.10.7",
 		"@types/ramda": "^0.29.9",
 		"@typescript-eslint/eslint-plugin": "^5.45.0",
 		"@typescript-eslint/parser": "^5.45.0",
@@ -22,6 +26,7 @@
 		"prettier": "^2.8.0",
 		"prettier-plugin-svelte": "^2.8.1",
 		"ramda": "^0.29.1",
+		"smui-theme": "^7.0.0-beta.16",
 		"svelte": "^3.53.1",
 		"svelte-adapter-bun": "^0.5.0",
 		"svelte-chartjs": "^3.1.2",
@@ -44,7 +49,8 @@
 		"test:unit": "vitest",
 		"lint": "prettier --plugin-search-dir . --check . && eslint .",
 		"format": "prettier --plugin-search-dir . --write .",
-		"prepare": "husky install"
+		"smui-theme-dark": "smui-theme compile static/smui-dark.css -i src/theme/dark",
+		"prepare": "husky install && bun run smui-theme-dark"
 	},
 	"lint-staged": {
 		"*.json": [
@@ -56,8 +62,5 @@
 			"prettier --check --plugin-search-dir .",
 			"eslint --fix"
 		]
-	},
-	"dependencies": {
-		"@tanstack/svelte-table": "^8.10.7"
 	}
 }
