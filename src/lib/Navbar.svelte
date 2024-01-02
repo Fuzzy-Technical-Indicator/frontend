@@ -1,5 +1,5 @@
 <script lang="ts">
-	let showMenu: boolean = false;
+	let showMenu = false;
 	const toggleNavbar = () => {
 		showMenu = !showMenu;
 	};

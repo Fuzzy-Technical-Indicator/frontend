@@ -25,15 +25,11 @@ function getTime<T>(x: Ohlc | DTValue<T>): UTCTimestamp {
 }
 
 function toSingleValueData(data: DTValue<number>[]): SingleValueData[] {
-	return data.map((x) => {
-		return { time: getTime(x), value: nullToNan(x.value) } as SingleValueData;
-	});
+	return data.map((x) => ({ time: getTime(x), value: nullToNan(x.value) } as SingleValueData));
 }
 
 function toSingleValueDataOfIdx(data: DTValue<number[]>[], idx: number): SingleValueData[] {
-	return data.map((x) => {
-		return { time: getTime(x), value: nullToNan(x.value[idx]) } as SingleValueData;
-	});
+	return data.map((x) => ({ time: getTime(x), value: nullToNan(x.value[idx]) } as SingleValueData));
 }
 
 export const chartSettings = writable({ symbol: 'ETH/USDT', interval: Interval.OneDay });
@@ -42,12 +38,16 @@ export function getQueryKey(keys: string[]): string[] {
 	return [symbol, interval, ...keys];
 }
 
+const defaultOption = {
+	headers: { Connection: 'keep-alive' }
+};
 const indicatorBaseUrl = `${PUBLIC_API_URL}/api/indicators`;
 export const api = (customFetch = fetch) => ({
 	ohlc: async () => {
 		const { symbol, interval } = get(chartSettings);
 		const resp = await customFetch(
-			`${PUBLIC_API_URL}/api/ohlc?symbol=${symbol}&interval=${interval}`
+			`${PUBLIC_API_URL}/api/ohlc?symbol=${symbol}&interval=${interval}`,
+			defaultOption
 		);
 		const ohlc = (await resp.json()) as Ohlc[];
 		const data: CandlestickData[] = ohlc.map((x) => {
@@ -64,7 +64,8 @@ export const api = (customFetch = fetch) => ({
 	bb: async (length = 20, stdev = 2) => {
 		const { symbol, interval } = get(chartSettings);
 		const resp = await customFetch(
-			`${indicatorBaseUrl}/bb?symbol=${symbol}&interval=${interval}&length=${length}&stdev=${stdev}`
+			`${indicatorBaseUrl}/bb?symbol=${symbol}&interval=${interval}&length=${length}&stdev=${stdev}`,
+			defaultOption
 		);
 		const json = (await resp.json()) as DTValue<[number, number, number]>[];
 		return {
@@ -76,7 +77,8 @@ export const api = (customFetch = fetch) => ({
 	stoch: async (k = 14, d = 3, length = 1) => {
 		const { symbol, interval } = get(chartSettings);
 		const resp = await customFetch(
-			`${indicatorBaseUrl}/stoch?symbol=${symbol}&interval=${interval}&k=${k}&d=${d}&length=${length}`
+			`${indicatorBaseUrl}/stoch?symbol=${symbol}&interval=${interval}&k=${k}&d=${d}&length=${length}`,
+			defaultOption
 		);
 		const json = (await resp.json()) as DTValue<[number, number, number]>[];
 		const kLine: LineData[] = toSingleValueDataOfIdx(json, 0);
@@ -86,7 +88,8 @@ export const api = (customFetch = fetch) => ({
 	macd: async (fast = 12, slow = 26, smooth = 9) => {
 		const { symbol, interval } = get(chartSettings);
 		const resp = await customFetch(
-			`${indicatorBaseUrl}/macd?symbol=${symbol}&interval=${interval}&fast=${fast}&slow=${slow}&smooth=${smooth}`
+			`${indicatorBaseUrl}/macd?symbol=${symbol}&interval=${interval}&fast=${fast}&slow=${slow}&smooth=${smooth}`,
+			defaultOption
 		);
 		const json = (await resp.json()) as DTValue<[number, number, number]>[];
 		const macdLine: LineData[] = toSingleValueDataOfIdx(json, 0);
@@ -97,27 +100,29 @@ export const api = (customFetch = fetch) => ({
 	aroon: async (length = 14) => {
 		const { symbol, interval } = get(chartSettings);
 		const resp = await customFetch(
-			`${indicatorBaseUrl}/aroon?symbol=${symbol}&interval=${interval}&length=${length}`
+			`${indicatorBaseUrl}/aroon?symbol=${symbol}&interval=${interval}&length=${length}`,
+			defaultOption
 		);
 		const data = (await resp.json()) as DTValue<[number, number, number]>[];
 		const upper: LineData[] = toSingleValueDataOfIdx(data, 0);
 		const lower: LineData[] = toSingleValueDataOfIdx(data, 1);
 		return { upper, lower };
 	},
-	fuzzy: async () => {
+	fuzzy: async (preset: string) => {
 		const { symbol, interval } = get(chartSettings);
 		const resp = await customFetch(
-			`${PUBLIC_API_URL}/api/fuzzy?symbol=${symbol}&interval=${interval}`
+			`${PUBLIC_API_URL}/api/fuzzy?symbol=${symbol}&interval=${interval}&preset=${preset}`,
+			defaultOption
 		);
-		const json = (await resp.json()) as DTValue<[number, number]>[];
-		const long: LineData[] = toSingleValueDataOfIdx(json, 0);
-		const short: LineData[] = toSingleValueDataOfIdx(json, 1);
-		return { long, short };
+		const json = (await resp.json()) as DTValue<number[]>[];
+		const result = Array.from({ length: json.length }, (_, i) => toSingleValueDataOfIdx(json, i));
+		return result;
 	},
 	rsi: async (length = 14) => {
 		const { symbol, interval } = get(chartSettings);
 		const resp = await customFetch(
-			`${indicatorBaseUrl}/rsi?symbol=${symbol}&interval=${interval}&length=${length}`
+			`${indicatorBaseUrl}/rsi?symbol=${symbol}&interval=${interval}&length=${length}`,
+			defaultOption
 		);
 		const json = (await resp.json()) as DTValue<number>[];
 		const result = toSingleValueData(json);
@@ -127,17 +132,20 @@ export const api = (customFetch = fetch) => ({
 	adx: async (length = 14) => {
 		const { symbol, interval } = get(chartSettings);
 		const resp = await customFetch(
-			`${indicatorBaseUrl}/adx?symbol=${symbol}&interval=${interval}&length=${length}`
+			`${indicatorBaseUrl}/adx?symbol=${symbol}&interval=${interval}&length=${length}`,
+			defaultOption
 		);
 		const json = (await resp.json()) as DTValue<number>[];
 		const result = toSingleValueData(json);
 
 		return result;
 	},
-
 	obv: async (): Promise<[LineData[], boolean]> => {
 		const { symbol, interval } = get(chartSettings);
-		const resp = await customFetch(`${indicatorBaseUrl}/obv?symbol=${symbol}&interval=${interval}`);
+		const resp = await customFetch(
+			`${indicatorBaseUrl}/obv?symbol=${symbol}&interval=${interval}`,
+			defaultOption
+		);
 		const json = (await resp.json()) as DTValue<number>[];
 		const result = toSingleValueData(json);
 
@@ -160,7 +168,8 @@ export const api = (customFetch = fetch) => ({
 	accumdist: async (): Promise<[LineData[], boolean]> => {
 		const { symbol, interval } = get(chartSettings);
 		const resp = await customFetch(
-			`${indicatorBaseUrl}/accumdist?symbol=${symbol}&interval=${interval}`
+			`${indicatorBaseUrl}/accumdist?symbol=${symbol}&interval=${interval}`,
+			defaultOption
 		);
 		const json = (await resp.json()) as DTValue<number>[];
 		const result = toSingleValueData(json);
@@ -180,40 +189,72 @@ export const api = (customFetch = fetch) => ({
 		}
 		return [result, exceed1M];
 	},
-	getSettings: async () => {
-		const resp = await customFetch(`${PUBLIC_API_URL}/api/settings`);
+	getSettings: async (preset: string) => {
+		const resp = await customFetch(
+			`${PUBLIC_API_URL}/api/settings?preset=${preset}`,
+			defaultOption
+		);
 		const json = (await resp.json()) as Settings;
 		return json;
 	},
-	updateLinguisticVars: async (linguisticVariables: UpdateLinguisticVariable) => {
-		const resp = await customFetch(`${PUBLIC_API_URL}/api/settings/linguisticvars`, {
-			method: 'PUT',
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			body: JSON.stringify(linguisticVariables)
-		});
+	updateLinguisticVars: async (linguisticVariables: UpdateLinguisticVariable, preset: string) => {
+		const resp = await customFetch(
+			`${PUBLIC_API_URL}/api/settings/linguisticvars?preset=${preset}`,
+			{
+				method: 'PUT',
+				headers: {
+					'Content-Type': 'application/json',
+					Connection: 'keep-alive'
+				},
+				body: JSON.stringify(linguisticVariables)
+			}
+		);
 		return resp;
 	},
 	deleteLinguisticVar: async (name: string) => {
 		const resp = await customFetch(`${PUBLIC_API_URL}/api/settings/linguisticvars/${name}`, {
-			method: 'DELETE'
+			method: 'DELETE',
+			...defaultOption
 		});
 		return resp;
 	},
-	addFuzzyRules: async (data: NewFuzzyRule) => {
-		const resp = await customFetch(`${PUBLIC_API_URL}/api/settings/fuzzyrules`, {
+	addFuzzyRules: async (data: NewFuzzyRule, preset: string) => {
+		const resp = await customFetch(`${PUBLIC_API_URL}/api/settings/fuzzyrules?preset=${preset}`, {
 			method: 'POST',
 			headers: {
-				'Content-Type': 'application/json'
+				'Content-Type': 'application/json',
+				Connection: 'keep-alive'
 			},
 			body: JSON.stringify(data)
 		});
 		return resp;
 	},
-	deleteFuzzyRule: async (id: string) => {
-		const resp = await customFetch(`${PUBLIC_API_URL}/api/settings/fuzzyrules/${id}`, {
-			method: 'DELETE'
+	deleteFuzzyRule: async (id: string, preset: string) => {
+		const resp = await customFetch(
+			`${PUBLIC_API_URL}/api/settings/fuzzyrules/${id}?preset=${preset}`,
+			{
+				method: 'DELETE',
+				...defaultOption
+			}
+		);
+		return resp;
+	},
+	getPresets: async () => {
+		const resp = await customFetch(`${PUBLIC_API_URL}/api/settings/presets`, defaultOption);
+		const json = (await resp.json()) as string[];
+		return json;
+	},
+	addPreset: async (presetName: string) => {
+		const resp = await customFetch(`${PUBLIC_API_URL}/api/settings/presets/${presetName}`, {
+			method: 'POST',
+			...defaultOption
+		});
+		return resp;
+	},
+	deletePreset: async (presetName: string) => {
+		const resp = await customFetch(`${PUBLIC_API_URL}/api/settings/presets/${presetName}`, {
+			method: 'DELETE',
+			...defaultOption
 		});
 		return resp;
 	}

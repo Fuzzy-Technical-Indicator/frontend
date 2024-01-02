@@ -8,10 +8,15 @@
 
 	export let info: LinguisticVariable;
 	export let name: string;
+	export let preset: string;
 
 	let lowerBoundary = info.lowerBoundary;
 	let upperBoundary = info.upperBoundary;
-	let shapes: Record<string, Omit<FuzzySet, 'data' | 'latex'>> = info.shapes;
+
+	type Shapes = Record<string, Omit<FuzzySet, 'data' | 'latex'>>;
+
+	let shapes: Shapes;
+	$: shapes = info.shapes;
 
 	const handleRemoveFuzzySet = (name: string) => {
 		shapes = omit([name], shapes);
@@ -23,33 +28,42 @@
 
 	const handleAddNewFuzzySet = () => {
 		if (!(newFuzzySetName in shapes)) {
-			shapes[newFuzzySetName] = {
-				shapeType: newFuzzySetType,
-				parameters: newFuzzySetParameters
-			};
-			$updateMutation.mutate();
+			$updateMutation.mutate({
+				...shapes,
+				[newFuzzySetName]: { shapeType: newFuzzySetType, parameters: newFuzzySetParameters }
+			});
+		} else {
+			alert('Fuzzy set with that name already exists');
 		}
 	};
 
 	const client = useQueryClient();
 	const updateMutation = createMutation({
-		mutationFn: () =>
-			api().updateLinguisticVars({
-				[name]: {
-					lowerBoundary,
-					upperBoundary,
-					shapes: Object.fromEntries(
-						Object.entries(shapes).map(([k, v]) => {
-							return [k, { shapeType: v.shapeType, parameters: v.parameters }];
-						})
-					),
-					kind: info.kind
-				}
-			}),
-		onSuccess: () => {
-			client.invalidateQueries({ queryKey: ['settings'] });
-			newFuzzySetName = '';
-			newFuzzySetParameters = {};
+		mutationFn: (shapes: Shapes) =>
+			api().updateLinguisticVars(
+				{
+					[name]: {
+						lowerBoundary,
+						upperBoundary,
+						shapes: Object.fromEntries(
+							Object.entries(shapes).map(([k, v]) => {
+								return [k, { shapeType: v.shapeType, parameters: v.parameters }];
+							})
+						),
+						kind: info.kind
+					}
+				},
+				preset
+			),
+		onSuccess: async (resp) => {
+			if (resp.status === 200) {
+				client.invalidateQueries({ queryKey: ['settings'] });
+				newFuzzySetName = '';
+				newFuzzySetParameters = {};
+			} else {
+				const errMsg = await resp.text();
+				alert(errMsg);
+			}
 		}
 	});
 
@@ -65,12 +79,20 @@
 	<div class="flex space-x-2">
 		<p class="font-bold text-lg">universe:</p>
 		<label class="px-2">
-			lowerBoundary - 
-			<input type="number" bind:value={lowerBoundary} class="bg-[#1A1A1A] text-[#A6A6A6] border border-[#313131] rounded-md" />
+			lowerBoundary -
+			<input
+				type="number"
+				bind:value={lowerBoundary}
+				class="bg-[#1A1A1A] text-[#A6A6A6] border border-[#313131] rounded-md"
+			/>
 		</label>
 		<label class="px-2">
-			upperBoundary - 
-			<input type="number" bind:value={upperBoundary} class="bg-[#1A1A1A] text-[#A6A6A6] border border-[#313131] rounded-md" />
+			upperBoundary -
+			<input
+				type="number"
+				bind:value={upperBoundary}
+				class="bg-[#1A1A1A] text-[#A6A6A6] border border-[#313131] rounded-md"
+			/>
 		</label>
 	</div>
 
@@ -82,17 +104,28 @@
 			{:else if shape.shapeType === ShapeType.Trapezoid}
 				<TrapezoidInputs bind:parameters={shapes[name].parameters} />
 			{/if}
-			<button class="bg-[#ff3232] text-[#FFFFFF] font-thin text-sm border border-[#313131] rounded-md px-2" on:click={() => handleRemoveFuzzySet(name)}>Remove</button
+			<button
+				class="bg-[#ff3232] text-[#FFFFFF] font-thin text-sm border border-[#313131] rounded-md px-2"
+				on:click={() => handleRemoveFuzzySet(name)}>Remove</button
 			>
 		</div>
 	{/each}
 	<div class="my-3">
-		<button class="border border-black" on:click={handleAddNewFuzzySet}><span class="font-bold text-lg">Fuzzy Set: </span></button>
+		<button class="border border-black bg-gray-900 p-2" on:click={handleAddNewFuzzySet}
+			><span class="font-bold text-lg">Fuzzy Set: </span></button
+		>
 		<label>
-			name - 
-			<input type="text" bind:value={newFuzzySetName} class="bg-[#1A1A1A] text-[#A6A6A6] border border-[#313131] rounded-md" />
+			name -
+			<input
+				type="text"
+				bind:value={newFuzzySetName}
+				class="bg-[#1A1A1A] text-[#A6A6A6] border border-[#313131] rounded-md"
+			/>
 		</label>
-		<select class="bg-[#1A1A1A] text-[#A6A6A6] border border-[#313131] rounded-md" bind:value={newFuzzySetType}>
+		<select
+			class="bg-[#1A1A1A] text-[#A6A6A6] border border-[#313131] rounded-md"
+			bind:value={newFuzzySetType}
+		>
 			{#each Object.values(ShapeType) as t}
 				<option value={t}>{t}</option>
 			{/each}
@@ -106,7 +139,7 @@
 	<button
 		class="bg-[#4e7ffa] text-[#FFFFFF] font-thin text-sm border border-[#313131] rounded-md px-2 py-2"
 		on:click={() => {
-			$updateMutation.mutate();
+			$updateMutation.mutate(shapes);
 		}}>Save</button
 	>
 	<button

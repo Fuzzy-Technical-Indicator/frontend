@@ -29,8 +29,6 @@
 
 	let g: any;
 	afterUpdate(async () => {
-		// await loadDesmos();
-
 		if (g) {
 			g.destroy();
 		}
@@ -42,7 +40,7 @@
 			expressions: false,
 			lockViewport: true,
 			settingsMenu: false,
-			keypad: false,
+			keypad: false
 		});
 
 		g.setMathBounds({

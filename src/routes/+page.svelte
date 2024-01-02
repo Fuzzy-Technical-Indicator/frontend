@@ -7,10 +7,14 @@
 	import FuzzyChart from '$lib/FuzzyChart.svelte';
 	import AroonChart from '$lib/AroonChart.svelte';
 	import StochChart from '$lib/StochChart.svelte';
-	import { createQuery } from '@tanstack/svelte-query';
+	import { createQuery, useIsFetching } from '@tanstack/svelte-query';
 	import { api, getQueryKey, chartSettings } from '$lib/apiClient';
 	import { get } from 'svelte/store';
 	import { Interval } from '$lib/types';
+	import { chartTheme } from '$lib/utils';
+	import Button from '@smui/button';
+	import Dialog from '@smui/dialog';
+	import CircularProgress from '@smui/circular-progress';
 
 	const ohlc = createQuery({
 		queryKey: getQueryKey(['ohlc']),
@@ -20,6 +24,11 @@
 	const bbData = createQuery({
 		queryKey: getQueryKey(['bb']),
 		queryFn: () => api().bb()
+	});
+
+	const presets = createQuery({
+		queryKey: ['presets'],
+		queryFn: () => api().getPresets()
 	});
 
 	let main: IChartApi | null;
@@ -65,7 +74,6 @@
 
 	let bb = false;
 	let macd = false;
-	let fuzzy = false;
 	let aroon = false;
 	let stoch = false;
 
@@ -96,20 +104,17 @@
 		$bbData.refetch();
 	};
 
-	const chartTheme = {
-		layout: {
-			background: {
-				color: '#1A1A1A'
-			},
-			lineColor: '#000000',
-			textColor: '#A6A6A6'
-		},
-		grid: {
-			vertLines: { color: '#313131' },
-			horzLines: { color: '#313131' }
-		}
-	};
+	let fuzzyDialogOpen = false;
+	let fuzzyPresets: { [key: string]: boolean } = {};
+
+	const isFetching = useIsFetching();
 </script>
+
+{#if $isFetching > 0}
+	<div class="absolute inset-1/2 z-20">
+		<CircularProgress style="height: 128px; width: 128px;" indeterminate />
+	</div>
+{/if}
 
 <div class="flex py-4">
 	<h1 class="pr-2 text-[#A6A6A6]">Chart :</h1>
@@ -138,6 +143,27 @@
 		<option value={Interval.OneHour}>1H</option>
 	</select>
 </div>
+
+{#if $presets.isSuccess}
+	<Dialog bind:open={fuzzyDialogOpen}>
+		<div class="p-4">
+			{#each $presets.data as preset}
+				<div class="flex">
+					<input class="mr-2" type="checkbox" bind:checked={fuzzyPresets[preset]} />
+					<span class="font-thin">{preset}</span>
+				</div>
+			{/each}
+		</div>
+	</Dialog>
+
+	<Button
+		class="my-2"
+		variant="raised"
+		on:click={() => {
+			fuzzyDialogOpen = true;
+		}}>Fuzzy Presets</Button
+	>
+{/if}
 
 {#key $ohlc.data && $bbData.data}
 	<div class="flex-row h-screen">
@@ -196,17 +222,6 @@
 					/>
 					<span class="font-thin">STOCH</span>
 				</div>
-
-				<div>
-					<input
-						type="checkbox"
-						bind:checked={fuzzy}
-						on:click={() => {
-							fuzzy = !fuzzy;
-						}}
-					/>
-					<span class="font-thin">NORMAL FUZZY</span>
-				</div>
 			</div>
 
 			<TimeScale
@@ -261,13 +276,16 @@
 			/>
 		{/if}
 
-		{#if fuzzy}
-			<FuzzyChart
-				ref={(ref) => otherCharts.set('fuzzy', ref)}
-				offsetStyle={offsetStyles.get('fuzzy')}
-				mainChart={main}
-				{handleVisibleLogicalRangeChange}
-			/>
-		{/if}
+		{#each Object.entries(fuzzyPresets) as [preset, enable]}
+			{#if enable}
+				<FuzzyChart
+					{preset}
+					ref={(ref) => otherCharts.set(`fuzzy-${preset}`, ref)}
+					offsetStyle={offsetStyles.get(`fuzzy-${preset}`)}
+					mainChart={main}
+					{handleVisibleLogicalRangeChange}
+				/>
+			{/if}
+		{/each}
 	</div>
 {/key}

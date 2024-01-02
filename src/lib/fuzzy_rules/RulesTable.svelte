@@ -23,15 +23,16 @@
 
 	export let linguisticVariables: Record<string, LinguisticVariable>;
 	export let fuzzyRules: FuzzyRule[];
-
+	export let currPreset: string;
 	const client = useQueryClient();
+
 	const deleteMutation = createMutation({
-		mutationFn: (id: unknown) => api().deleteFuzzyRule(id as string),
+		mutationFn: (id: unknown) => api().deleteFuzzyRule(id as string, currPreset),
 		onSuccess: () => client.invalidateQueries({ queryKey: ['settings'] })
 	});
 
 	const addMutataion = createMutation({
-		mutationFn: (newRule: NewFuzzyRule) => api().addFuzzyRules(newRule),
+		mutationFn: (newRule: NewFuzzyRule) => api().addFuzzyRules(newRule, currPreset),
 		onSuccess: async (resp) => {
 			if (resp.status === 200) {
 				client.invalidateQueries({ queryKey: ['settings'] });
@@ -42,21 +43,20 @@
 		}
 	});
 
-	// this is so ugly but necessary for the options to work
-	let inputVar = Object.entries(linguisticVariables).filter(
-		([, info]) => info.kind === LinguisticVarKind.Input
-	);
-	let outputVar = Object.entries(linguisticVariables).filter(
-		([, info]) => info.kind === LinguisticVarKind.Output
-	);
-	$: inputVar = Object.entries(linguisticVariables).filter(
-		([, info]) => info.kind === LinguisticVarKind.Input
-	);
-	$: outputVar = Object.entries(linguisticVariables).filter(
-		([, info]) => info.kind === LinguisticVarKind.Output
-	);
+	let inputVar: [string, LinguisticVariable][];
+	let outputVar: [string, LinguisticVariable][];
+	$: {
+		inputVar = Object.entries(linguisticVariables).filter(
+			([, info]) => info.kind === LinguisticVarKind.Input
+		);
+		outputVar = Object.entries(linguisticVariables).filter(
+			([, info]) => info.kind === LinguisticVarKind.Output
+		);
+	}
 
-	const defaultColumns: ColumnDef<Rules>[] = [
+	// this need to be reactive, fuck all of this is so ugly
+	let defaultColumns: ColumnDef<Rules>[];
+	$: defaultColumns = [
 		{
 			header: 'Valid',
 			id: 'valid',
@@ -84,9 +84,7 @@
 	];
 
 	let newRule: NewFuzzyRule = { input: {}, output: {} };
-	//$: console.log(newRule);
 
-	// inputVar and outputVar is not reactive -_-
 	$: ruleOptions = inputVar
 		.map(([name, linguisticVar]) => {
 			let options: (string | null)[] = Object.keys(linguisticVar.shapes);
@@ -106,15 +104,15 @@
 		);
 
 	$: data = fuzzyRules.map((r) => mergeAll([r.input, r.output, { id: r.id }, { valid: r.valid }]));
-
-	const options = writable<TableOptions<Rules>>({
+	let options = writable<TableOptions<Rules>>({
 		data,
 		columns: defaultColumns,
 		getCoreRowModel: getCoreRowModel()
 	});
-	$: options.update((options) => ({
-		...options,
-		data
+	$: options.update(() => ({
+		data,
+		columns: defaultColumns,
+		getCoreRowModel: getCoreRowModel()
 	}));
 
 	const table = createSvelteTable(options);
@@ -143,7 +141,10 @@
 					{#each row.getVisibleCells() as cell}
 						<td>
 							{#if cell.column.columnDef.id === 'actions'}
-								<button class="bg-[#ff3232] text-[#FFFFFF] border border-[#313131] rounded-md text-md font-thin px-2" on:click={() => $deleteMutation.mutate(cell.getValue())}>delete</button>
+								<button
+									class="bg-[#ff3232] text-[#FFFFFF] border border-[#313131] rounded-md text-md font-thin px-2"
+									on:click={() => $deleteMutation.mutate(cell.getValue())}>delete</button
+								>
 							{:else}
 								<svelte:component
 									this={flexRender(cell.column.columnDef.cell, cell.getContext())}
@@ -159,7 +160,10 @@
 				<th />
 				{#each ruleOptions as ruleOpt}
 					<th>
-						<select class="bg-[#1A1A1A] text-[#A6A6A6] border border-[#313131] rounded-md" bind:value={newRule[ruleOpt.kind][ruleOpt.name]}>
+						<select
+							class="bg-[#1A1A1A] text-[#A6A6A6] border border-[#313131] rounded-md"
+							bind:value={newRule[ruleOpt.kind][ruleOpt.name]}
+						>
 							{#each ruleOpt.options as opt}
 								<option value={opt}>{opt}</option>
 							{/each}
@@ -167,7 +171,10 @@
 					</th>
 				{/each}
 				<th>
-					<button class="bg-[#4e7ffa] text-[#FFFFFF] border border-[#313131] rounded-md text-md font-thin px-2" on:click={() => $addMutataion.mutate(newRule)}>add</button>
+					<button
+						class="bg-[#4e7ffa] text-[#FFFFFF] border border-[#313131] rounded-md text-md font-thin px-2"
+						on:click={() => $addMutataion.mutate(newRule)}>add</button
+					>
 				</th>
 			</tr>
 		</tfoot>

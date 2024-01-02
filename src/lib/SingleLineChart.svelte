@@ -4,6 +4,7 @@
 	import { formatterM } from './utils';
 	import { getQueryKey, api } from './apiClient';
 	import { createQuery } from '@tanstack/svelte-query';
+	import { chartTheme } from './utils';
 
 	export let mainChart: IChartApi | null;
 	export let handleVisibleLogicalRangeChange: (
@@ -40,20 +41,6 @@
 			throw Error('something wrong');
 		}
 	});
-
-	const chartTheme = {
-		layout: {
-			background: {
-				color: '#1A1A1A'
-			},
-			lineColor: '#000000',
-			textColor: '#A6A6A6'
-		},
-		grid: {
-			vertLines: { color: '#313131' },
-			horzLines: { color: '#313131' }
-		}
-	};
 </script>
 
 <Chart
