@@ -10,3 +10,21 @@
   $background: #000,
   $error: color-palette.$red-700
 );
+
+@use '@material/button/mixins' as button;
+
+.red-button {
+  &.mdc-button {
+    @include button.ink-color(color-palette.$red-600);
+  }
+  &.mdc-button--unelevated,
+  &.mdc-button--raised {
+    @include button.filled-accessible(color-palette.$red-600);
+  }
+  &.mdc-button--outlined {
+    @include button.outline-color(color-palette.$red-600);
+    @include button.ink-color(color-palette.$red-600);
+  }
+ 
+  @include button.ripple-states(color-palette.$red-600);
+}
