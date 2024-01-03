@@ -48,9 +48,10 @@
 
 <div>
 	<a href="/settings"><button class="p-2 bg-gray-900">Back</button></a>
+	<h1 class="text-3xl font-bold text-center py-4">{currPreset}</h1>
 	{#if $settings.isSuccess}
 		<div>
-			<h1 class="text-3xl font-bold text-center py-4">Linguistic Variables</h1>
+			<h1 class="text-2xl text-center py-4">Linguistic Variables</h1>
 			{#each Object.entries($settings.data.linguisticVariables) as [name, info]}
 				<h3 class="text-lg text-center">{name} ({info.kind})</h3>
 				<Desmos
