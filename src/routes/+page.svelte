@@ -117,7 +117,6 @@
 {/if}
 
 <div class="flex py-4">
-	<h1 class="pr-2 text-[#A6A6A6]">Chart :</h1>
 	<select
 		class="bg-[#1A1A1A] text-[#A6A6A6] border border-[#313131] rounded-md mr-4"
 		on:change={handleSymbolChange}
@@ -133,7 +132,6 @@
 		<option value="TSLA/USD">TSLA/USD</option>
 	</select>
 
-	<h1 class="pr-2 text-[#A6A6A6]">Interval :</h1>
 	<select
 		class="bg-[#1A1A1A] text-[#A6A6A6] border border-[#313131] rounded-md"
 		on:change={handleIntervalChange}
@@ -142,11 +140,20 @@
 		<option value={Interval.FourHour}>4H</option>
 		<option value={Interval.OneHour}>1H</option>
 	</select>
+
+	<Button
+		class="ml-4"
+		variant="raised"
+		on:click={() => {
+			fuzzyDialogOpen = true;
+		}}>Fuzzy Presets</Button
+	>
 </div>
 
 {#if $presets.isSuccess}
 	<Dialog bind:open={fuzzyDialogOpen}>
 		<div class="p-4">
+			<h1 class="text-lg">Fuzzy Presets</h1>
 			{#each $presets.data as preset}
 				<div class="flex">
 					<input class="mr-2" type="checkbox" bind:checked={fuzzyPresets[preset]} />
@@ -155,14 +162,6 @@
 			{/each}
 		</div>
 	</Dialog>
-
-	<Button
-		class="my-2"
-		variant="raised"
-		on:click={() => {
-			fuzzyDialogOpen = true;
-		}}>Fuzzy Presets</Button
-	>
 {/if}
 
 {#key $ohlc.data && $bbData.data}
