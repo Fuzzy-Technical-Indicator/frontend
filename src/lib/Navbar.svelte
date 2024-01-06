@@ -1,9 +1,11 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
 	let showMenu = false;
 	const toggleNavbar = () => {
 		showMenu = !showMenu;
 	};
 	import { page } from '$app/stores';
+	import { username } from './auth';
 </script>
 
 <div class="bg-black text-[#D4D4D4]">
@@ -57,6 +59,13 @@
 					class="font-nunito font-normal text-[#A6A6A6] text-l hover:text-[#FFFFFF]"
 					href="/settings"
 					><span class:text-white={$page.url.pathname.includes('/settings')}>Settings</span></a
+				>
+				<button
+					class="font-nunito font-normal text-[#A6A6A6] text-l hover:text-[#FFFFFF]"
+					on:click={() => {
+						username.set('');
+						goto('/login');
+					}}>Logout</button
 				>
 			</div>
 		</nav>

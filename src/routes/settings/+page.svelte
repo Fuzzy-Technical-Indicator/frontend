@@ -3,6 +3,7 @@
 	import { api } from '$lib/apiClient';
 	import Button from '@smui/button';
 	import { goto } from '$app/navigation';
+	import { username } from '$lib/auth';
 
 	const presets = createQuery({
 		queryKey: ['presets'],
@@ -22,7 +23,7 @@
 </script>
 
 <div class="">
-	<h1 class="text-xl font-extralight">Username's settings</h1>
+	<h1 class="text-xl font-extralight">{$username}'s settings</h1>
 	<div>
 		<input type="text" bind:value={currNewPresetName} class="bg-zinc-900 text-white mr-2" />
 		<Button
