@@ -6,6 +6,7 @@
 	import Desmos from '$lib/desmos/Desmos.svelte';
 	import RulesTable from '$lib/fuzzy_rules/RulesTable.svelte';
 	import type { PageData } from './$types';
+	import { desmosLoaded } from '$lib/utils';
 
 	export let data: PageData;
 	let currPreset = data.currPreset;
@@ -49,7 +50,7 @@
 <div>
 	<a href="/settings"><button class="p-2 bg-gray-900">Back</button></a>
 	<h1 class="text-3xl font-bold text-center py-4">{currPreset}</h1>
-	{#if $settings.isSuccess}
+	{#if $settings.isSuccess && $desmosLoaded}
 		<div>
 			<h1 class="text-2xl text-center py-4">Linguistic Variables</h1>
 			{#each Object.entries($settings.data.linguisticVariables) as [name, info]}

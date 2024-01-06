@@ -1,4 +1,5 @@
-import type { BarPrice, IChartApi, PriceFormatterFn, SingleValueData } from 'lightweight-charts';
+import type { BarPrice, PriceFormatterFn } from 'lightweight-charts';
+import { writable } from 'svelte/store';
 
 const K = 1000;
 const M = 1000 * K;
@@ -25,3 +26,5 @@ export const chartTheme = {
 		horzLines: { color: '#313131' }
 	}
 };
+
+export const desmosLoaded = writable(false);

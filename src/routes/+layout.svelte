@@ -4,32 +4,33 @@
 	import type { PageData } from './$types';
 	import Navbar from '$lib/Navbar.svelte';
 	import Footer from '$lib/Footer.svelte';
+	import { username } from '$lib/auth';
+	import { desmosLoaded } from '$lib/utils';
 
 	export let data: PageData;
 
-	let desmosLoaded = false;
-	
+	const handleOnLoad = () => {
+		desmosLoaded.set(true);
+	};
 </script>
 
 <svelte:head>
 	<title>Fuzzy Technical Indicator</title>
 	<script
 		async
-		id="desmos-script"
 		src="https://www.desmos.com/api/v1.8/calculator.js?apiKey=dcb31709b452b1cf9dc26972add0fda6"
-		on:load={() => desmosLoaded = true}
-	>
-	</script>
+		on:load={handleOnLoad}
+	></script>
 </svelte:head>
 
-{#if desmosLoaded}
-	<QueryClientProvider client={data.queryClient}>
-		<main class="bg-black text-[#D4D4D4]">
+<QueryClientProvider client={data.queryClient}>
+	<main class="bg-black text-[#D4D4D4]">
+		{#if $username !== ''}
 			<Navbar />
-			<div class="container mx-auto max-w-7xl bg-black font-nunito">
-				<slot />
-			</div>
-			<Footer />
-		</main>
-	</QueryClientProvider>
-{/if}
+		{/if}
+		<div class="container mx-auto max-w-7xl bg-black font-nunito">
+			<slot />
+		</div>
+		<Footer />
+	</main>
+</QueryClientProvider>

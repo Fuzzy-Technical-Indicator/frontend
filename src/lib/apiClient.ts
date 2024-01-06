@@ -7,6 +7,7 @@ import type {
 	UTCTimestamp
 } from 'lightweight-charts';
 import { get, writable } from 'svelte/store';
+import { username } from './auth';
 import {
 	Interval,
 	type DTValue,
@@ -38,17 +39,32 @@ export function getQueryKey(keys: string[]): string[] {
 	return [symbol, interval, ...keys];
 }
 
-const defaultOption = {
-	headers: { Connection: 'keep-alive' }
-};
+function getDefaultOption({
+	method,
+	headers,
+	body
+}: {
+	method?: string;
+	headers?: Record<string, string>;
+	body?: BodyInit;
+}): RequestInit {
+	const defaultHeader: HeadersInit = {
+		Connection: 'keep-alive',
+		Authorization: `Bearer ${get(username)}`,
+		...headers
+	};
+	return { method, body, headers: defaultHeader };
+}
+
 const indicatorBaseUrl = `${PUBLIC_API_URL}/api/indicators`;
 export const api = (customFetch = fetch) => ({
 	ohlc: async () => {
 		const { symbol, interval } = get(chartSettings);
 		const resp = await customFetch(
 			`${PUBLIC_API_URL}/api/ohlc?symbol=${symbol}&interval=${interval}`,
-			defaultOption
+			getDefaultOption({})
 		);
+
 		const ohlc = (await resp.json()) as Ohlc[];
 		const data: CandlestickData[] = ohlc.map((x) => {
 			return {
@@ -65,7 +81,7 @@ export const api = (customFetch = fetch) => ({
 		const { symbol, interval } = get(chartSettings);
 		const resp = await customFetch(
 			`${indicatorBaseUrl}/bb?symbol=${symbol}&interval=${interval}&length=${length}&stdev=${stdev}`,
-			defaultOption
+			getDefaultOption({})
 		);
 		const json = (await resp.json()) as DTValue<[number, number, number]>[];
 		return {
@@ -78,7 +94,7 @@ export const api = (customFetch = fetch) => ({
 		const { symbol, interval } = get(chartSettings);
 		const resp = await customFetch(
 			`${indicatorBaseUrl}/stoch?symbol=${symbol}&interval=${interval}&k=${k}&d=${d}&length=${length}`,
-			defaultOption
+			getDefaultOption({})
 		);
 		const json = (await resp.json()) as DTValue<[number, number, number]>[];
 		const kLine: LineData[] = toSingleValueDataOfIdx(json, 0);
@@ -89,7 +105,7 @@ export const api = (customFetch = fetch) => ({
 		const { symbol, interval } = get(chartSettings);
 		const resp = await customFetch(
 			`${indicatorBaseUrl}/macd?symbol=${symbol}&interval=${interval}&fast=${fast}&slow=${slow}&smooth=${smooth}`,
-			defaultOption
+			getDefaultOption({})
 		);
 		const json = (await resp.json()) as DTValue<[number, number, number]>[];
 		const macdLine: LineData[] = toSingleValueDataOfIdx(json, 0);
@@ -101,7 +117,7 @@ export const api = (customFetch = fetch) => ({
 		const { symbol, interval } = get(chartSettings);
 		const resp = await customFetch(
 			`${indicatorBaseUrl}/aroon?symbol=${symbol}&interval=${interval}&length=${length}`,
-			defaultOption
+			getDefaultOption({})
 		);
 		const data = (await resp.json()) as DTValue<[number, number, number]>[];
 		const upper: LineData[] = toSingleValueDataOfIdx(data, 0);
@@ -112,7 +128,7 @@ export const api = (customFetch = fetch) => ({
 		const { symbol, interval } = get(chartSettings);
 		const resp = await customFetch(
 			`${PUBLIC_API_URL}/api/fuzzy?symbol=${symbol}&interval=${interval}&preset=${preset}`,
-			defaultOption
+			getDefaultOption({})
 		);
 		const json = (await resp.json()) as DTValue<number[]>[];
 		const result = Array.from({ length: json.length }, (_, i) => toSingleValueDataOfIdx(json, i));
@@ -122,7 +138,7 @@ export const api = (customFetch = fetch) => ({
 		const { symbol, interval } = get(chartSettings);
 		const resp = await customFetch(
 			`${indicatorBaseUrl}/rsi?symbol=${symbol}&interval=${interval}&length=${length}`,
-			defaultOption
+			getDefaultOption({})
 		);
 		const json = (await resp.json()) as DTValue<number>[];
 		const result = toSingleValueData(json);
@@ -133,7 +149,7 @@ export const api = (customFetch = fetch) => ({
 		const { symbol, interval } = get(chartSettings);
 		const resp = await customFetch(
 			`${indicatorBaseUrl}/adx?symbol=${symbol}&interval=${interval}&length=${length}`,
-			defaultOption
+			getDefaultOption({})
 		);
 		const json = (await resp.json()) as DTValue<number>[];
 		const result = toSingleValueData(json);
@@ -144,7 +160,7 @@ export const api = (customFetch = fetch) => ({
 		const { symbol, interval } = get(chartSettings);
 		const resp = await customFetch(
 			`${indicatorBaseUrl}/obv?symbol=${symbol}&interval=${interval}`,
-			defaultOption
+			getDefaultOption({})
 		);
 		const json = (await resp.json()) as DTValue<number>[];
 		const result = toSingleValueData(json);
@@ -169,7 +185,7 @@ export const api = (customFetch = fetch) => ({
 		const { symbol, interval } = get(chartSettings);
 		const resp = await customFetch(
 			`${indicatorBaseUrl}/accumdist?symbol=${symbol}&interval=${interval}`,
-			defaultOption
+			getDefaultOption({})
 		);
 		const json = (await resp.json()) as DTValue<number>[];
 		const result = toSingleValueData(json);
@@ -192,7 +208,7 @@ export const api = (customFetch = fetch) => ({
 	getSettings: async (preset: string) => {
 		const resp = await customFetch(
 			`${PUBLIC_API_URL}/api/settings?preset=${preset}`,
-			defaultOption
+			getDefaultOption({})
 		);
 		const json = (await resp.json()) as Settings;
 		return json;
@@ -200,62 +216,73 @@ export const api = (customFetch = fetch) => ({
 	updateLinguisticVars: async (linguisticVariables: UpdateLinguisticVariable, preset: string) => {
 		const resp = await customFetch(
 			`${PUBLIC_API_URL}/api/settings/linguisticvars?preset=${preset}`,
-			{
+			getDefaultOption({
 				method: 'PUT',
 				headers: {
-					'Content-Type': 'application/json',
-					Connection: 'keep-alive'
+					'Content-Type': 'application/json'
 				},
 				body: JSON.stringify(linguisticVariables)
-			}
+			})
 		);
 		return resp;
 	},
 	deleteLinguisticVar: async (name: string) => {
-		const resp = await customFetch(`${PUBLIC_API_URL}/api/settings/linguisticvars/${name}`, {
-			method: 'DELETE',
-			...defaultOption
-		});
+		const resp = await customFetch(
+			`${PUBLIC_API_URL}/api/settings/linguisticvars/${name}`,
+			getDefaultOption({ method: 'DELETE' })
+		);
 		return resp;
 	},
 	addFuzzyRules: async (data: NewFuzzyRule, preset: string) => {
-		const resp = await customFetch(`${PUBLIC_API_URL}/api/settings/fuzzyrules?preset=${preset}`, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				Connection: 'keep-alive'
-			},
-			body: JSON.stringify(data)
-		});
+		const resp = await customFetch(
+			`${PUBLIC_API_URL}/api/settings/fuzzyrules?preset=${preset}`,
+			getDefaultOption({
+				body: JSON.stringify(data),
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				}
+			})
+		);
 		return resp;
 	},
 	deleteFuzzyRule: async (id: string, preset: string) => {
 		const resp = await customFetch(
 			`${PUBLIC_API_URL}/api/settings/fuzzyrules/${id}?preset=${preset}`,
-			{
-				method: 'DELETE',
-				...defaultOption
-			}
+			getDefaultOption({ method: 'DELETE' })
 		);
 		return resp;
 	},
 	getPresets: async () => {
-		const resp = await customFetch(`${PUBLIC_API_URL}/api/settings/presets`, defaultOption);
+		const resp = await customFetch(`${PUBLIC_API_URL}/api/settings/presets`, getDefaultOption({}));
 		const json = (await resp.json()) as string[];
 		return json;
 	},
 	addPreset: async (presetName: string) => {
-		const resp = await customFetch(`${PUBLIC_API_URL}/api/settings/presets/${presetName}`, {
-			method: 'POST',
-			...defaultOption
-		});
+		const resp = await customFetch(
+			`${PUBLIC_API_URL}/api/settings/presets/${presetName}`,
+			getDefaultOption({ method: 'POST' })
+		);
 		return resp;
 	},
 	deletePreset: async (presetName: string) => {
-		const resp = await customFetch(`${PUBLIC_API_URL}/api/settings/presets/${presetName}`, {
-			method: 'DELETE',
-			...defaultOption
-		});
+		const resp = await customFetch(
+			`${PUBLIC_API_URL}/api/settings/presets/${presetName}`,
+			getDefaultOption({ method: 'DELETE' })
+		);
 		return resp;
+	},
+	/**
+	 * Special Fake API for checking if username is valid
+	 */
+	isUsernameOkay: async (username: string) => {
+		const resp = await customFetch(`${PUBLIC_API_URL}/api/settings/presets`, {
+			headers: { Authorization: `Bearer ${username}` }
+		});
+
+		if (resp.status === 401) {
+			return false;
+		}
+		return true;
 	}
 });
