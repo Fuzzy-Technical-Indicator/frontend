@@ -13,19 +13,6 @@
 
 	const colors = ['#c74440', '#2d70b3', '#388c46', '#6042a6', '#fa7e19', '#ffffff'];
 	const colorsInvert = ['#38bbbf', '#d28f4c', '#c773b9', '#9fbd59', '#0581e6', '#000000']; // desmos dark-mode by myself
-	// const loadDesmos = () => {
-	// 	// FIX: SPA when change to settings page, Desmos not load
-	// 	return new Promise((resolve, reject) => {
-	// 		const script = document.createElement('script');
-	// 		script.src =
-	// 			'https://www.desmos.com/api/v1.8/calculator.js?apiKey=dcb31709b452b1cf9dc26972add0fda6';
-	// 		script.id = 'desmos-script';
-	// 		script.async = true;
-	// 		script.onload = resolve;
-	// 		script.onerror = reject;
-	// 		document.head.appendChild(script);
-	// 	});
-	// };
 
 	let g: any;
 	afterUpdate(async () => {

@@ -5,13 +5,8 @@
 	import Navbar from '$lib/Navbar.svelte';
 	import Footer from '$lib/Footer.svelte';
 	import { username } from '$lib/auth';
-	import { desmosLoaded } from '$lib/utils';
 
 	export let data: PageData;
-
-	const handleOnLoad = () => {
-		desmosLoaded.set(true);
-	};
 </script>
 
 <svelte:head>
@@ -19,7 +14,6 @@
 	<script
 		async
 		src="https://www.desmos.com/api/v1.8/calculator.js?apiKey=dcb31709b452b1cf9dc26972add0fda6"
-		on:load={handleOnLoad}
 	></script>
 </svelte:head>
 

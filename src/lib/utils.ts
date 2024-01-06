@@ -26,5 +26,3 @@ export const chartTheme = {
 		horzLines: { color: '#313131' }
 	}
 };
-
-export const desmosLoaded = writable(false);
