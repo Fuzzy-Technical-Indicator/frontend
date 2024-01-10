@@ -4,6 +4,9 @@
 	import { getQueryKey, api } from './apiClient';
 	import { createQuery } from '@tanstack/svelte-query';
 	import { chartTheme } from './utils';
+	import Legend from './components/Legend.svelte';
+	import StochSetting from './dialogs/StochSetting.svelte';
+	import type { UserSettings } from './types';
 
 	export let mainChart: IChartApi | null;
 	export let handleVisibleLogicalRangeChange: (
@@ -12,12 +15,16 @@
 	) => void;
 	export let ref: (ref: IChartApi | null) => void;
 	export let offsetStyle: string | undefined;
+	export let userSetting: UserSettings;
 
+	let dialogOpen = false;
 	const stoch = createQuery({
 		queryKey: getQueryKey(['stoch']),
 		queryFn: () => api().stoch()
 	});
 </script>
+
+<StochSetting bind:open={dialogOpen} data={userSetting.stoch} />
 
 <Chart
 	{ref}
@@ -25,13 +32,26 @@
 	autoSize={true}
 	{...chartTheme}
 >
-	<div class="absolute z-10 top-2 left-2">STOCH</div>
+	<div class="absolute z-10 top-2 left-2">
+		<Legend
+			name={'STOCH'}
+			onSettingClick={() => {
+				dialogOpen = true;
+			}}
+		/>
+	</div>
 	<TimeScale
 		on:visibleLogicalRangeChange={(e) => handleVisibleLogicalRangeChange(e, [mainChart])}
 	/>
 
 	{#if $stoch.isSuccess}
-		<LineSeries lastValueVisible={false} lineWidth={1} data={$stoch.data.kLine} />
-		<LineSeries lastValueVisible={false} lineWidth={1} color={'orange'} data={$stoch.data.kLine} />
+		<LineSeries lastValueVisible={false} lineWidth={1} data={$stoch.data.dLine} reactive={true} />
+		<LineSeries
+			lastValueVisible={false}
+			lineWidth={1}
+			color={'orange'}
+			data={$stoch.data.kLine}
+			reactive={true}
+		/>
 	{/if}
 </Chart>

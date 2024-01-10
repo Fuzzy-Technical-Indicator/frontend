@@ -4,6 +4,9 @@
 	import { Chart, LineSeries, TimeScale } from 'svelte-lightweight-charts';
 	import { api, getQueryKey } from './apiClient';
 	import { chartTheme } from './utils';
+	import Legend from './components/Legend.svelte';
+	import AroonSetting from './dialogs/AroonSetting.svelte';
+	import type { UserSettings } from './types';
 
 	export let mainChart: IChartApi | null;
 	export let handleVisibleLogicalRangeChange: (
@@ -12,12 +15,16 @@
 	) => void;
 	export let ref: (ref: IChartApi | null) => void;
 	export let offsetStyle: string | undefined;
+	export let userSetting: UserSettings;
 
 	const aroon = createQuery({
 		queryKey: getQueryKey(['aroon']),
 		queryFn: () => api().aroon()
 	});
+	let dialogOpen = false;
 </script>
+
+<AroonSetting bind:open={dialogOpen} data={userSetting.aroon} />
 
 <Chart
 	{ref}
@@ -25,13 +32,26 @@
 	autoSize={true}
 	{...chartTheme}
 >
-	<div class="absolute z-10 top-2 left-2">AROON</div>
+	<div class="absolute z-10 top-2 left-2">
+		<Legend
+			name={'AROON'}
+			onSettingClick={() => {
+				dialogOpen = true;
+			}}
+		/>
+	</div>
 	<TimeScale
 		on:visibleLogicalRangeChange={(e) => handleVisibleLogicalRangeChange(e, [mainChart])}
 	/>
 
 	{#if $aroon.isSuccess}
-		<LineSeries lastValueVisible={false} lineWidth={1} color={'orange'} data={$aroon.data.upper} />
-		<LineSeries lastValueVisible={false} lineWidth={1} data={$aroon.data.lower} />
+		<LineSeries
+			lastValueVisible={false}
+			lineWidth={1}
+			color={'orange'}
+			data={$aroon.data.upper}
+			reactive={true}
+		/>
+		<LineSeries lastValueVisible={false} lineWidth={1} data={$aroon.data.lower} reactive={true} />
 	{/if}
 </Chart>

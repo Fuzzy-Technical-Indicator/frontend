@@ -73,3 +73,41 @@ export interface Settings {
 	linguisticVariables: Record<string, LinguisticVariable>;
 	fuzzyRules: FuzzyRule[];
 }
+
+export interface BBSetting {
+	length: number;
+	stdev: number;
+}
+
+export interface LengthSetting {
+	length: number;
+}
+
+export interface MacdSetting {
+	fast: number;
+	slow: number;
+	smooth: number;
+}
+
+export interface StochSetting {
+	k: number;
+	d: number;
+	length: number;
+}
+
+export interface UserSettings {
+	bb: BBSetting;
+	rsi: LengthSetting;
+	adx: LengthSetting;
+	aroon: LengthSetting;
+	macd: MacdSetting;
+	stoch: StochSetting;
+}
+
+export type UpdateUserSettings =
+	| { bb: BBSetting }
+	| { rsi: LengthSetting }
+	| { adx: LengthSetting }
+	| { aroon: LengthSetting }
+	| { macd: MacdSetting }
+	| { stoch: StochSetting };

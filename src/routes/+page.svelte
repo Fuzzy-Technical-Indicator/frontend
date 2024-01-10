@@ -15,6 +15,9 @@
 	import Button from '@smui/button';
 	import Dialog from '@smui/dialog';
 	import CircularProgress from '@smui/circular-progress';
+	import BbSetting from '$lib/dialogs/BBSetting.svelte';
+	import Legend from '$lib/components/Legend.svelte';
+	import RsiSetting from '$lib/dialogs/RsiSetting.svelte';
 
 	const ohlc = createQuery({
 		queryKey: getQueryKey(['ohlc']),
@@ -29,6 +32,11 @@
 	const presets = createQuery({
 		queryKey: ['presets'],
 		queryFn: () => api().getPresets()
+	});
+
+	const userSettings = createQuery({
+		queryKey: ['userSettings'],
+		queryFn: () => api().getUserSettings()
 	});
 
 	let main: IChartApi | null;
@@ -76,6 +84,9 @@
 	let macd = false;
 	let aroon = false;
 	let stoch = false;
+	let settingDialogOpen = {
+		bb: false
+	};
 
 	let otherCharts = new Map<string, IChartApi | null>();
 	let singleLineCharts = new Map<string, boolean>();
@@ -164,6 +175,10 @@
 	</Dialog>
 {/if}
 
+{#if $userSettings.isSuccess}
+	<BbSetting bind:open={settingDialogOpen.bb} data={$userSettings.data.bb} />
+{/if}
+
 {#key $ohlc.data && $bbData.data}
 	<div class="flex-row h-screen">
 		<Chart
@@ -177,10 +192,14 @@
 				{$chartSettings.symbol.toLocaleUpperCase()}
 				-
 				{$chartSettings.interval.toUpperCase()}
-				<div>
+				<Legend
+					name="BB"
+					onSettingClick={() => {
+						settingDialogOpen.bb = true;
+					}}
+				>
 					<input type="checkbox" bind:checked={bb} />
-					<span class="font-thin">BB</span>
-				</div>
+				</Legend>
 
 				{#each singleLineOptions as { opt, use }}
 					<div>
@@ -236,55 +255,61 @@
 			{/if}
 		</Chart>
 
-		{#each Array.from(singleLineCharts.entries()) as [kind, visible]}
-			{#if visible}
-				<SingleLineChart
-					ref={(ref) => otherCharts.set(kind, ref)}
-					offsetStyle={offsetStyles.get(kind)}
-					mainChart={main}
-					{handleVisibleLogicalRangeChange}
-					{kind}
-				/>
-			{/if}
-		{/each}
+		{#if $userSettings.isSuccess}
+			{#each Array.from(singleLineCharts.entries()) as [kind, visible]}
+				{#if visible}
+					<SingleLineChart
+						userSetting={$userSettings.data}
+						ref={(ref) => otherCharts.set(kind, ref)}
+						offsetStyle={offsetStyles.get(kind)}
+						mainChart={main}
+						{handleVisibleLogicalRangeChange}
+						{kind}
+					/>
+				{/if}
+			{/each}
 
-		{#if macd}
-			<MacdChart
-				ref={(ref) => otherCharts.set('macd', ref)}
-				offsetStyle={offsetStyles.get('macd')}
-				mainChart={main}
-				{handleVisibleLogicalRangeChange}
-			/>
-		{/if}
-
-		{#if aroon}
-			<AroonChart
-				ref={(ref) => otherCharts.set('aroon', ref)}
-				offsetStyle={offsetStyles.get('aroon')}
-				mainChart={main}
-				{handleVisibleLogicalRangeChange}
-			/>
-		{/if}
-
-		{#if stoch}
-			<StochChart
-				ref={(ref) => otherCharts.set('stoch', ref)}
-				offsetStyle={offsetStyles.get('stoch')}
-				mainChart={main}
-				{handleVisibleLogicalRangeChange}
-			/>
-		{/if}
-
-		{#each Object.entries(fuzzyPresets) as [preset, enable]}
-			{#if enable}
-				<FuzzyChart
-					{preset}
-					ref={(ref) => otherCharts.set(`fuzzy-${preset}`, ref)}
-					offsetStyle={offsetStyles.get(`fuzzy-${preset}`)}
+			{#if macd}
+				<MacdChart
+					userSetting={$userSettings.data}
+					ref={(ref) => otherCharts.set('macd', ref)}
+					offsetStyle={offsetStyles.get('macd')}
 					mainChart={main}
 					{handleVisibleLogicalRangeChange}
 				/>
 			{/if}
-		{/each}
+
+			{#if aroon}
+				<AroonChart
+					userSetting={$userSettings.data}
+					ref={(ref) => otherCharts.set('aroon', ref)}
+					offsetStyle={offsetStyles.get('aroon')}
+					mainChart={main}
+					{handleVisibleLogicalRangeChange}
+				/>
+			{/if}
+
+			{#if stoch}
+				<StochChart
+					userSetting={$userSettings.data}
+					ref={(ref) => otherCharts.set('stoch', ref)}
+					offsetStyle={offsetStyles.get('stoch')}
+					mainChart={main}
+					{handleVisibleLogicalRangeChange}
+				/>
+			{/if}
+
+			{#each Object.entries(fuzzyPresets) as [preset, enable]}
+				{#if enable}
+					<FuzzyChart
+						{preset}
+						ref={(ref) => otherCharts.set(`fuzzy-${preset}`, ref)}
+						offsetStyle={offsetStyles.get(`fuzzy-${preset}`)}
+						mainChart={main}
+						{handleVisibleLogicalRangeChange}
+					/>
+				{/if}
+			{/each}
+		{/if}
 	</div>
 {/key}

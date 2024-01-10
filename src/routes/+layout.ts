@@ -13,7 +13,8 @@ export const load: LayoutLoad = async ({ url }) => {
 	const queryClient = new QueryClient({
 		defaultOptions: {
 			queries: {
-				enabled: browser
+				enabled: browser,
+				refetchOnWindowFocus: false
 			}
 		}
 	});

@@ -1,0 +1,28 @@
+<script lang="ts">
+	import { api } from '$lib/apiClient';
+	import type { UpdateUserSettings } from '$lib/types';
+	import Button from '@smui/button';
+	import Dialog from '@smui/dialog';
+	import { createMutation, useQueryClient } from '@tanstack/svelte-query';
+
+	export let open: boolean;
+	export let data: UpdateUserSettings;
+	export let queryKeyToInvalidate: string[];
+
+	const client = useQueryClient();
+	const updateMutation = createMutation({
+		mutationFn: () => api().updateUserSetting(data),
+		onSuccess: async () => {
+			await client.invalidateQueries({ queryKey: queryKeyToInvalidate });
+			open = false;
+		}
+	});
+</script>
+
+<Dialog bind:open>
+	<div class="p-4 grid grid-cols-3 gap-y-2">
+		<slot />
+		<Button variant="raised" class="col-span-3" on:click={() => $updateMutation.mutate()}>Ok</Button
+		>
+	</div>
+</Dialog>

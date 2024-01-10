@@ -5,6 +5,11 @@
 	import { getQueryKey, api } from './apiClient';
 	import { createQuery } from '@tanstack/svelte-query';
 	import { chartTheme } from './utils';
+	import Legend from './components/Legend.svelte';
+	import RsiSetting from './dialogs/RsiSetting.svelte';
+	import type { UserSettings } from './types';
+	import { any as rany } from 'ramda';
+	import AdxSetting from './dialogs/AdxSetting.svelte';
 
 	export let mainChart: IChartApi | null;
 	export let handleVisibleLogicalRangeChange: (
@@ -16,15 +21,19 @@
 	export let color: string | undefined = undefined;
 	export let offsetStyle: string | undefined;
 
+	export let userSetting: UserSettings;
+
+	let dialogOpen = false;
 	let exceed1M = false;
+	const queryKey = getQueryKey([kind]);
 	const line = createQuery({
-		queryKey: getQueryKey([kind]),
+		queryKey,
 		queryFn: async () => {
 			if (kind === 'rsi') {
-				return api().rsi(14);
+				return api().rsi();
 			}
 			if (kind === 'adx') {
-				return api().adx(14);
+				return api().adx();
 			}
 			if (kind === 'obv') {
 				let [result, isExceed1M] = await api().obv();
@@ -41,7 +50,16 @@
 			throw Error('something wrong');
 		}
 	});
+
+	const showSettingButton = rany((x) => kind === x)(['rsi', 'aroon', 'adx']);
 </script>
+
+{#if kind === 'rsi'}
+	<RsiSetting bind:open={dialogOpen} data={userSetting.rsi} />
+{/if}
+{#if kind === 'adx'}
+	<AdxSetting bind:open={dialogOpen} data={userSetting.adx} />
+{/if}
 
 <Chart
 	{ref}
@@ -50,12 +68,28 @@
 	localization={{ priceFormatter: exceed1M ? formatterM : undefined }}
 	{...chartTheme}
 >
-	<div class="absolute z-10 top-2 left-2">{kind.toUpperCase()}</div>
+	<div class="absolute z-10 top-2 left-2">
+		<Legend
+			name={kind.toUpperCase()}
+			onSettingClick={() => {
+				dialogOpen = true;
+			}}
+			{showSettingButton}
+		/>
+	</div>
 	<TimeScale
 		on:visibleLogicalRangeChange={(e) => handleVisibleLogicalRangeChange(e, [mainChart])}
 	/>
 
-	{#if $line.isSuccess}
-		<LineSeries lastValueVisible={false} lineWidth={1} {color} data={$line.data} />
-	{/if}
+	{#key $line.data}
+		{#if $line.isSuccess}
+			<LineSeries
+				lastValueVisible={false}
+				lineWidth={1}
+				{color}
+				data={$line.data}
+				reactive={true}
+			/>
+		{/if}
+	{/key}
 </Chart>

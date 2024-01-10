@@ -1,5 +1,4 @@
 import type { BarPrice, PriceFormatterFn } from 'lightweight-charts';
-import { writable } from 'svelte/store';
 
 const K = 1000;
 const M = 1000 * K;
