@@ -68,7 +68,7 @@
 	});
 
 	const deleteMutation = createMutation({
-		mutationFn: () => api().deleteLinguisticVar(name),
+		mutationFn: () => api().deleteLinguisticVar(name, preset),
 		onSuccess: () => {
 			client.invalidateQueries({ queryKey: ['settings'] });
 		}

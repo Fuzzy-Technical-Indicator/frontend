@@ -10,6 +10,10 @@
 </script>
 
 <svelte:head>
+	<link
+		rel="stylesheet"
+		href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,200,0,-25"
+	/>
 	<title>Fuzzy Technical Indicator</title>
 	<script
 		async

@@ -14,7 +14,9 @@ import {
 	type NewFuzzyRule,
 	type Ohlc,
 	type Settings,
-	type UpdateLinguisticVariable
+	type UpdateLinguisticVariable,
+	type UpdateUserSettings,
+	type UserSettings
 } from './types';
 
 function nullToNan(x: number | null): number {
@@ -77,10 +79,10 @@ export const api = (customFetch = fetch) => ({
 		});
 		return data;
 	},
-	bb: async (length = 20, stdev = 2) => {
+	bb: async () => {
 		const { symbol, interval } = get(chartSettings);
 		const resp = await customFetch(
-			`${indicatorBaseUrl}/bb?symbol=${symbol}&interval=${interval}&length=${length}&stdev=${stdev}`,
+			`${indicatorBaseUrl}/bb?symbol=${symbol}&interval=${interval}`,
 			getDefaultOption({})
 		);
 		const json = (await resp.json()) as DTValue<[number, number, number]>[];
@@ -90,10 +92,10 @@ export const api = (customFetch = fetch) => ({
 			upper: toSingleValueDataOfIdx(json, 2)
 		};
 	},
-	stoch: async (k = 14, d = 3, length = 1) => {
+	stoch: async () => {
 		const { symbol, interval } = get(chartSettings);
 		const resp = await customFetch(
-			`${indicatorBaseUrl}/stoch?symbol=${symbol}&interval=${interval}&k=${k}&d=${d}&length=${length}`,
+			`${indicatorBaseUrl}/stoch?symbol=${symbol}&interval=${interval}`,
 			getDefaultOption({})
 		);
 		const json = (await resp.json()) as DTValue<[number, number, number]>[];
@@ -101,10 +103,10 @@ export const api = (customFetch = fetch) => ({
 		const dLine: LineData[] = toSingleValueDataOfIdx(json, 1);
 		return { kLine, dLine };
 	},
-	macd: async (fast = 12, slow = 26, smooth = 9) => {
+	macd: async () => {
 		const { symbol, interval } = get(chartSettings);
 		const resp = await customFetch(
-			`${indicatorBaseUrl}/macd?symbol=${symbol}&interval=${interval}&fast=${fast}&slow=${slow}&smooth=${smooth}`,
+			`${indicatorBaseUrl}/macd?symbol=${symbol}&interval=${interval}`,
 			getDefaultOption({})
 		);
 		const json = (await resp.json()) as DTValue<[number, number, number]>[];
@@ -113,10 +115,10 @@ export const api = (customFetch = fetch) => ({
 		const histogram: HistogramData[] = toSingleValueDataOfIdx(json, 2);
 		return { macdLine, signalLine, histogram };
 	},
-	aroon: async (length = 14) => {
+	aroon: async () => {
 		const { symbol, interval } = get(chartSettings);
 		const resp = await customFetch(
-			`${indicatorBaseUrl}/aroon?symbol=${symbol}&interval=${interval}&length=${length}`,
+			`${indicatorBaseUrl}/aroon?symbol=${symbol}&interval=${interval}`,
 			getDefaultOption({})
 		);
 		const data = (await resp.json()) as DTValue<[number, number, number]>[];
@@ -134,10 +136,10 @@ export const api = (customFetch = fetch) => ({
 		const result = Array.from({ length: json.length }, (_, i) => toSingleValueDataOfIdx(json, i));
 		return result;
 	},
-	rsi: async (length = 14) => {
+	rsi: async () => {
 		const { symbol, interval } = get(chartSettings);
 		const resp = await customFetch(
-			`${indicatorBaseUrl}/rsi?symbol=${symbol}&interval=${interval}&length=${length}`,
+			`${indicatorBaseUrl}/rsi?symbol=${symbol}&interval=${interval}`,
 			getDefaultOption({})
 		);
 		const json = (await resp.json()) as DTValue<number>[];
@@ -145,10 +147,10 @@ export const api = (customFetch = fetch) => ({
 
 		return result;
 	},
-	adx: async (length = 14) => {
+	adx: async () => {
 		const { symbol, interval } = get(chartSettings);
 		const resp = await customFetch(
-			`${indicatorBaseUrl}/adx?symbol=${symbol}&interval=${interval}&length=${length}`,
+			`${indicatorBaseUrl}/adx?symbol=${symbol}&interval=${interval}`,
 			getDefaultOption({})
 		);
 		const json = (await resp.json()) as DTValue<number>[];
@@ -226,9 +228,9 @@ export const api = (customFetch = fetch) => ({
 		);
 		return resp;
 	},
-	deleteLinguisticVar: async (name: string) => {
+	deleteLinguisticVar: async (name: string, preset: string) => {
 		const resp = await customFetch(
-			`${PUBLIC_API_URL}/api/settings/linguisticvars/${name}`,
+			`${PUBLIC_API_URL}/api/settings/linguisticvars/${name}?preset=${preset}`,
 			getDefaultOption({ method: 'DELETE' })
 		);
 		return resp;
@@ -284,5 +286,23 @@ export const api = (customFetch = fetch) => ({
 			return false;
 		}
 		return true;
+	},
+	getUserSettings: async () => {
+		const resp = await customFetch(`${PUBLIC_API_URL}/api/settings/users`, getDefaultOption({}));
+		const json = (await resp.json()) as UserSettings;
+		return json;
+	},
+	updateUserSetting: async (data: UpdateUserSettings) => {
+		const resp = await customFetch(
+			`${PUBLIC_API_URL}/api/settings/users`,
+			getDefaultOption({
+				method: 'PUT',
+				body: JSON.stringify(data),
+				headers: {
+					'Content-Type': 'application/json'
+				}
+			})
+		);
+		return resp;
 	}
 });
