@@ -15,7 +15,18 @@
 		queryFn: () => api().getSettings(currPreset)
 	});
 
-	const linguisticVarOptions = ['rsi', 'bb', 'custom'];
+	const linguisticVarOptions = [
+		'rsi',
+		'bb',
+		'adx',
+		'obv',
+		'accumdist',
+		'macd',
+		'stoch',
+		'aroonup',
+		'aroondown',
+		'custom'
+	];
 	let currLinguisticVarOpt = linguisticVarOptions[0];
 	let customName = '';
 
