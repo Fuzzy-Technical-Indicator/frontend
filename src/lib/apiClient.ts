@@ -10,6 +10,7 @@ import { get, writable } from 'svelte/store';
 import { username } from './auth';
 import {
 	Interval,
+	type BacktestReport,
 	type DTValue,
 	type NewFuzzyRule,
 	type Ohlc,
@@ -304,5 +305,10 @@ export const api = (customFetch = fetch) => ({
 			})
 		);
 		return resp;
+	},
+	getBacktestReports: async () => {
+		const resp = await customFetch(`${PUBLIC_API_URL}/api/backtesting`, getDefaultOption({}));
+		const json = (await resp.json()) as BacktestReport[];
+		return json;
 	}
 });
