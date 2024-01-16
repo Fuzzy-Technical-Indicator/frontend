@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { CandlestickSeries, Chart, LineSeries, TimeScale } from 'svelte-lightweight-charts';
 	import type { IChartApi, LogicalRange } from 'lightweight-charts';
-	import { priceFn } from '$lib/utils';
+	import { priceFn, tickers } from '$lib/utils';
 	import SingleLineChart from '$lib/SingleLineChart.svelte';
 	import MacdChart from '$lib/MacdChart.svelte';
 	import FuzzyChart from '$lib/FuzzyChart.svelte';
@@ -17,7 +17,6 @@
 	import CircularProgress from '@smui/circular-progress';
 	import BbSetting from '$lib/dialogs/BBSetting.svelte';
 	import Legend from '$lib/components/Legend.svelte';
-	import RsiSetting from '$lib/dialogs/RsiSetting.svelte';
 
 	const ohlc = createQuery({
 		queryKey: getQueryKey(['ohlc']),
@@ -132,15 +131,9 @@
 		class="bg-[#1A1A1A] text-[#A6A6A6] border border-[#313131] rounded-md mr-4"
 		on:change={handleSymbolChange}
 	>
-		<option value="ETH/USDT">ETH/USDT</option>
-		<option value="BTC/USDT">BTC/USDT</option>
-		<option value="BNB/USDT">BNB/USDT</option>
-		<option value="AAPL/USD">AAPL/USD</option>
-		<option value="IBM/USD">IBM/USD</option>
-		<option value="JPM/USD">JPM/USD</option>
-		<option value="MSFT/USD">MSFT/USD</option>
-		<option value="NKE/USD">NKE/USD</option>
-		<option value="TSLA/USD">TSLA/USD</option>
+		{#each tickers as ticker}
+			<option value={ticker}>{ticker}</option>
+		{/each}
 	</select>
 
 	<select

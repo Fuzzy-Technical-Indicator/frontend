@@ -25,3 +25,15 @@ export const chartTheme = {
 		horzLines: { color: '#313131' }
 	}
 };
+
+export const tickers = [
+	'ETH/USDT',
+	'BTC/USDT',
+	'BNB/USDT',
+	'AAPL/USD',
+	'IBM/USD',
+	'JPM/USD',
+	'MSFT/USD',
+	'NKE/USD',
+	'TSLA/USD'
+];

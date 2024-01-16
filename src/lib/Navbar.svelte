@@ -60,6 +60,11 @@
 					href="/settings"
 					><span class:text-white={$page.url.pathname.includes('/settings')}>Settings</span></a
 				>
+				<a
+					class="font-nunito font-normal text-[#A6A6A6] text-l hover:text-[#FFFFFF]"
+					href="/backtests"
+					><span class:text-white={$page.url.pathname.includes('/backtests')}>Backtests</span></a
+				>
 				<button
 					class="font-nunito font-normal text-[#A6A6A6] text-l hover:text-[#FFFFFF]"
 					on:click={() => {

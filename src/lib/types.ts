@@ -111,3 +111,58 @@ export type UpdateUserSettings =
 	| { aroon: LengthSetting }
 	| { macd: MacdSetting }
 	| { stoch: StochSetting };
+
+export interface Trades {
+	pnl: number;
+	pnl_percent: number;
+	trades: number;
+}
+
+export interface MaximumDrawdown {
+	amount: number;
+	percent: number;
+}
+
+export interface CumalativeReturn {
+	time: number;
+	value: number;
+}
+
+export enum PosType {
+	Long = 'long',
+	Short = 'short'
+}
+
+export interface SignalCondition {
+	signal_index: number;
+	signal_threshold: number;
+	signal_do_command: PosType;
+	entry_size_percent: number;
+	take_profit_when: number;
+	stop_loss_when: number;
+}
+
+export interface BacktestRequest {
+	capital: number;
+	start_time: number;
+	end_time: number;
+	signal_conditions: SignalCondition[];
+}
+
+export interface BacktestResult {
+	backtest_request: BacktestRequest;
+	maximum_drawdown: MaximumDrawdown;
+	profit_trades: Trades;
+	loss_trades: Trades;
+	total: Trades;
+	cumalative_return: CumalativeReturn[];
+}
+
+export interface BacktestReport {
+	username: string;
+	ticker: string;
+	interval: Interval;
+	fuzzy_preset: string;
+	backtest_result: BacktestResult;
+	run_at: number;
+}
