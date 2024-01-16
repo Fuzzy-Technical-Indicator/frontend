@@ -1,4 +1,4 @@
-import { api, getQueryKey } from '$lib/apiClient';
+import { api } from '$lib/apiClient';
 import type { PageLoad } from './$types';
 
 export const load: PageLoad = async ({ parent, fetch }) => {

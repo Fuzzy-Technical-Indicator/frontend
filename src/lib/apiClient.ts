@@ -11,6 +11,7 @@ import { username } from './auth';
 import {
 	Interval,
 	type BacktestReport,
+	type BacktestRequest,
 	type DTValue,
 	type NewFuzzyRule,
 	type Ohlc,
@@ -310,5 +311,23 @@ export const api = (customFetch = fetch) => ({
 		const resp = await customFetch(`${PUBLIC_API_URL}/api/backtesting`, getDefaultOption({}));
 		const json = (await resp.json()) as BacktestReport[];
 		return json;
+	},
+	createBacktestReport: async (
+		data: BacktestRequest,
+		symbol: string,
+		interval: Interval,
+		preset: string
+	) => {
+		const resp = await customFetch(
+			`${PUBLIC_API_URL}/api/backtesting/run?symbol=${symbol}&interval=${interval}&preset=${preset}`,
+			getDefaultOption({
+				method: 'POST',
+				body: JSON.stringify(data),
+				headers: {
+					'Content-Type': 'application/json'
+				}
+			})
+		);
+		return resp;
 	}
 });
