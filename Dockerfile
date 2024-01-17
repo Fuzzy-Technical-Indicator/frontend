@@ -7,7 +7,7 @@ COPY . .
 
 ENV HUSKY 0
 
-RUN bun install
+RUN bun install --verbose --frozen-lockfile
 
 RUN bun run build
 
@@ -17,7 +17,7 @@ FROM oven/bun:slim
 
 COPY --from=builder /app/build /app
 
-EXPOSE 3000
+EXPOSE 4000
 
 WORKDIR /app
 
