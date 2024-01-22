@@ -5,16 +5,25 @@
 	import { Chart, LineSeries, PriceLine } from 'svelte-lightweight-charts';
 
 	export let data: BacktestResult;
-	let request = data.backtest_request;
-	let initial_capital = data.backtest_request.capital;
-	let start_time = new Date(data.backtest_request.start_time).toDateString();
-	let end_time = new Date(data.backtest_request.end_time).toDateString();
+	let metadata = data.metadata;
+	let initial_capital = metadata.capital;
+	let start_time: string;
+	let end_time: string;
+
+	if (metadata.tag === 'NormalBackTest') {
+		start_time = new Date(metadata.start_time).toDateString();
+		end_time = new Date(metadata.end_time).toDateString();
+	} else if (metadata.tag === 'PsoBackTest') {
+		start_time = new Date(metadata.train_start_time).toDateString();
+		end_time = new Date(metadata.validation_end_time).toDateString();
+	}
+
 	let cumalative_return = data.cumalative_return as SingleValueData[];
 </script>
 
 <div>
-	Initial Capital = {request.capital}, Start = {start_time}, End = {end_time}
-	{#each request.signal_conditions as condition, i}
+	Initial Capital = {metadata.capital}, Start = {start_time}, End = {end_time}
+	{#each metadata.signal_conditions as condition, i}
 		<div>
 			Condition {i + 1} → index: {condition.signal_index}, threshold: {condition.signal_threshold}
 			type: {condition.signal_do_command}, entry size %: {condition.entry_size_percent}

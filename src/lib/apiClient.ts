@@ -313,7 +313,7 @@ export const api = (customFetch = fetch) => ({
 		return json;
 	},
 	createBacktestReport: async (
-		data: BacktestRequest,
+		data: Omit<BacktestRequest, 'tag'>,
 		symbol: string,
 		interval: Interval,
 		preset: string

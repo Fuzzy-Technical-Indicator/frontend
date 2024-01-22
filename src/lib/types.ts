@@ -143,14 +143,25 @@ export interface SignalCondition {
 }
 
 export interface BacktestRequest {
+	tag: 'NormalBackTest';
 	capital: number;
 	start_time: number;
 	end_time: number;
 	signal_conditions: SignalCondition[];
 }
 
+export interface PsoBacktest {
+	tag: 'PsoBackTest';
+	capital: number;
+	train_start_time: number;
+	train_end_time: number;
+	validation_start_time: number;
+	validation_end_time: number;
+	signal_conditions: SignalCondition[];
+}
+
 export interface BacktestResult {
-	backtest_request: BacktestRequest;
+	metadata: BacktestRequest | PsoBacktest;
 	maximum_drawdown: MaximumDrawdown;
 	profit_trades: Trades;
 	loss_trades: Trades;
