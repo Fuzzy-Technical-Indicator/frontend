@@ -6,20 +6,25 @@
 	};
 	import { page } from '$app/stores';
 	import { username } from './auth';
+	import Button, { Label, Icon } from '@smui/button';
 </script>
 
 <div class="bg-black text-[#D4D4D4]">
 	<div class="bg-black text-[#D4D4D4]">
 		<nav
-			class="container max-w-8xl bg-black py-8 px-16 font-nunito mx-auto md:flex md:justify-between md:items-center"
+			class="container max-w-8xl bg-black py-8 px-16 mx-auto md:flex md:justify-between md:items-center"
 		>
 			<div class="flex items-center justify-between">
 				<a
-					class="font-nunito text-lg inline-flex items-center font-extralight text-[#FFFFFF] md:text-lg"
+					class="text-lg inline-flex items-center font-extralight text-[#FFFFFF] md:text-xl"
 					href="/"
 				>
 					<img src="favicon.png" alt="fzt-logo" width="35" height="35" class="mr-2" />
-					<p>Fuzzy Technical Indicator</p>
+					<p
+						class="font-yuji text-transparent bg-clip-text bg-gradient-to-bl from-gray-900 via-gray-100 to-gray-900"
+					>
+						Fuzzy Technical Indicator
+					</p>
 				</a>
 				<!-- Mobile menu button -->
 				<!-- svelte-ignore a11y-click-events-have-key-events -->
@@ -52,29 +57,31 @@
 					? 'flex'
 					: 'hidden'}"
 			>
-				<a class="font-nunito font-normal text-[#A6A6A6] text-l hover:text-[#FFFFFF]" href="/"
-					><span class:text-white={$page.url.pathname === '/'}>Chart</span></a
+				<a
+					class="font-normal text-[#A6A6A6] transition duration-500 ease-in-out text-l hover:text-[#FFFFFF]"
+					href="/"><span class:text-white={$page.url.pathname === '/'}>CHART</span></a
 				>
 				<a
-					class="font-nunito font-normal text-[#A6A6A6] text-l hover:text-[#FFFFFF]"
+					class="font-nunito font-normal text-[#A6A6A6] transition duration-500 ease-in-out text-l hover:text-[#FFFFFF]"
 					href="/settings"
-					><span class:text-white={$page.url.pathname.includes('/settings')}>Settings</span></a
+					><span class:text-white={$page.url.pathname.includes('/settings')}>SETTINGS</span></a
 				>
 				<a
-					class="font-nunito font-normal text-[#A6A6A6] text-l hover:text-[#FFFFFF]"
+					class="font-nunito font-normal text-[#A6A6A6] transition duration-500 ease-in-out text-l hover:text-[#FFFFFF]"
 					href="/backtests"
-					><span class:text-white={$page.url.pathname.includes('/backtests')}>Backtests</span></a
+					><span class:text-white={$page.url.pathname.includes('/backtests')}>BACKTESTS</span></a
 				>
-				<a class="font-nunito font-normal text-[#A6A6A6] text-l hover:text-[#FFFFFF]" href="/pso"
-					><span class:text-white={$page.url.pathname.includes('/pso')}>PSO</span></a
-				>
-				<button
-					class="font-nunito font-normal text-[#A6A6A6] text-l hover:text-[#FFFFFF]"
+				<Button
+					variant="outlined"
+					class="my-primary-button"
 					on:click={() => {
 						username.set('');
 						goto('/login');
-					}}>Logout</button
+					}}
 				>
+					<Icon class="material-icons">person_off</Icon>
+					<Label>LOGOUT</Label>
+				</Button>
 			</div>
 		</nav>
 	</div>

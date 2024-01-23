@@ -17,6 +17,8 @@
 	});
 </script>
 
+<h1 class="font-yuji my-8 text-center text-2xl font-bold">Backtesting</h1>
+
 <button
 	on:click={() => goto('/backtests/run')}
 	class="bg-slate-100 text-black p-2 rounded-md hover:bg-slate-200 font-normal">Run Backtest</button

@@ -109,7 +109,7 @@
 	}}>Run</button
 >
 
-<style lang="postcss">
+<!-- <style lang="postcss">
 	button {
 		@apply bg-slate-100 text-black p-2 rounded-md font-normal;
 	}
@@ -124,4 +124,4 @@
 	select {
 		@apply bg-zinc-900 text-white border border-[#313131] rounded-md col-span-2;
 	}
-</style>
+</style> -->

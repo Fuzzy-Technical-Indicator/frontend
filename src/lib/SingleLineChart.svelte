@@ -68,7 +68,7 @@
 	localization={{ priceFormatter: exceed1M ? formatterM : undefined }}
 	{...chartTheme}
 >
-	<div class="absolute z-10 top-2 left-2">
+	<div class="absolute z-10 top-2 left-1 bg-black bg-opacity-50 rounded">
 		<Legend
 			name={kind.toUpperCase()}
 			onSettingClick={() => {

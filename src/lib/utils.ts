@@ -31,14 +31,14 @@ export function toDateTimeString(timestamp: number) {
 export const chartTheme = {
 	layout: {
 		background: {
-			color: '#1A1A1A'
+			color: '#1c1c20',
 		},
 		lineColor: '#000000',
 		textColor: '#A6A6A6'
 	},
 	grid: {
-		vertLines: { color: '#313131' },
-		horzLines: { color: '#313131' }
+		vertLines: { color: '#3D4045' },
+		horzLines: { color: '#3D4045' }
 	}
 };
 

@@ -59,10 +59,10 @@
 	<div class="flex justify-center space-x-3">
 		{#each names as name, i}
 			<div class="flex space-x-1 p-4">
-				<span class="p-4 rounded-lg" style={`background-color: ${colors[i % colors.length]}`} />
+				<span class="px-4 rounded" style={`background-color: ${colors[i % colors.length]}`} />
 				<p>{name}</p>
 			</div>
 		{/each}
 	</div>
-	<div id={gId} class="m-2 w-full h-[600px]" />
+	<div id={gId} class="w-full h-[600px]" />
 </div>

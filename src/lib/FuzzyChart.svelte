@@ -49,7 +49,7 @@
 </script>
 
 <div class="h-1/6 relative">
-	<div class="absolute z-10 top-2 left-2 flex">
+	<div class="absolute z-10 top-2 px-4 bg-black bg-opacity-50 rounded flex">
 		<p>FUZZY {preset}</p>
 	</div>
 	<Chart

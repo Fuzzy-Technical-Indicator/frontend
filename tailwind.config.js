@@ -4,8 +4,10 @@ export default {
 	theme: {
 		extend: {
 			fontFamily: {
-				mono: ['Nunito Sans', 'monospace'],
-				nunito: ['Nunito Sans', 'sans-serif']
+				sans: ['sans-serif'],
+				open: ['Open Sans'],
+				roboto: ['Roboto'],
+				yuji: ['Trade Winds']
 			}
 		}
 	},

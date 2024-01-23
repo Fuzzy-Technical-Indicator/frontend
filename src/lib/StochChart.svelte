@@ -32,7 +32,7 @@
 	autoSize={true}
 	{...chartTheme}
 >
-	<div class="absolute z-10 top-2 left-2">
+	<div class="absolute z-10 top-2 px-4 bg-black bg-opacity-50 rounded">
 		<Legend
 			name={'STOCH'}
 			onSettingClick={() => {

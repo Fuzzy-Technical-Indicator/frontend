@@ -1,68 +1,71 @@
 {
-	"name": "frontend",
-	"version": "0.0.1",
-	"type": "module",
-	"private": true,
-	"devDependencies": {
-		"@smui/button": "^7.0.0-beta.16",
-		"@smui/circular-progress": "^7.0.0-beta.16",
-		"@smui/dialog": "^7.0.0-beta.16",
-		"@sveltejs/adapter-auto": "next",
-		"@sveltejs/kit": "next",
-		"@tanstack/svelte-query": "^5.8.4",
-		"@tanstack/svelte-table": "^8.10.7",
-		"@types/ramda": "^0.29.9",
-		"@typescript-eslint/eslint-plugin": "^5.45.0",
-		"@typescript-eslint/parser": "^5.45.0",
-		"autoprefixer": "^10.4.14",
-		"eslint": "^8.28.0",
-		"eslint-config-prettier": "^8.5.0",
-		"eslint-plugin-svelte3": "^4.0.0",
-		"husky": "^8.0.3",
-		"lightweight-charts": "^4.0.1",
-		"lint-staged": "^15.1.0",
-		"postcss": "^8.4.21",
-		"prettier": "^2.8.0",
-		"prettier-plugin-svelte": "^2.8.1",
-		"ramda": "^0.29.1",
-		"smui-theme": "^7.0.0-beta.16",
-		"svelte": "^3.53.1",
-		"svelte-adapter-bun": "^0.5.0",
-		"svelte-chartjs": "^3.1.2",
-		"svelte-check": "^2.9.2",
-		"svelte-lightweight-charts": "^2.2.0",
-		"svelte-preprocess": "^4.10.7",
-		"tailwindcss": "^3.3.1",
-		"tslib": "^2.4.1",
-		"typescript": "^4.9.3",
-		"typescript-svelte-plugin": "^0.3.29",
-		"vite": "^4.0.0",
-		"vitest": "^1.0.0"
-	},
-	"scripts": {
-		"dev": "vite dev",
-		"build": "vite build",
-		"preview": "vite preview",
-		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
-		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
-		"test:unit": "vitest",
-		"lint": "prettier --plugin-search-dir . --check . && eslint .",
-		"format": "prettier --plugin-search-dir . --write .",
-		"smui-theme-dark": "smui-theme compile static/smui-dark.css -i src/theme/dark",
-		"prepare": "husky install && bun run smui-theme-dark"
-	},
-	"lint-staged": {
-		"*.json": [
-			"prettier --write --plugin-search-dir .",
-			"prettier --check --plugin-search-dir ."
-		],
-		"*.{js,ts,svelte}": [
-			"prettier --plugin-search-dir . --write",
-			"prettier --check --plugin-search-dir .",
-			"eslint --fix"
-		]
-	},
-	"dependencies": {
-		"chart.js": "^4.4.1"
-	}
+  "name": "frontend",
+  "version": "0.0.1",
+  "type": "module",
+  "private": true,
+  "devDependencies": {
+    "@smui-extra/accordion": "^7.0.0-beta.16",
+    "@smui/button": "^7.0.0-beta.16",
+    "@smui/card": "^7.0.0-beta.16",
+    "@smui/circular-progress": "^7.0.0-beta.16",
+    "@smui/data-table": "^7.0.0-beta.16",
+    "@smui/dialog": "^7.0.0-beta.16",
+    "@smui/select": "^7.0.0-beta.16",
+    "@smui/textfield": "^7.0.0-beta.16",
+    "@smui/tooltip": "^7.0.0-beta.16",
+    "@sveltejs/adapter-auto": "next",
+    "@sveltejs/kit": "next",
+    "@tanstack/svelte-query": "^5.8.4",
+    "@tanstack/svelte-table": "^8.10.7",
+    "@types/ramda": "^0.29.9",
+    "@typescript-eslint/eslint-plugin": "^5.45.0",
+    "@typescript-eslint/parser": "^5.45.0",
+    "autoprefixer": "^10.4.14",
+    "eslint": "^8.28.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-svelte3": "^4.0.0",
+    "husky": "^8.0.3",
+    "lightweight-charts": "^4.0.1",
+    "lint-staged": "^15.1.0",
+    "postcss": "^8.4.21",
+    "prettier": "^2.8.0",
+    "prettier-plugin-svelte": "^2.8.1",
+    "ramda": "^0.29.1",
+    "smui-theme": "^7.0.0-beta.16",
+    "svelte": "^3.53.1",
+    "svelte-adapter-bun": "^0.5.0",
+    "svelte-chartjs": "^3.1.2",
+    "svelte-check": "^2.9.2",
+    "svelte-lightweight-charts": "^2.2.0",
+    "svelte-preprocess": "^4.10.7",
+    "tailwindcss": "^3.3.1",
+    "tslib": "^2.4.1",
+    "typescript": "^4.9.3",
+    "typescript-svelte-plugin": "^0.3.29",
+    "vite": "^4.0.0",
+    "vitest": "^1.0.0"
+  },
+  "scripts": {
+    "dev": "vite dev",
+    "build": "vite build",
+    "preview": "vite preview",
+    "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+    "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
+    "test:unit": "vitest",
+    "lint": "prettier --plugin-search-dir . --check . && eslint .",
+    "format": "prettier --plugin-search-dir . --write .",
+    "smui-theme-dark": "smui-theme compile static/smui-dark.css -i src/theme/dark",
+    "prepare": "husky install && bun run smui-theme-dark"
+  },
+  "lint-staged": {
+    "*.json": [
+      "prettier --write --plugin-search-dir .",
+      "prettier --check --plugin-search-dir ."
+    ],
+    "*.{js,ts,svelte}": [
+      "prettier --plugin-search-dir . --write",
+      "prettier --check --plugin-search-dir .",
+      "eslint --fix"
+    ]
+  }
 }

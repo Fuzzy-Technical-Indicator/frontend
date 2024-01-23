@@ -2,13 +2,16 @@
 
 @use '@material/theme/color-palette';
 
+$background: #000000;
+$foreground: #F8F9FA;
+
 // Svelte Colors! (Dark Theme)
 @use '@material/theme/index' as theme with (
-  $primary: #1d4ed8,
+  $primary: #F8F9FA,
   $secondary: color.scale(#676778, $whiteness: -10%),
-  $surface: color.adjust(color-palette.$grey-900, $blue: +4),
-  $background: #000,
-  $error: color-palette.$red-700
+  $surface: $background,
+  $background: $background,
+  $error: color-palette.$red-700,
 );
 
 @use '@material/button/mixins' as button;
@@ -27,4 +30,32 @@
   }
  
   @include button.ripple-states(color-palette.$red-600);
+}
+
+.my-primary-button {
+  &.mdc-button {
+    @include button.ink-color(#F8F9FA);
+  }
+  &.mdc-button--unelevated,
+  &.mdc-button--raised {
+    @include button.filled-accessible(#F8F9FA);
+  }
+  &.mdc-button--outlined {
+    @include button.outline-color(#F8F9FA);
+    @include button.ink-color(#F8F9FA);
+  }
+}
+
+.my-teal-button {
+  &.mdc-button {
+    @include button.ink-color(color-palette.$teal-500);
+  }
+  &.mdc-button--unelevated,
+  &.mdc-button--raised {
+    @include button.filled-accessible(color-palette.$teal-500);
+  }
+  &.mdc-button--outlined {
+    @include button.outline-color(color-palette.$teal-500);
+    @include button.ink-color(color-palette.$teal-500);
+  }
 }
