@@ -176,3 +176,9 @@ export interface BacktestReport {
 	backtest_result: BacktestResult;
 	run_at: number;
 }
+
+export interface PsoResult {
+	preset: string;
+	train_progress: { epoch: number; group: number; f: number }[];
+	validation_f: number;
+}

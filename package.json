@@ -61,5 +61,8 @@
 			"prettier --check --plugin-search-dir .",
 			"eslint --fix"
 		]
+	},
+	"dependencies": {
+		"chart.js": "^4.4.1"
 	}
 }

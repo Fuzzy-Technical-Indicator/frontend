@@ -15,6 +15,7 @@ import {
 	type DTValue,
 	type NewFuzzyRule,
 	type Ohlc,
+	type PsoResult,
 	type Settings,
 	type UpdateLinguisticVariable,
 	type UpdateUserSettings,
@@ -329,5 +330,10 @@ export const api = (customFetch = fetch) => ({
 			})
 		);
 		return resp;
+	},
+	getPsoResult: async () => {
+		const resp = await customFetch(`${PUBLIC_API_URL}/api/pso`, getDefaultOption({}));
+		const json = (await resp.json()) as PsoResult[];
+		return json;
 	}
 });
