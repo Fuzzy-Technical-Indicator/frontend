@@ -153,9 +153,8 @@ export interface BacktestRequest {
 export interface PsoBacktest {
 	tag: 'PsoBackTest';
 	capital: number;
-	train_start_time: number;
+	start_time: number;
 	train_end_time: number;
-	validation_start_time: number;
 	validation_end_time: number;
 	signal_conditions: SignalCondition[];
 }

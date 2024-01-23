@@ -7,14 +7,12 @@
 	export let data: BacktestResult;
 	let metadata = data.metadata;
 	let initial_capital = metadata.capital;
-	let start_time: string;
 	let end_time: string;
 
+	let start_time = new Date(metadata.start_time).toDateString();
 	if (metadata.tag === 'NormalBackTest') {
-		start_time = new Date(metadata.start_time).toDateString();
 		end_time = new Date(metadata.end_time).toDateString();
 	} else if (metadata.tag === 'PsoBackTest') {
-		start_time = new Date(metadata.train_start_time).toDateString();
 		end_time = new Date(metadata.validation_end_time).toDateString();
 	}
 
