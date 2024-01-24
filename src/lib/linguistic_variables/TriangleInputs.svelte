@@ -4,10 +4,10 @@
 </script>
 
 <div class="grid grid-cols-3 gap-4">
-	<Textfield class="" variant="filled" bind:value={parameters.center} label="Center">
+	<Textfield type="number" class="" variant="filled" bind:value={parameters.center} label="Center">
 	</Textfield>
-	<Textfield class="" variant="filled" bind:value={parameters.width} label="Width">
+	<Textfield type="number" class="" variant="filled" bind:value={parameters.width} label="Width">
 	</Textfield>
-	<Textfield class="" variant="filled" bind:value={parameters.height} label="Height">
+	<Textfield type="number" class="" variant="filled" bind:value={parameters.height} label="Height">
 	</Textfield>
 </div>

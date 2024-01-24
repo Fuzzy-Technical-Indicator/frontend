@@ -1,12 +1,12 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import { page } from '$app/stores';
+	import { username } from './auth';
+	import Button, { Label, Icon } from '@smui/button';
 	let showMenu = false;
 	const toggleNavbar = () => {
 		showMenu = !showMenu;
 	};
-	import { page } from '$app/stores';
-	import { username } from './auth';
-	import Button, { Label, Icon } from '@smui/button';
 </script>
 
 <div class="bg-black text-[#D4D4D4]">
@@ -19,7 +19,7 @@
 					class="text-lg inline-flex items-center font-extralight text-[#FFFFFF] md:text-xl"
 					href="/"
 				>
-					<img src="favicon.png" alt="fzt-logo" width="35" height="35" class="mr-2" />
+					<img src="/favicon.png" alt="fzt-logo" width="35" height="35" class="mr-2" />
 					<p
 						class="font-yuji text-transparent bg-clip-text bg-gradient-to-bl from-gray-900 via-gray-100 to-gray-900"
 					>
@@ -70,6 +70,9 @@
 					class="font-nunito font-normal text-[#A6A6A6] transition duration-500 ease-in-out text-l hover:text-[#FFFFFF]"
 					href="/backtests"
 					><span class:text-white={$page.url.pathname.includes('/backtests')}>BACKTESTS</span></a
+				>
+				<a class="font-nunito font-normal text-[#A6A6A6] text-l hover:text-[#FFFFFF]" href="/pso"
+					><span class:text-white={$page.url.pathname.includes('/pso')}>PSO</span></a
 				>
 				<Button
 					variant="outlined"
