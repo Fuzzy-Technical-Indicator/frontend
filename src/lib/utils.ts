@@ -12,6 +12,22 @@ export const formatterM: PriceFormatterFn = (price: BarPrice) => {
 	return `${value.toFixed(2)}M`.padEnd(10);
 };
 
+export function toDateTimeString(timestamp: number) {
+	const dt = new Date(timestamp);
+	const options: Intl.DateTimeFormatOptions = {
+		day: '2-digit',
+		month: '2-digit',
+		year: 'numeric',
+		hour: '2-digit',
+		minute: '2-digit',
+		hour12: false,
+		timeZoneName: 'short'
+	};
+
+	const formattedDate = new Intl.DateTimeFormat('en-GB', options).format(dt);
+	return formattedDate.replace(',', ' ');
+}
+
 export const chartTheme = {
 	layout: {
 		background: {

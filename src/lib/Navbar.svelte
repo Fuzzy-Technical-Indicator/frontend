@@ -65,6 +65,9 @@
 					href="/backtests"
 					><span class:text-white={$page.url.pathname.includes('/backtests')}>Backtests</span></a
 				>
+				<a class="font-nunito font-normal text-[#A6A6A6] text-l hover:text-[#FFFFFF]" href="/pso"
+					><span class:text-white={$page.url.pathname.includes('/pso')}>PSO</span></a
+				>
 				<button
 					class="font-nunito font-normal text-[#A6A6A6] text-l hover:text-[#FFFFFF]"
 					on:click={() => {

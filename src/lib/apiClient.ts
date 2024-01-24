@@ -313,6 +313,18 @@ export const api = (customFetch = fetch) => ({
 		const json = (await resp.json()) as BacktestReport[];
 		return json;
 	},
+	getBacktestReport: async (id: string) => {
+		const resp = await customFetch(`${PUBLIC_API_URL}/api/backtesting/${id}`, getDefaultOption({}));
+		const json = (await resp.json()) as BacktestReport;
+		return json;
+	},
+	deleteBacktestReport: async (id: string) => {
+		const resp = await customFetch(
+			`${PUBLIC_API_URL}/api/backtesting/${id}`,
+			getDefaultOption({ method: 'DELETE' })
+		);
+		return resp;
+	},
 	createBacktestReport: async (
 		data: Omit<BacktestRequest, 'tag'>,
 		symbol: string,
@@ -335,5 +347,12 @@ export const api = (customFetch = fetch) => ({
 		const resp = await customFetch(`${PUBLIC_API_URL}/api/pso`, getDefaultOption({}));
 		const json = (await resp.json()) as PsoResult[];
 		return json;
+	},
+	deletePsoResult: async (id: string) => {
+		const resp = await customFetch(
+			`${PUBLIC_API_URL}/api/pso/${id}`,
+			getDefaultOption({ method: 'DELETE' })
+		);
+		return resp;
 	}
 });

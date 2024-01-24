@@ -25,11 +25,19 @@
 			// this is fucking ugly but neccessary to make lightweight chart work
 			// if we loop through $fuzzy.data, the web will crash (maybe because of svelte weird shit)
 			if ($fuzzy.data.length >= 1) {
-				const lineSeries = chart.addLineSeries({ lineWidth: 1, lastValueVisible: false });
+				const lineSeries = chart.addLineSeries({
+					lineWidth: 1,
+					lastValueVisible: false,
+					color: 'green'
+				});
 				lineSeries.setData($fuzzy.data[0]);
 			}
 			if ($fuzzy.data.length >= 2) {
-				const lineSeries = chart.addLineSeries({ lineWidth: 1, lastValueVisible: false });
+				const lineSeries = chart.addLineSeries({
+					lineWidth: 1,
+					lastValueVisible: false,
+					color: 'red'
+				});
 				lineSeries.setData($fuzzy.data[1]);
 			}
 			if ($fuzzy.data.length >= 3) {
