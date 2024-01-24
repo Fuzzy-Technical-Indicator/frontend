@@ -15,6 +15,7 @@ import {
 	type DTValue,
 	type NewFuzzyRule,
 	type Ohlc,
+	type PsoResult,
 	type Settings,
 	type UpdateLinguisticVariable,
 	type UpdateUserSettings,
@@ -312,8 +313,20 @@ export const api = (customFetch = fetch) => ({
 		const json = (await resp.json()) as BacktestReport[];
 		return json;
 	},
+	getBacktestReport: async (id: string) => {
+		const resp = await customFetch(`${PUBLIC_API_URL}/api/backtesting/${id}`, getDefaultOption({}));
+		const json = (await resp.json()) as BacktestReport;
+		return json;
+	},
+	deleteBacktestReport: async (id: string) => {
+		const resp = await customFetch(
+			`${PUBLIC_API_URL}/api/backtesting/${id}`,
+			getDefaultOption({ method: 'DELETE' })
+		);
+		return resp;
+	},
 	createBacktestReport: async (
-		data: BacktestRequest,
+		data: Omit<BacktestRequest, 'tag'>,
 		symbol: string,
 		interval: Interval,
 		preset: string
@@ -327,6 +340,18 @@ export const api = (customFetch = fetch) => ({
 					'Content-Type': 'application/json'
 				}
 			})
+		);
+		return resp;
+	},
+	getPsoResult: async () => {
+		const resp = await customFetch(`${PUBLIC_API_URL}/api/pso`, getDefaultOption({}));
+		const json = (await resp.json()) as PsoResult[];
+		return json;
+	},
+	deletePsoResult: async (id: string) => {
+		const resp = await customFetch(
+			`${PUBLIC_API_URL}/api/pso/${id}`,
+			getDefaultOption({ method: 'DELETE' })
 		);
 		return resp;
 	}

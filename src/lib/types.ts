@@ -143,14 +143,24 @@ export interface SignalCondition {
 }
 
 export interface BacktestRequest {
+	tag: 'NormalBackTest';
 	capital: number;
 	start_time: number;
 	end_time: number;
 	signal_conditions: SignalCondition[];
 }
 
+export interface PsoBacktest {
+	tag: 'PsoBackTest';
+	capital: number;
+	start_time: number;
+	train_end_time: number;
+	validation_end_time: number;
+	signal_conditions: SignalCondition[];
+}
+
 export interface BacktestResult {
-	backtest_request: BacktestRequest;
+	metadata: BacktestRequest | PsoBacktest;
 	maximum_drawdown: MaximumDrawdown;
 	profit_trades: Trades;
 	loss_trades: Trades;
@@ -159,10 +169,24 @@ export interface BacktestResult {
 }
 
 export interface BacktestReport {
+	_id: string;
 	username: string;
 	ticker: string;
 	interval: Interval;
 	fuzzy_preset: string;
 	backtest_result: BacktestResult;
+	backtest_id: string;
 	run_at: number;
+}
+
+export interface PsoResult {
+	preset: string;
+	train_progress: { epoch: number; group: number; f: number }[];
+	validation_f: number;
+	start_time: number;
+	train_end_time: number;
+	validation_end_time: number;
+	backtest_id: string;
+	run_at: number;
+	_id: string;
 }

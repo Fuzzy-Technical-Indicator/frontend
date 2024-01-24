@@ -1,12 +1,19 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { api } from '$lib/apiClient';
-	import BacktestResult from '$lib/components/BacktestResult.svelte';
-	import { createQuery } from '@tanstack/svelte-query';
+	import BacktestReport from '$lib/components/BacktestReport.svelte';
+	import { createMutation, createQuery } from '@tanstack/svelte-query';
 
 	const backtests = createQuery({
-		queryKey: ['backtest'],
+		queryKey: ['backtests'],
 		queryFn: () => api().getBacktestReports()
+	});
+	const deleteMutation = createMutation({
+		mutationFn: (id: string) => {
+			confirm('Are you sure you want to delete this backtest report?');
+			return api().deleteBacktestReport(id);
+		},
+		onSuccess: () => $backtests.refetch()
 	});
 </script>
 
@@ -17,13 +24,13 @@
 
 <div>
 	{#if $backtests.isSuccess}
-		{#each $backtests.data as item}
+		{#each $backtests.data as item (item._id)}
 			<div class="mt-6">
-				{item.ticker}
-				{item.interval}
-				<a href={`/settings/${item.fuzzy_preset}`} class="text-blue-400">{item.fuzzy_preset}</a>
-				{new Date(item.run_at).toUTCString()}
-				<BacktestResult data={item.backtest_result} />
+				<BacktestReport data={item} />
+				<button
+					class="bg-red-600 rounded-md hover:bg-red-500 p-2 mt-2"
+					on:click={() => $deleteMutation.mutate(item._id)}>Delete</button
+				>
 			</div>
 		{/each}
 	{/if}
