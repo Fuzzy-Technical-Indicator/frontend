@@ -1,24 +1,41 @@
-@import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,200;0,6..12,300;0,6..12,400;0,6..12,500;0,6..12,600;0,6..12,700;0,6..12,800;0,6..12,900;0,6..12,1000;1,6..12,200;1,6..12,300;1,6..12,400;1,6..12,500;1,6..12,600;1,6..12,700;1,6..12,800;1,6..12,900;1,6..12,1000&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400;1,500;1,600;1,700;1,800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Oleo+Script+Swash+Caps:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Racing+Sans+One&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Trade+Winds&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-.chart-container > .tv-lightweight-charts {
-	border-radius: 16px;
+@layer base {
+	html {
+		@apply font-roboto;
+	}
+}
+
+.chart-container>.tv-lightweight-charts {
+	border-radius: 8px;
 	border-width: 1px;
 	border-style: solid;
 	border-color: #313131;
 }
 
 .dcg-container {
-	border-radius: 16px !important;
+	border-radius: 8px !important;
 	border-width: 1px !important;
-	/* border-style: solid !important;
-	border-color: #313131 !important; */
 	background: #e5e5e5 !important;
 	filter: invert(1) !important;
 }
 
 .dcg-graphpaper-branding {
 	visibility: hidden !important;
+}
+
+.custom-select {
+	padding: 0px 8px;
+	border-right: 16px solid transparent;
+}
+
+::-webkit-calendar-picker-indicator {
+    filter: invert(1);
 }

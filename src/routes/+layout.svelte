@@ -4,7 +4,10 @@
 	import type { PageData } from './$types';
 	import Navbar from '$lib/Navbar.svelte';
 	import Footer from '$lib/Footer.svelte';
+	import PageTransition from '$lib/components/PageTransition.svelte';
 	import { username } from '$lib/auth';
+	import { page } from '$app/stores';
+	import CircularProgress from '@smui/circular-progress';
 
 	export let data: PageData;
 </script>
@@ -22,13 +25,21 @@
 </svelte:head>
 
 <QueryClientProvider client={data.queryClient}>
-	<main class="bg-black text-[#D4D4D4]">
+	<main class="bg-black text-[#F8F9FA]">
 		{#if $username !== ''}
 			<Navbar />
 		{/if}
-		<div class="container mx-auto max-w-7xl bg-black font-nunito">
-			<slot />
+		{#if $page.url.pathname === '/login' || $username !== ''}
+		<div class="container mx-auto max-w-8xl bg-black">
+			<PageTransition pathname={$page.url.pathname}>
+				<slot />
+			</PageTransition>
 		</div>
+		{:else}
+		<div class="z-20 absolute bottom-0 left-0 right-0 top-0 grid place-items-center">
+			<CircularProgress style="height: 128px; width: 128px;" indeterminate />
+		</div>
+		{/if}
 		<Footer />
 	</main>
 </QueryClientProvider>

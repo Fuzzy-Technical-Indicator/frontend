@@ -12,11 +12,12 @@
 	import { get } from 'svelte/store';
 	import { Interval } from '$lib/types';
 	import { chartTheme } from '$lib/utils';
-	import Button from '@smui/button';
+	import Button, { Label, Icon } from '@smui/button';
 	import Dialog from '@smui/dialog';
 	import CircularProgress from '@smui/circular-progress';
 	import BbSetting from '$lib/dialogs/BBSetting.svelte';
 	import Legend from '$lib/components/Legend.svelte';
+	import Tooltip, { Wrapper } from '@smui/tooltip';
 
 	const ohlc = createQuery({
 		queryKey: getQueryKey(['ohlc']),
@@ -121,37 +122,49 @@
 </script>
 
 {#if $isFetching > 0}
-	<div class="absolute inset-1/2 z-20">
+	<div class="z-20 absolute bottom-0 left-0 right-0 top-0 grid place-items-center">
 		<CircularProgress style="height: 128px; width: 128px;" indeterminate />
 	</div>
 {/if}
 
 <div class="flex py-4">
-	<select
-		class="bg-[#1A1A1A] text-[#A6A6A6] border border-[#313131] rounded-md mr-4"
-		on:change={handleSymbolChange}
-	>
-		{#each tickers as ticker}
-			<option value={ticker}>{ticker}</option>
-		{/each}
-	</select>
+	<Wrapper>
+		<select
+			class="bg-[#232428] text-[#F8F9FA] pl-2 rounded mr-4 custom-select"
+			on:change={handleSymbolChange}
+		>
+			{#each tickers as ticker}
+				<option value={ticker}>{ticker}</option>
+			{/each}
+		</select>
+		<Tooltip>Select stock.</Tooltip>
+	</Wrapper>
 
-	<select
-		class="bg-[#1A1A1A] text-[#A6A6A6] border border-[#313131] rounded-md"
-		on:change={handleIntervalChange}
-	>
-		<option value={Interval.OneDay}>1D</option>
-		<option value={Interval.FourHour}>4H</option>
-		<option value={Interval.OneHour}>1H</option>
-	</select>
+	<Wrapper>
+		<select
+			class="bg-[#232428] text-[#F8F9FA] pl-2 rounded custom-select"
+			on:change={handleIntervalChange}
+		>
+			<option value={Interval.OneDay}>1D</option>
+			<option value={Interval.FourHour}>4H</option>
+			<option value={Interval.OneHour}>1H</option>
+		</select>
+		<Tooltip>Select interval.</Tooltip>
+	</Wrapper>
 
-	<Button
-		class="ml-4"
-		variant="raised"
-		on:click={() => {
-			fuzzyDialogOpen = true;
-		}}>Fuzzy Presets</Button
-	>
+	<Wrapper>
+		<Button
+			class="ml-4 my-primary-button"
+			variant="raised"
+			on:click={() => {
+				fuzzyDialogOpen = true;
+			}}
+		>
+			<Icon class="material-icons">menu</Icon>
+			<Label>Fuzzy Presets</Label>
+		</Button>
+		<Tooltip>Select your fuzzy presets then plotting chart.</Tooltip>
+	</Wrapper>
 </div>
 
 {#if $presets.isSuccess}
@@ -181,7 +194,7 @@
 			{...chartTheme}
 			localization={{ priceFormatter: priceFn }}
 		>
-			<div class="absolute z-10 top-0 left-0 p-2">
+			<div class="absolute z-10 top-0 left-0 p-2 pr-4 bg-black bg-opacity-50 rounded drop-shadow-lg shadow-xl">
 				{$chartSettings.symbol.toLocaleUpperCase()}
 				-
 				{$chartSettings.interval.toUpperCase()}

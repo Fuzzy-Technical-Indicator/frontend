@@ -16,6 +16,8 @@
 	} from '@tanstack/svelte-table';
 	import { mergeAll } from 'ramda';
 	import { writable } from 'svelte/store';
+	import Button, { Label } from '@smui/button';
+	import { Icon } from '@smui/icon-button';
 
 	type Rules = {
 		[k: string]: string;
@@ -118,19 +120,21 @@
 	const table = createSvelteTable(options);
 </script>
 
-<div class="p-4">
-	<table>
+<div class="py-4 px-64">
+	<table class="border-collapse w-full border border-[#313131]">
 		<thead>
 			{#each $table.getHeaderGroups() as headerGroup}
 				<tr>
 					{#each headerGroup.headers as header}
-						<th colSpan={header.colSpan}>
+						<td class="bg-[#1A1A1A] border-[#313131] text-center p-3 font-bold" class:border-b={!header.isPlaceholder} class:border-l={!header.isPlaceholder} class:border-r={!header.isPlaceholder} colSpan={header.colSpan}>
 							{#if !header.isPlaceholder}
-								<svelte:component
+								<div>
+									<svelte:component
 									this={flexRender(header.column.columnDef.header, header.getContext())}
 								/>
+								</div>
 							{/if}
-						</th>
+						</td>
 					{/each}
 				</tr>
 			{/each}
@@ -139,16 +143,20 @@
 			{#each $table.getRowModel().rows as row}
 				<tr>
 					{#each row.getVisibleCells() as cell}
-						<td>
+						<td class="border border-[#313131] p-2">
 							{#if cell.column.columnDef.id === 'actions'}
-								<button
-									class="bg-[#ff3232] text-[#FFFFFF] border border-[#313131] rounded-md text-md font-thin px-2"
-									on:click={() => $deleteMutation.mutate(cell.getValue())}>delete</button
-								>
+								<div class="text-center">
+								<Button class="" variant="outlined" on:click={() => $deleteMutation.mutate(cell.getValue())}>
+									<Icon class="material-icons">delete</Icon>
+									<Label>Remove</Label>
+								</Button>
+								</div>
 							{:else}
-								<svelte:component
+								<div class="text-center">
+									<svelte:component
 									this={flexRender(cell.column.columnDef.cell, cell.getContext())}
 								/>
+								</div>
 							{/if}
 						</td>
 					{/each}
@@ -159,7 +167,7 @@
 			<tr>
 				<th />
 				{#each ruleOptions as ruleOpt}
-					<th>
+					<th class="p-2">
 						<select
 							class="bg-[#1A1A1A] text-[#A6A6A6] border border-[#313131] rounded-md"
 							bind:value={newRule[ruleOpt.kind][ruleOpt.name]}
@@ -170,29 +178,13 @@
 						</select>
 					</th>
 				{/each}
-				<th>
-					<button
-						class="bg-[#4e7ffa] text-[#FFFFFF] border border-[#313131] rounded-md text-md font-thin px-2"
-						on:click={() => $addMutataion.mutate(newRule)}>add</button
-					>
+				<th class="p-2">
+					<Button class="" variant="outlined" on:click={() => $addMutataion.mutate(newRule)}>
+						<Icon class="material-icons">add</Icon>
+						<Label>Add Rule</Label>
+					</Button>
 				</th>
 			</tr>
 		</tfoot>
 	</table>
 </div>
-
-<style>
-	table {
-		border: 1px solid lightgray;
-	}
-
-	tbody {
-		border-bottom: 1px solid lightgray;
-	}
-
-	th {
-		border-bottom: 1px solid lightgray;
-		border-right: 1px solid lightgray;
-		padding: 2px 4px;
-	}
-</style>

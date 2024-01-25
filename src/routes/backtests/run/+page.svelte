@@ -4,6 +4,11 @@
 	import { tickers } from '$lib/utils';
 	import { createMutation, createQuery } from '@tanstack/svelte-query';
 
+	import Select, { Option } from '@smui/select';
+	import Textfield from '@smui/textfield';
+	import Button, { Label, Icon } from '@smui/button';
+	import DataTable, { Head, Body, Row, Cell } from '@smui/data-table';
+
 	const defaultCondition: SignalCondition = {
 		signal_index: 0,
 		signal_threshold: 0,
@@ -26,8 +31,13 @@
 	let signal_conditions: SignalCondition[] = [];
 	let condition = defaultCondition;
 
-	let start_time = 0; // TODO: need to change UI for this to calendar
+	let start_date = '';
+	let end_date = '';
+	let start_time = 0;
 	let end_time = 0;
+
+	$: start_time = start_date ? new Date(start_date).getTime() : 0;
+	$: end_time = end_date ? new Date(end_date).getTime() : 0;
 
 	let runMutation = createMutation({
 		mutationFn: () =>
@@ -40,88 +50,131 @@
 	});
 </script>
 
-<div class="grid grid-cols-3 gap-2">
-	<span>Ticker</span>
-	<select bind:value={ticker}>
-		{#each tickers as ticker}
-			<option value={ticker}>{ticker}</option>
-		{/each}
-	</select>
-	<span>Interval</span>
-	<select bind:value={interval}>
-		{#each Object.values(Interval) as interval}
-			<option value={interval}>{interval}</option>
-		{/each}
-	</select>
-	<span>Fuzzy Presets</span>
-	<select bind:value={preset}>
-		{#if $presets.isSuccess}
-			{#each $presets.data as preset}
-				<option value={preset}>{preset}</option>
-			{/each}
-		{/if}
-	</select>
-	<span>Initial Capital</span>
-	<input type="number" placeholder="capital" bind:value={capital} />
-	<span>Start time</span>
-	<input type="number" placeholder="start time" bind:value={start_time} />
-	<span>End time</span>
-	<input type="number" placeholder="end time" bind:value={end_time} />
-</div>
-
-<div class="flex border-t mt-4 pt-4">
-	<h3 class="mr-2 self-center">Conditions</h3>
-	<button
-		on:click={() => {
-			signal_conditions.push(condition);
-			signal_conditions = signal_conditions;
-			condition = defaultCondition;
-		}}>Add Condition</button
-	>
-</div>
-<div class="grid grid-cols-3 gap-2">
-	<span>signal index</span>
-	<input type="number" placeholder="signal index" bind:value={condition.signal_index} />
-	<span>threshold</span>
-	<input type="number" placeholder="threshold" bind:value={condition.signal_threshold} />
-	<span>type</span>
-	<select bind:value={condition.signal_do_command} class="bg-zinc-900 text-white col-span-2">
-		<option value="long">Long</option>
-		<option value="short">Short</option>
-	</select>
-	<span>entry size %</span>
-	<input type="number" placeholder="entry size %" bind:value={condition.entry_size_percent} />
-	<span>take profit %</span>
-	<input type="number" placeholder="take profit %" bind:value={condition.take_profit_when} />
-	<span>stop loss %</span>
-	<input type="number" placeholder="stop loss %" bind:value={condition.stop_loss_when} />
+<div>
+	<h1 class="font-yuji my-8 text-center text-2xl font-bold">Setup Backtesting</h1>
 </div>
 
 <div>
-	{#each signal_conditions as cond}
-		{JSON.stringify(cond)}
-	{/each}
+	<h1 class="text-center text-xl mb-12">Trading Essentials</h1>
+	<div class="grid grid-cols-2">
+		<span class="pr-2">Ticker</span>
+		<Select variant="filled" bind:value={ticker} label="Ticker">
+			{#each tickers as ticker}
+				<Option value={ticker}>{ticker}</Option>
+			{/each}
+		</Select>
+
+		<span class="pr-2">Interval</span>
+		<Select variant="filled" bind:value={interval} label="Interval">
+			{#each Object.values(Interval) as interval}
+				<Option value={interval}>{interval.toUpperCase()}</Option>
+			{/each}
+		</Select>
+
+		<span class="pr-2">Fuzzy Preset</span>
+		<Select variant="filled" bind:value={preset} label="Fuzzy Preset">
+			{#if $presets.isSuccess}
+				{#each $presets.data as preset}
+					<Option value={preset}>{preset}</Option>
+				{/each}
+			{/if}
+		</Select>
+
+		<span class="pr-2">Initial Capital</span>
+		<Textfield variant="filled" type="number" bind:value={capital} label="Capital" />
+
+		<span class="pr-2">Start time</span>
+		<input
+			class="py-3 px-4 rounded-t bg-[#0A0A0A] border-b border-[#717171]"
+			type="date"
+			placeholder="start time"
+			bind:value={start_date}
+		/>
+
+		<span class="pr-2">End time</span>
+		<input
+			class="py-3 px-4 rounded-t bg-[#0A0A0A] border-b border-[#717171]"
+			type="date"
+			placeholder="end time"
+			bind:value={end_date}
+		/>
+	</div>
 </div>
 
-<button
-	on:click={() => {
+<div>
+	<h1 class="text-center text-xl mt-12">Ordering Conditions</h1>
+	<div class="flex justify-between py-4">
+		<h1 class="font-bold">Condition Setup</h1>
+		<Button class="" variant="raised" on:click={() => {
+			signal_conditions.push({ ...condition });
+			signal_conditions = signal_conditions;
+			condition = defaultCondition;
+		}}>
+			<Icon class="material-icons">add</Icon>
+			<Label>Add Condition</Label>
+		</Button>
+	</div>
+
+	<div class="grid grid-cols-2">
+
+		<span>Signal Index</span>
+		<Textfield variant="filled" type="number" bind:value={condition.signal_index} label="Signal Index" />
+
+		<span>Signal Threshold</span>
+		<Textfield variant="filled" type="number" bind:value={condition.signal_threshold} label="Signal Threshold" />
+
+		<span>Signal Do Command</span>
+		<Select variant="filled" bind:value={condition.signal_do_command} label="Signal Do Command">
+			<Option value="long">Long</Option>
+			<Option value="short">Short</Option>
+		</Select>
+
+		<span>Entry size (%)</span>
+		<Textfield variant="filled" type="number" bind:value={condition.entry_size_percent} label="Entry size (%)" />
+
+		<span>Take profit (%)</span>
+		<Textfield variant="filled" type="number" bind:value={condition.take_profit_when} label="Take profit (%)" />
+
+		<span>Stop loss (%)</span>
+		<Textfield variant="filled" type="number" bind:value={condition.stop_loss_when} label="Stop loss (%)" />
+
+	</div>
+</div>
+
+<div class="text-center mt-8">
+	<DataTable table$aria-label="Condition List" style="max-width: 100%;">
+		<Head>
+		  <Row>
+			<Cell numeric>No.</Cell>
+			<Cell numeric>Signal Index</Cell>
+			<Cell numeric>Signal Threshold</Cell>
+			<Cell>Signal Do Command</Cell>
+			<Cell numeric>Entry size (%)</Cell>
+			<Cell numeric>Take profit (%)</Cell>
+			<Cell numeric>Stop loss (%)</Cell>
+		  </Row>
+		</Head>
+		<Body>
+			{#each signal_conditions as cond}
+				<Row>
+					<Cell class="text-center" numeric>{signal_conditions.indexOf(cond) + 1}</Cell>
+					<Cell class="text-center" numeric>{cond.signal_index}</Cell>
+					<Cell class="text-center" numeric>{cond.signal_threshold}</Cell>
+					<Cell class="text-center">{cond.signal_do_command}</Cell>
+					<Cell class="text-center" numeric>{cond.entry_size_percent}</Cell>
+					<Cell class="text-center" numeric>{cond.take_profit_when}</Cell>
+					<Cell class="text-center" numeric>{cond.stop_loss_when}</Cell>
+				</Row>
+			{/each}
+		</Body>
+	  </DataTable>
+</div>
+
+<div class="text-center my-12">
+	<Button class="" variant="raised" on:click={() => {
 		$runMutation.mutate();
-	}}>Run</button
->
-
-<style lang="postcss">
-	button {
-		@apply bg-slate-100 text-black p-2 rounded-md font-normal;
-	}
-	button:hover {
-		@apply bg-slate-200;
-	}
-
-	input {
-		@apply bg-zinc-900 text-white border border-[#313131] rounded-md col-span-2 pl-1;
-	}
-
-	select {
-		@apply bg-zinc-900 text-white border border-[#313131] rounded-md col-span-2;
-	}
-</style>
+	}}>
+		<Icon class="material-icons">speed</Icon>
+		<Label>Run Backtest</Label>
+	</Button>
+</div>

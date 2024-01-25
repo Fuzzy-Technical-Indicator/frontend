@@ -6,6 +6,10 @@
 	import Desmos from '$lib/desmos/Desmos.svelte';
 	import RulesTable from '$lib/fuzzy_rules/RulesTable.svelte';
 	import type { PageData } from './$types';
+	import Button, { Label } from '@smui/button';
+	import { Icon } from '@smui/icon-button';
+	import Select, { Option } from '@smui/select';
+	import Textfield from '@smui/textfield';
 
 	export let data: PageData;
 	let currPreset = data.currPreset;
@@ -58,56 +62,64 @@
 </script>
 
 <div>
-	<a href="/settings"><button class="p-2 bg-gray-900">Back</button></a>
+	<Button variant="outlined" class="mt-8" href="/settings">
+		<Icon class="material-icons">arrow_back</Icon>
+		<Label>Back</Label>
+	</Button>
 	<h1 class="text-3xl font-bold text-center py-4">{currPreset}</h1>
 	{#if $settings.isSuccess}
-		<div>
+		<div class="">
 			<h1 class="text-2xl text-center py-4">Linguistic Variables</h1>
-			{#each Object.entries($settings.data.linguisticVariables) as [name, info]}
-				<h3 class="text-lg text-center">{name} ({info.kind})</h3>
-				<Desmos
-					graphId={name}
-					boundary={{ left: info.lowerBoundary, right: info.upperBoundary }}
-					graphs={Object.values(info.shapes).map((v) => v.latex)}
-					names={Object.keys(info.shapes)}
-				/>
-				<LinguisticVar {info} {name} preset={currPreset} />
-			{/each}
+			<div class="linguistic-container grid grid-cols-2 gap-4">
+				{#each Object.entries($settings.data.linguisticVariables) as [name, info]}
+					<div class="my-8 p-4 border border-[#313131] rounded">
+						<h3 class="text-lg text-center">{name} ({info.kind})</h3>
+						<Desmos
+							graphId={name}
+							boundary={{ left: info.lowerBoundary, right: info.upperBoundary }}
+							graphs={Object.values(info.shapes).map((v) => v.latex)}
+							names={Object.keys(info.shapes)}
+						/>
+						<LinguisticVar {info} {name} preset={currPreset} />
+					</div>
+				{/each}
+			</div>
 
-			<div class="mt-5">
-				<button
-					class="bg-[#4e7ffa] text-[#FFFFFF] border border-[#313131] rounded-md px-2 text-md font-thin"
-					on:click={handleAddLinguisticVar}>Add new Linguistic Variable</button
-				>
-				<select
-					class="bg-[#1A1A1A] text-[#A6A6A6] border border-[#313131] rounded-md"
+			<div class="mt-5 text-center">
+				<Select
+					class="mr-4"
+					variant="filled"
 					bind:value={currLinguisticVarOpt}
+					label="Linguistic Variable"
 				>
 					{#each linguisticVarOptions as opt}
-						<option value={opt}>{opt}</option>
+						<Option value={opt}>{opt}</Option>
 					{/each}
-				</select>
+				</Select>
+
 				{#if currLinguisticVarOpt === 'custom'}
-					<label>
-						name
-						<input type="text" bind:value={customName} class="bg-zinc-900 text-white" />
-					</label>
+					<Textfield class="mr-4" variant="filled" bind:value={customName} label="Name" />
 				{/if}
+
+				<Button class="mb-4" variant="raised" on:click={handleAddLinguisticVar}>
+					<Icon class="material-icons">add</Icon>
+					<Label>Add Linguistic Variable</Label>
+				</Button>
 			</div>
 		</div>
-		<div class="mt-10">
-			<h1 class="text-2xl">Rules</h1>
+		<div class="mt-16">
+			<h1 class="text-2xl text-center py-4">Rules</h1>
 			<RulesTable
 				linguisticVariables={$settings.data.linguisticVariables}
 				fuzzyRules={$settings.data.fuzzyRules}
 				{currPreset}
 			/>
-			<div class="flex space-x-2">
-				<button
-					class="bg-[#4e7ffa] text-[#FFFFFF] border border-[#313131] rounded-md px-2 text-md font-thin"
-					>Add rule</button
-				>
-			</div>
+			<!-- <div class="text-center">
+				<Button class="mb-4" variant="raised" on:click={handleAddLinguisticVar}>
+					<Icon class="material-icons">add</Icon>
+					<Label>Add Linguistic Variable</Label>
+				</Button>
+			</div> -->
 		</div>
 	{/if}
 </div>
