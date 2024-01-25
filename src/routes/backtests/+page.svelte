@@ -29,6 +29,21 @@
 	<Label>Run Backtest</Label>
 </Button>
 
+<Dialog bind:open aria-labelledby="simple-title" aria-describedby="simple-content">
+	<Title id="simple-title">Confirm</Title>
+	<Content id="simple-content"
+		>Are you sure you want to delete this backtest report?</Content
+	>
+	<Actions>
+		<Button>
+			<Label>No</Label>
+		</Button>
+		<Button on:click={() => $deleteMutation.mutate(openItemId)}>
+			<Label>Yes</Label>
+		</Button>
+	</Actions>
+</Dialog>
+
 <div class="mt-8">
 	{#if $backtests.isSuccess}
 		{#each $backtests.data as item (item._id)}
@@ -49,20 +64,6 @@
 					<Icon class="material-icons">delete</Icon>
 					<Label>Remove</Label>
 				</Button>
-				<Dialog bind:open aria-labelledby="simple-title" aria-describedby="simple-content">
-					<Title id="simple-title">Confirm</Title>
-					<Content id="simple-content"
-						>Are you sure you want to delete this backtest report?</Content
-					>
-					<Actions>
-						<Button>
-							<Label>No</Label>
-						</Button>
-						<Button on:click={() => $deleteMutation.mutate(openItemId)}>
-							<Label>Yes</Label>
-						</Button>
-					</Actions>
-				</Dialog>
 			</div>
 		{/each}
 	{/if}
