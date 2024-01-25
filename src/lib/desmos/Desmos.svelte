@@ -9,7 +9,7 @@
 	export let graphs: string[][];
 	export let names: string[];
 
-	const gId = `${graphId}-desmos-graph`;
+	// let gId = `${graphId}-desmos-graph`;
 
 	const colors = ['#c74440', '#2d70b3', '#388c46', '#6042a6', '#fa7e19', '#ffffff'];
 	const colorsInvert = ['#38bbbf', '#d28f4c', '#c773b9', '#9fbd59', '#0581e6', '#000000']; // desmos dark-mode by myself
@@ -20,7 +20,7 @@
 			g.destroy();
 		}
 
-		let elt = document.getElementById(gId);
+		let elt = document.getElementById(`${graphId}-desmos-graph`);
 		// @ts-expect-error : Desmos is an object from the script
 		// eslint-disable-next-line
 		g = Desmos.GraphingCalculator(elt, {
@@ -64,5 +64,5 @@
 			</div>
 		{/each}
 	</div>
-	<div id={gId} class="w-full h-[600px]" />
+	<div id={`${graphId}-desmos-graph`} class="w-full h-[600px]" />
 </div>

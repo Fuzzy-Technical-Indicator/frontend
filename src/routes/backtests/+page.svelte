@@ -4,6 +4,7 @@
 	import BacktestReport from '$lib/components/BacktestReport.svelte';
 	import { createMutation, createQuery } from '@tanstack/svelte-query';
 	import Button, { Label, Icon } from '@smui/button';
+	import Dialog, { Title, Content, Actions } from '@smui/dialog';
 
 	const backtests = createQuery({
 		queryKey: ['backtests'],
@@ -11,31 +12,55 @@
 	});
 	const deleteMutation = createMutation({
 		mutationFn: (id: string) => {
-			confirm('Are you sure you want to delete this backtest report?');
+			// confirm('Are you sure you want to delete this backtest report?');
 			return api().deleteBacktestReport(id);
 		},
 		onSuccess: () => $backtests.refetch()
 	});
+
+	let open = false;
+	let openItemId = '';
 </script>
 
 <h1 class="font-yuji my-8 text-center text-2xl font-bold">Backtesting</h1>
-
-<!-- <button
-	on:click={() => goto('/backtests/run')}
-	class="bg-slate-100 text-black p-2 rounded-md hover:bg-slate-200 font-normal">Run Backtest</button
-> -->
 
 <Button variant="raised" on:click={() => goto('/backtests/run')}>
 	<Icon class="material-icons">speed</Icon>
 	<Label>Run Backtest</Label>
 </Button>
 
+<Dialog bind:open aria-labelledby="simple-title" aria-describedby="simple-content">
+	<Title id="simple-title">Confirm</Title>
+	<Content id="simple-content"
+		>Are you sure you want to delete this backtest report?</Content
+	>
+	<Actions>
+		<Button>
+			<Label>No</Label>
+		</Button>
+		<Button on:click={() => $deleteMutation.mutate(openItemId)}>
+			<Label>Yes</Label>
+		</Button>
+	</Actions>
+</Dialog>
+
 <div class="mt-8">
 	{#if $backtests.isSuccess}
 		{#each $backtests.data as item (item._id)}
 			<div class="border border-[#313131] rounded p-4 my-4">
 				<BacktestReport data={item} />
-				<Button class="mt-4" variant="outlined" on:click={() => $deleteMutation.mutate(item._id)}>
+				<!-- <Button class="mt-4" variant="outlined" on:click={() => $deleteMutation.mutate(item._id)}>
+					<Icon class="material-icons">delete</Icon>
+					<Label>Remove</Label>
+				</Button> -->
+				<Button
+					class="mt-4"
+					variant="outlined"
+					on:click={() => {
+						open = true;
+						openItemId = item._id;
+					}}
+				>
 					<Icon class="material-icons">delete</Icon>
 					<Label>Remove</Label>
 				</Button>
