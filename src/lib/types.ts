@@ -137,6 +137,7 @@ export interface SignalCondition {
 	signal_index: number;
 	signal_threshold: number;
 	signal_do_command: PosType;
+	min_entry_size: number,
 	entry_size_percent: number;
 	take_profit_when: number;
 	stop_loss_when: number;

@@ -81,8 +81,18 @@
 			if (resp.status === 200) {
 				client.invalidateQueries({ queryKey: ['settings'] });
 				newFuzzySetName = '';
-				newFuzzySetTriangleParameters = {};
-				newFuzzySetTrapezoidParameters = {};
+				newFuzzySetTriangleParameters = {
+					center: 0,
+					width: 0,
+					height: 0
+				};
+				newFuzzySetTrapezoidParameters = {
+					a: 0,
+					b: 0,
+					c: 0,
+					d: 0,
+					height: 0
+				};
 			} else {
 				const errMsg = await resp.text();
 				alert(errMsg);

@@ -8,11 +8,14 @@
 	import Textfield from '@smui/textfield';
 	import Button, { Label, Icon } from '@smui/button';
 	import DataTable, { Head, Body, Row, Cell } from '@smui/data-table';
+	import CircularProgress from '@smui/circular-progress';
+	import { goto } from '$app/navigation';
 
 	const defaultCondition: SignalCondition = {
 		signal_index: 0,
 		signal_threshold: 0,
 		signal_do_command: PosType.Long,
+		min_entry_size: 10,
 		entry_size_percent: 10,
 		take_profit_when: 20,
 		stop_loss_when: 10
@@ -48,7 +51,15 @@
 				preset
 			)
 	});
+
+	let loadBacktest = false;
 </script>
+
+{#if loadBacktest}
+	<div class="z-20 absolute bottom-0 left-0 right-0 top-0 grid place-items-center">
+		<CircularProgress style="height: 128px; width: 128px;" indeterminate />
+	</div>
+{/if}
 
 <div>
 	<h1 class="font-yuji my-8 text-center text-2xl font-bold">Setup Backtesting</h1>
@@ -105,23 +116,36 @@
 	<h1 class="text-center text-xl mt-12">Ordering Conditions</h1>
 	<div class="flex justify-between py-4">
 		<h1 class="font-bold">Condition Setup</h1>
-		<Button class="" variant="raised" on:click={() => {
-			signal_conditions.push({ ...condition });
-			signal_conditions = signal_conditions;
-			condition = defaultCondition;
-		}}>
+		<Button
+			class=""
+			variant="raised"
+			on:click={() => {
+				signal_conditions.push({ ...condition });
+				signal_conditions = signal_conditions;
+				condition = defaultCondition;
+			}}
+		>
 			<Icon class="material-icons">add</Icon>
 			<Label>Add Condition</Label>
 		</Button>
 	</div>
 
 	<div class="grid grid-cols-2">
-
 		<span>Signal Index</span>
-		<Textfield variant="filled" type="number" bind:value={condition.signal_index} label="Signal Index" />
+		<Textfield
+			variant="filled"
+			type="number"
+			bind:value={condition.signal_index}
+			label="Signal Index"
+		/>
 
 		<span>Signal Threshold</span>
-		<Textfield variant="filled" type="number" bind:value={condition.signal_threshold} label="Signal Threshold" />
+		<Textfield
+			variant="filled"
+			type="number"
+			bind:value={condition.signal_threshold}
+			label="Signal Threshold"
+		/>
 
 		<span>Signal Do Command</span>
 		<Select variant="filled" bind:value={condition.signal_do_command} label="Signal Do Command">
@@ -129,30 +153,53 @@
 			<Option value="short">Short</Option>
 		</Select>
 
+		<span>Minimum Entry Size</span>
+		<Textfield
+			variant="filled"
+			type="number"
+			bind:value={condition.min_entry_size}
+			label="Minimum Entry Size"
+		/>
+
 		<span>Entry size (%)</span>
-		<Textfield variant="filled" type="number" bind:value={condition.entry_size_percent} label="Entry size (%)" />
+		<Textfield
+			variant="filled"
+			type="number"
+			bind:value={condition.entry_size_percent}
+			label="Entry size (%)"
+		/>
 
 		<span>Take profit (%)</span>
-		<Textfield variant="filled" type="number" bind:value={condition.take_profit_when} label="Take profit (%)" />
+		<Textfield
+			variant="filled"
+			type="number"
+			bind:value={condition.take_profit_when}
+			label="Take profit (%)"
+		/>
 
 		<span>Stop loss (%)</span>
-		<Textfield variant="filled" type="number" bind:value={condition.stop_loss_when} label="Stop loss (%)" />
-
+		<Textfield
+			variant="filled"
+			type="number"
+			bind:value={condition.stop_loss_when}
+			label="Stop loss (%)"
+		/>
 	</div>
 </div>
 
 <div class="text-center mt-8">
 	<DataTable table$aria-label="Condition List" style="max-width: 100%;">
 		<Head>
-		  <Row>
-			<Cell numeric>No.</Cell>
-			<Cell numeric>Signal Index</Cell>
-			<Cell numeric>Signal Threshold</Cell>
-			<Cell>Signal Do Command</Cell>
-			<Cell numeric>Entry size (%)</Cell>
-			<Cell numeric>Take profit (%)</Cell>
-			<Cell numeric>Stop loss (%)</Cell>
-		  </Row>
+			<Row>
+				<Cell numeric>No.</Cell>
+				<Cell numeric>Signal Index</Cell>
+				<Cell numeric>Signal Threshold</Cell>
+				<Cell>Signal Do Command</Cell>
+				<Cell numeric>Minimum Entry Size</Cell>
+				<Cell numeric>Entry size (%)</Cell>
+				<Cell numeric>Take profit (%)</Cell>
+				<Cell numeric>Stop loss (%)</Cell>
+			</Row>
 		</Head>
 		<Body>
 			{#each signal_conditions as cond}
@@ -161,19 +208,29 @@
 					<Cell class="text-center" numeric>{cond.signal_index}</Cell>
 					<Cell class="text-center" numeric>{cond.signal_threshold}</Cell>
 					<Cell class="text-center">{cond.signal_do_command}</Cell>
+					<Cell class="text-center" numeric>{cond.min_entry_size}</Cell>
 					<Cell class="text-center" numeric>{cond.entry_size_percent}</Cell>
 					<Cell class="text-center" numeric>{cond.take_profit_when}</Cell>
 					<Cell class="text-center" numeric>{cond.stop_loss_when}</Cell>
 				</Row>
 			{/each}
 		</Body>
-	  </DataTable>
+	</DataTable>
 </div>
 
 <div class="text-center my-12">
-	<Button class="" variant="raised" on:click={() => {
-		$runMutation.mutate();
-	}}>
+	<Button
+		class=""
+		variant="raised"
+		on:click={() => {
+			$runMutation.mutate();
+			loadBacktest = true;
+			setTimeout(() => {
+				loadBacktest = false;
+				goto('/backtests');
+			}, 2000);
+		}}
+	>
 		<Icon class="material-icons">speed</Icon>
 		<Label>Run Backtest</Label>
 	</Button>
