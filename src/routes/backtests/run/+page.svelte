@@ -15,8 +15,11 @@
 		signal_index: 0,
 		signal_threshold: 0,
 		signal_do_command: PosType.Long,
-		min_entry_size: 10,
-		entry_size_percent: 10,
+		capital_management: {
+			type: 'Normal',
+			min_entry_size: 10,
+			entry_size_percent: 10
+		},
 		take_profit_when: 20,
 		stop_loss_when: 10
 	};
@@ -157,7 +160,7 @@
 		<Textfield
 			variant="filled"
 			type="number"
-			bind:value={condition.min_entry_size}
+			bind:value={condition.capital_management.min_entry_size}
 			label="Minimum Entry Size"
 		/>
 
@@ -165,7 +168,7 @@
 		<Textfield
 			variant="filled"
 			type="number"
-			bind:value={condition.entry_size_percent}
+			bind:value={condition.capital_management.entry_size_percent}
 			label="Entry size (%)"
 		/>
 
@@ -208,8 +211,8 @@
 					<Cell class="text-center" numeric>{cond.signal_index}</Cell>
 					<Cell class="text-center" numeric>{cond.signal_threshold}</Cell>
 					<Cell class="text-center">{cond.signal_do_command}</Cell>
-					<Cell class="text-center" numeric>{cond.min_entry_size}</Cell>
-					<Cell class="text-center" numeric>{cond.entry_size_percent}</Cell>
+					<Cell class="text-center" numeric>{cond.capital_management.min_entry_size}</Cell>
+					<Cell class="text-center" numeric>{cond.capital_management.entry_size_percent}</Cell>
 					<Cell class="text-center" numeric>{cond.take_profit_when}</Cell>
 					<Cell class="text-center" numeric>{cond.stop_loss_when}</Cell>
 				</Row>
