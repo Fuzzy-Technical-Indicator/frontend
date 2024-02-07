@@ -34,7 +34,8 @@
 	{#each metadata.signal_conditions as condition, i}
 		<div>
 			Condition {i + 1} → index: {condition.signal_index}, threshold: {condition.signal_threshold}
-			type: {condition.signal_do_command}, entry size %: {condition.entry_size_percent}
+			type: {condition.signal_do_command}, entry size %: {condition.capital_management
+				.entry_size_percent}
 			take profit %: {condition.take_profit_when}
 			stop losss %: {condition.stop_loss_when}
 		</div>
