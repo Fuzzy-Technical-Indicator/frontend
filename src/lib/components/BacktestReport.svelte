@@ -10,15 +10,6 @@
 	let backtest_result = data.backtest_result;
 	let metadata = backtest_result.metadata;
 	let initial_capital = metadata.capital;
-	let end_time: string;
-
-	let start_time = toDateTimeString(metadata.start_time);
-	if (metadata.tag === 'NormalBackTest') {
-		end_time = toDateTimeString(metadata.end_time);
-	} else if (metadata.tag === 'PsoBackTest') {
-		end_time = toDateTimeString(metadata.validation_end_time);
-	}
-
 	let cumalative_return = backtest_result.cumalative_return as SingleValueData[];
 </script>
 
@@ -30,7 +21,10 @@
 </h1>
 
 <div>
-	Initial Capital = {metadata.capital}, Start = {start_time}, End = {end_time}
+	Initial Capital = {metadata.capital},
+	{#if metadata.tag === 'NormalBackTest'}
+		Start = {toDateTimeString(metadata.start_time)}, End = {toDateTimeString(metadata.end_time)}
+	{/if}
 	{#each metadata.signal_conditions as condition, i}
 		<div>
 			Condition {i + 1} → index: {condition.signal_index}, threshold: {condition.signal_threshold}

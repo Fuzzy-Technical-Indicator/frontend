@@ -18,22 +18,37 @@
 		onSuccess: () => $backtests.refetch()
 	});
 
+	const runningBacktests = createQuery({
+		queryKey: ['runningBacktests'],
+		queryFn: () => api().getRunningBacktest(),
+		refetchInterval: 5000
+	});
+
 	let open = false;
 	let openItemId = '';
 </script>
 
 <h1 class="font-yuji my-8 text-center text-2xl font-bold">Backtesting</h1>
 
-<Button variant="raised" on:click={() => goto('/backtests/run')}>
-	<Icon class="material-icons">speed</Icon>
-	<Label>Run Backtest</Label>
-</Button>
+<div class="flex justify-between">
+	<Button variant="raised" on:click={() => goto('/backtests/run')}>
+		<Icon class="material-icons">speed</Icon>
+		<Label>Run Backtest</Label>
+	</Button>
+
+	<h3>
+		Running
+		{#if $runningBacktests.isSuccess}
+			{$runningBacktests.data}
+		{:else}
+			0
+		{/if}
+	</h3>
+</div>
 
 <Dialog bind:open aria-labelledby="simple-title" aria-describedby="simple-content">
 	<Title id="simple-title">Confirm</Title>
-	<Content id="simple-content"
-		>Are you sure you want to delete this backtest report?</Content
-	>
+	<Content id="simple-content">Are you sure you want to delete this backtest report?</Content>
 	<Actions>
 		<Button>
 			<Label>No</Label>
