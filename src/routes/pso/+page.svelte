@@ -57,8 +57,25 @@
 		enabled: backtest_id !== ''
 	});
 
+	const runningPSO = createQuery({
+		queryKey: ['runningPSO'],
+		queryFn: () => api().getRunningPso(),
+		refetchInterval: 5000
+	});
+
 	ChartJS.register(LinearScale, PointElement);
 </script>
+
+<div>
+	<h3>
+		Running
+		{#if $runningPSO.isSuccess}
+			{$runningPSO.data}
+		{:else}
+			0
+		{/if}
+	</h3>
+</div>
 
 {#if $backtest.isSuccess}
 	<Dialog bind:open={dialogOpen}>
@@ -75,9 +92,6 @@
 				validation_f {item.validation_f},
 				<a href={`/settings/${item.preset}`} class="text-blue-400"> {item.preset}</a>
 				<p>run at: {toDateTimeString(item.run_at)}</p>
-				<p>start time: {toDateTimeString(item.start_time)}</p>
-				<p>train end time: {toDateTimeString(item.train_end_time)}</p>
-				<p>validation end time: {toDateTimeString(item.validation_end_time)}</p>
 			</div>
 			<Scatter data={mapData(item)} />
 			<div class="flex mt-2 space-x-4">

@@ -189,9 +189,6 @@ export interface PsoResult {
 	preset: string;
 	train_progress: { epoch: number; group: number; f: number }[];
 	validation_f: number;
-	start_time: number;
-	train_end_time: number;
-	validation_end_time: number;
 	backtest_id: string;
 	run_at: number;
 	_id: string;
