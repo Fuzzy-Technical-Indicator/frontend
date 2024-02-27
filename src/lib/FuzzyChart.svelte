@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { IChartApi, LogicalRange } from 'lightweight-charts';
-	import { Chart, TimeScale } from 'svelte-lightweight-charts';
+	import { Chart, LineSeries, TimeScale } from 'svelte-lightweight-charts';
 	import { api, getQueryKey } from './apiClient';
 	import { createQuery } from '@tanstack/svelte-query';
 	import { chartTheme } from './utils';
@@ -18,34 +18,6 @@
 		queryKey: getQueryKey(['fuzzy', preset]),
 		queryFn: () => api().fuzzy(preset)
 	});
-
-	let chart: IChartApi;
-	$: {
-		if ($fuzzy.isSuccess && chart) {
-			// this is fucking ugly but neccessary to make lightweight chart work
-			// if we loop through $fuzzy.data, the web will crash (maybe because of svelte weird shit)
-			if ($fuzzy.data.length >= 1) {
-				const lineSeries = chart.addLineSeries({
-					lineWidth: 1,
-					lastValueVisible: false,
-					color: 'green'
-				});
-				lineSeries.setData($fuzzy.data[0]);
-			}
-			if ($fuzzy.data.length >= 2) {
-				const lineSeries = chart.addLineSeries({
-					lineWidth: 1,
-					lastValueVisible: false,
-					color: 'red'
-				});
-				lineSeries.setData($fuzzy.data[1]);
-			}
-			if ($fuzzy.data.length >= 3) {
-				const lineSeries = chart.addLineSeries({ lineWidth: 1, lastValueVisible: false });
-				lineSeries.setData($fuzzy.data[2]);
-			}
-		}
-	}
 </script>
 
 <div class="h-1/6 relative">
@@ -55,9 +27,6 @@
 	<Chart
 		ref={(r) => {
 			ref(r);
-			if (r != null) {
-				chart = r;
-			}
 		}}
 		container={{ class: 'chart-container h-full relative pt-2', style: offsetStyle }}
 		autoSize={true}
@@ -66,5 +35,9 @@
 		<TimeScale
 			on:visibleLogicalRangeChange={(e) => handleVisibleLogicalRangeChange(e, [mainChart])}
 		/>
+		{#if $fuzzy.isSuccess}
+			<LineSeries data={$fuzzy.data.first} lineWidth={1} lastValueVisible={false} color="green" />
+			<LineSeries data={$fuzzy.data.second} lineWidth={1} lastValueVisible={false} color="red" />
+		{/if}
 	</Chart>
 </div>
