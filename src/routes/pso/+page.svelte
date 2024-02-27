@@ -89,7 +89,7 @@
 	{#each $psoResult.data as item (item._id)}
 		<div class="mt-6">
 			<div>
-				validation_f {item.validation_f},
+				test_f {item.validation_f},
 				<a href={`/settings/${item.preset}`} class="text-blue-400"> {item.preset}</a>
 				<p>run at: {toDateTimeString(item.run_at)}</p>
 			</div>

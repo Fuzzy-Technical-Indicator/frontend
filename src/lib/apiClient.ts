@@ -136,7 +136,11 @@ export const api = (customFetch = fetch) => ({
 			getDefaultOption({})
 		);
 		const json = (await resp.json()) as DTValue<number[]>[];
-		const result = Array.from({ length: json.length }, (_, i) => toSingleValueDataOfIdx(json, i));
+
+		const result = {
+			first: toSingleValueDataOfIdx(json, 0),
+			second: toSingleValueDataOfIdx(json, 1)
+		};
 		return result;
 	},
 	rsi: async () => {
@@ -219,6 +223,10 @@ export const api = (customFetch = fetch) => ({
 		return json;
 	},
 	updateLinguisticVars: async (linguisticVariables: UpdateLinguisticVariable, preset: string) => {
+		console.log(linguisticVariables);
+		const body = JSON.stringify(linguisticVariables);
+		console.log(body);
+
 		const resp = await customFetch(
 			`${PUBLIC_API_URL}/api/settings/linguisticvars?preset=${preset}`,
 			getDefaultOption({
@@ -226,7 +234,7 @@ export const api = (customFetch = fetch) => ({
 				headers: {
 					'Content-Type': 'application/json'
 				},
-				body: JSON.stringify(linguisticVariables)
+				body
 			})
 		);
 		return resp;

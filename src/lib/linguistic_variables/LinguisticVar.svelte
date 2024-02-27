@@ -127,12 +127,18 @@
 					<Content>
 						<div class="my-4 text-center bg-[#1A1A1A] border border-[#313131] rounded py-4">
 							<Textfield
+								type="number"
 								class="mr-4"
 								variant="filled"
 								bind:value={lowerBoundary}
 								label="Lower Boundary"
 							/>
-							<Textfield variant="filled" bind:value={upperBoundary} label="Upper Boundary" />
+							<Textfield
+								type="number"
+								variant="filled"
+								bind:value={upperBoundary}
+								label="Upper Boundary"
+							/>
 						</div>
 					</Content>
 				</Panel>
