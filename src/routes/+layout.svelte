@@ -20,7 +20,7 @@
 	<title>Fuzzy Technical Indicator</title>
 	<script
 		async
-		src="https://www.desmos.com/api/v1.8/calculator.js?apiKey=dcb31709b452b1cf9dc26972add0fda6"
+		src="https://www.desmos.com/api/v1.9/calculator.js?apiKey=dcb31709b452b1cf9dc26972add0fda6"
 	></script>
 </svelte:head>
 
@@ -30,15 +30,15 @@
 			<Navbar />
 		{/if}
 		{#if $page.url.pathname === '/login' || $username !== ''}
-		<div class="container mx-auto max-w-8xl bg-black">
-			<PageTransition pathname={$page.url.pathname}>
-				<slot />
-			</PageTransition>
-		</div>
+			<div class="container mx-auto max-w-8xl bg-black">
+				<PageTransition pathname={$page.url.pathname}>
+					<slot />
+				</PageTransition>
+			</div>
 		{:else}
-		<div class="z-20 absolute bottom-0 left-0 right-0 top-0 grid place-items-center">
-			<CircularProgress style="height: 128px; width: 128px;" indeterminate />
-		</div>
+			<div class="z-20 absolute bottom-0 left-0 right-0 top-0 grid place-items-center">
+				<CircularProgress style="height: 128px; width: 128px;" indeterminate />
+			</div>
 		{/if}
 		<Footer />
 	</main>

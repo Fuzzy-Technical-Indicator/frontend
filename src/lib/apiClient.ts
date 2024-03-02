@@ -118,6 +118,16 @@ export const api = (customFetch = fetch) => ({
 		const histogram: HistogramData[] = toSingleValueDataOfIdx(json, 2);
 		return { macdLine, signalLine, histogram };
 	},
+	transformed_macd: async () => {
+		const { symbol, interval } = get(chartSettings);
+		const resp = await customFetch(
+			`${indicatorBaseUrl}/macd/transformed?symbol=${symbol}&interval=${interval}`,
+			getDefaultOption({})
+		);
+		const json = (await resp.json()) as DTValue<number>[];
+		const data: LineData[] = toSingleValueData(json);
+		return data;
+	},
 	aroon: async () => {
 		const { symbol, interval } = get(chartSettings);
 		const resp = await customFetch(

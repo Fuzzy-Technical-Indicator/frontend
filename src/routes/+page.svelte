@@ -77,7 +77,8 @@
 		{ opt: 'rsi', use: false },
 		{ opt: 'adx', use: false },
 		{ opt: 'obv', use: false },
-		{ opt: 'accumdist', use: false }
+		{ opt: 'accumdist', use: false },
+		{ opt: 'transformed macd', use: false }
 	];
 
 	let bb = false;
@@ -194,7 +195,9 @@
 			{...chartTheme}
 			localization={{ priceFormatter: priceFn }}
 		>
-			<div class="absolute z-10 top-0 left-0 p-2 pr-4 bg-black bg-opacity-50 rounded drop-shadow-lg shadow-xl">
+			<div
+				class="absolute z-10 top-0 left-0 p-2 pr-4 bg-black bg-opacity-50 rounded drop-shadow-lg shadow-xl"
+			>
 				{$chartSettings.symbol.toLocaleUpperCase()}
 				-
 				{$chartSettings.interval.toUpperCase()}
