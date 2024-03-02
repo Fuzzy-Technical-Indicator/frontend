@@ -35,6 +35,9 @@
 			if (kind === 'adx') {
 				return api().adx();
 			}
+			if (kind === 'transformed macd') {
+				return api().transformed_macd();
+			}
 			if (kind === 'obv') {
 				let [result, isExceed1M] = await api().obv();
 				exceed1M = isExceed1M;
