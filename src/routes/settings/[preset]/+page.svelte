@@ -72,8 +72,9 @@
 			<h1 class="text-2xl text-center py-4">Linguistic Variables</h1>
 			<div class="linguistic-container grid grid-cols-2 gap-4">
 				{#each Object.entries($settings.data.linguisticVariables) as [name, info]}
-					<div class="my-8 p-4 border border-[#313131] rounded">
+					<div class="my-8 p-4 border border-[#313131] rounded relative">
 						<h3 class="text-lg text-center">{name} ({info.kind})</h3>
+						<div class="absolute right-0 top-0">Informations</div>
 						<Desmos
 							graphId={name}
 							boundary={{ left: info.lowerBoundary, right: info.upperBoundary }}

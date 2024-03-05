@@ -1,12 +1,11 @@
 <script lang="ts">
 	import { api } from '$lib/apiClient';
 	import BacktestReport from '$lib/components/BacktestReport.svelte';
+	import Plotly from '$lib/plotly/Plotly.svelte';
 	import type { PsoResult } from '$lib/types';
 	import { toDateTimeString } from '$lib/utils';
 	import Dialog from '@smui/dialog';
 	import { createMutation, createQuery } from '@tanstack/svelte-query';
-	import { Chart as ChartJS, LinearScale, PointElement } from 'chart.js';
-	import { Scatter } from 'svelte-chartjs';
 
 	const psoResult = createQuery({
 		queryKey: ['pso'],
@@ -21,30 +20,44 @@
 		onSuccess: () => $psoResult.refetch()
 	});
 
-	const colorList = [
-		'rgba(255, 99, 132, 0.5)',
-		'rgba(54, 162, 235, 0.5)',
-		'rgba(255, 205, 86, 0.5)'
-	];
-
-	/** this is shit code */
-	const mapData = (data: PsoResult) => {
-		let m = new Map();
+	const getScatterData = (data: PsoResult) => {
+		let m = new Map<
+			number,
+			{
+				x: number[];
+				y: number[];
+				type: string;
+				mode: string;
+				name: string;
+				marker: Record<string, any>;
+			}
+		>();
 		for (const dt of data.train_progress) {
 			if (!m.has(dt.group)) {
 				m.set(dt.group, {
-					label: dt.group,
-					data: [],
-					backgroundColor: colorList[dt.group % colorList.length]
+					x: [],
+					y: [],
+					type: 'scatter',
+					mode: 'markers',
+					name: `group ${dt.group}`,
+					marker: {
+						opacity: 0.5
+					}
 				});
 			}
-			m.get(dt.group).data.push({ x: dt.epoch, y: dt.f });
+			m.get(dt.group)?.x.push(dt.epoch);
+			m.get(dt.group)?.y.push(dt.f);
 		}
-		let datasets = [];
-		for (const [, v] of m.entries()) {
-			datasets.push(v);
-		}
-		return { datasets };
+		return Array.from(m.values());
+	};
+
+	const getLineData = (data: PsoResult) => {
+		return [
+			{
+				x: data.validation_progress.map((_, i) => i),
+				y: data.validation_progress
+			}
+		];
 	};
 
 	let dialogOpen = false;
@@ -62,9 +75,11 @@
 		queryFn: () => api().getRunningPso(),
 		refetchInterval: 5000
 	});
-
-	ChartJS.register(LinearScale, PointElement);
 </script>
+
+<svelte:head>
+	<script src="https://cdn.plot.ly/plotly-2.29.1.min.js" charset="utf-8"></script>
+</svelte:head>
 
 <div>
 	<h3>
@@ -89,11 +104,12 @@
 	{#each $psoResult.data as item (item._id)}
 		<div class="mt-6">
 			<div>
-				test_f {item.validation_f},
+				test_f {item.test_f},
 				<a href={`/settings/${item.preset}`} class="text-blue-400"> {item.preset}</a>
 				<p>run at: {toDateTimeString(item.run_at)}</p>
 			</div>
-			<Scatter data={mapData(item)} />
+			<Plotly data={getLineData(item)} title="Validation Graph" />
+			<Plotly data={getScatterData(item)} title="Training Progress" />
 			<div class="flex mt-2 space-x-4">
 				<button
 					class="bg-red-600 rounded-md hover:bg-red-500 p-2"
@@ -106,7 +122,7 @@
 						currTimestamp = new Date();
 						$backtest.refetch();
 						dialogOpen = true;
-					}}>Validation Result</button
+					}}>Test Result</button
 				>
 			</div>
 		</div>
