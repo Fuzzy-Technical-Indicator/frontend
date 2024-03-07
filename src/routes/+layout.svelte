@@ -10,6 +10,12 @@
 	import CircularProgress from '@smui/circular-progress';
 
 	export let data: PageData;
+
+	$: if (data.username !== undefined) {
+		username.set(data.username);
+	} else {
+		username.set('');
+	}
 </script>
 
 <svelte:head>
