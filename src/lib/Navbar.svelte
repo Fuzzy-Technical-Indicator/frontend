@@ -1,8 +1,7 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
-	import { username } from './auth';
 	import Button, { Label, Icon } from '@smui/button';
+	import { username } from './auth';
 	let showMenu = false;
 	const toggleNavbar = () => {
 		showMenu = !showMenu;
@@ -74,17 +73,12 @@
 				<a class="font-nunito font-normal text-[#A6A6A6] text-l hover:text-[#FFFFFF]" href="/pso"
 					><span class:text-white={$page.url.pathname.includes('/pso')}>PSO</span></a
 				>
-				<Button
-					variant="outlined"
-					class="my-primary-button"
-					on:click={() => {
-						username.set('');
-						goto('/login');
-					}}
-				>
-					<Icon class="material-icons">person_off</Icon>
-					<Label>LOGOUT</Label>
-				</Button>
+				<form method="POST" action="?/logout">
+					<Button variant="outlined" class="my-primary-button">
+						<Icon class="material-icons">person_off</Icon>
+						<Label>LOGOUT</Label>
+					</Button>
+				</form>
 			</div>
 		</nav>
 	</div>

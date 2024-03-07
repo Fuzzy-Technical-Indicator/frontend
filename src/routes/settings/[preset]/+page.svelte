@@ -74,7 +74,6 @@
 				{#each Object.entries($settings.data.linguisticVariables) as [name, info]}
 					<div class="my-8 p-4 border border-[#313131] rounded relative">
 						<h3 class="text-lg text-center">{name} ({info.kind})</h3>
-						<div class="absolute right-0 top-0">Informations</div>
 						<Desmos
 							graphId={name}
 							boundary={{ left: info.lowerBoundary, right: info.upperBoundary }}

@@ -18,6 +18,7 @@
 	import BbSetting from '$lib/dialogs/BBSetting.svelte';
 	import Legend from '$lib/components/Legend.svelte';
 	import Tooltip, { Wrapper } from '@smui/tooltip';
+	import type { PageServerData } from './$types';
 
 	const ohlc = createQuery({
 		queryKey: getQueryKey(['ohlc']),
@@ -29,9 +30,12 @@
 		queryFn: () => api().bb()
 	});
 
+	export let data: PageServerData;
 	const presets = createQuery({
 		queryKey: ['presets'],
-		queryFn: () => api().getPresets()
+		queryFn: () => api().getPresets(),
+		refetchOnMount: false,
+		initialData: data.presets
 	});
 
 	const userSettings = createQuery({
@@ -174,8 +178,13 @@
 			<h1 class="text-lg">Fuzzy Presets</h1>
 			{#each $presets.data as preset}
 				<div class="flex">
-					<input class="mr-2" type="checkbox" bind:checked={fuzzyPresets[preset]} />
-					<span class="font-thin">{preset}</span>
+					<input
+						class="mr-2"
+						type="checkbox"
+						disabled={!preset[1]}
+						bind:checked={fuzzyPresets[preset[0]]}
+					/>
+					<span class="font-thin">{preset[0]}</span>
 				</div>
 			{/each}
 		</div>

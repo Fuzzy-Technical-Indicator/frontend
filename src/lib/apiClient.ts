@@ -61,12 +61,12 @@ function getDefaultOption({
 	return { method, body, headers: defaultHeader };
 }
 
-const indicatorBaseUrl = `${PUBLIC_API_URL}/api/indicators`;
-export const api = (customFetch = fetch) => ({
+const indicatorUrl = (url: string) => `${url}/api/indicators`;
+export const api = (customFetch = fetch, url = PUBLIC_API_URL) => ({
 	ohlc: async () => {
 		const { symbol, interval } = get(chartSettings);
 		const resp = await customFetch(
-			`${PUBLIC_API_URL}/api/ohlc?symbol=${symbol}&interval=${interval}`,
+			`${url}/api/ohlc?symbol=${symbol}&interval=${interval}`,
 			getDefaultOption({})
 		);
 
@@ -85,7 +85,7 @@ export const api = (customFetch = fetch) => ({
 	bb: async () => {
 		const { symbol, interval } = get(chartSettings);
 		const resp = await customFetch(
-			`${indicatorBaseUrl}/bb?symbol=${symbol}&interval=${interval}`,
+			`${indicatorUrl(url)}/bb?symbol=${symbol}&interval=${interval}`,
 			getDefaultOption({})
 		);
 		const json = (await resp.json()) as DTValue<[number, number, number]>[];
@@ -98,7 +98,7 @@ export const api = (customFetch = fetch) => ({
 	stoch: async () => {
 		const { symbol, interval } = get(chartSettings);
 		const resp = await customFetch(
-			`${indicatorBaseUrl}/stoch?symbol=${symbol}&interval=${interval}`,
+			`${indicatorUrl(url)}/stoch?symbol=${symbol}&interval=${interval}`,
 			getDefaultOption({})
 		);
 		const json = (await resp.json()) as DTValue<[number, number, number]>[];
@@ -109,7 +109,7 @@ export const api = (customFetch = fetch) => ({
 	macd: async () => {
 		const { symbol, interval } = get(chartSettings);
 		const resp = await customFetch(
-			`${indicatorBaseUrl}/macd?symbol=${symbol}&interval=${interval}`,
+			`${indicatorUrl(url)}/macd?symbol=${symbol}&interval=${interval}`,
 			getDefaultOption({})
 		);
 		const json = (await resp.json()) as DTValue<[number, number, number]>[];
@@ -121,7 +121,7 @@ export const api = (customFetch = fetch) => ({
 	transformed_macd: async () => {
 		const { symbol, interval } = get(chartSettings);
 		const resp = await customFetch(
-			`${indicatorBaseUrl}/macd/transformed?symbol=${symbol}&interval=${interval}`,
+			`${indicatorUrl(url)}/macd/transformed?symbol=${symbol}&interval=${interval}`,
 			getDefaultOption({})
 		);
 		const json = (await resp.json()) as DTValue<number>[];
@@ -131,7 +131,7 @@ export const api = (customFetch = fetch) => ({
 	aroon: async () => {
 		const { symbol, interval } = get(chartSettings);
 		const resp = await customFetch(
-			`${indicatorBaseUrl}/aroon?symbol=${symbol}&interval=${interval}`,
+			`${indicatorUrl(url)}/aroon?symbol=${symbol}&interval=${interval}`,
 			getDefaultOption({})
 		);
 		const data = (await resp.json()) as DTValue<[number, number, number]>[];
@@ -142,7 +142,7 @@ export const api = (customFetch = fetch) => ({
 	fuzzy: async (preset: string) => {
 		const { symbol, interval } = get(chartSettings);
 		const resp = await customFetch(
-			`${PUBLIC_API_URL}/api/fuzzy?symbol=${symbol}&interval=${interval}&preset=${preset}`,
+			`${url}/api/fuzzy?symbol=${symbol}&interval=${interval}&preset=${preset}`,
 			getDefaultOption({})
 		);
 		const json = (await resp.json()) as DTValue<number[]>[];
@@ -156,7 +156,7 @@ export const api = (customFetch = fetch) => ({
 	rsi: async () => {
 		const { symbol, interval } = get(chartSettings);
 		const resp = await customFetch(
-			`${indicatorBaseUrl}/rsi?symbol=${symbol}&interval=${interval}`,
+			`${indicatorUrl(url)}/rsi?symbol=${symbol}&interval=${interval}`,
 			getDefaultOption({})
 		);
 		const json = (await resp.json()) as DTValue<number>[];
@@ -167,7 +167,7 @@ export const api = (customFetch = fetch) => ({
 	adx: async () => {
 		const { symbol, interval } = get(chartSettings);
 		const resp = await customFetch(
-			`${indicatorBaseUrl}/adx?symbol=${symbol}&interval=${interval}`,
+			`${indicatorUrl(url)}/adx?symbol=${symbol}&interval=${interval}`,
 			getDefaultOption({})
 		);
 		const json = (await resp.json()) as DTValue<number>[];
@@ -178,7 +178,7 @@ export const api = (customFetch = fetch) => ({
 	obv: async (): Promise<[LineData[], boolean]> => {
 		const { symbol, interval } = get(chartSettings);
 		const resp = await customFetch(
-			`${indicatorBaseUrl}/obv?symbol=${symbol}&interval=${interval}`,
+			`${indicatorUrl(url)}/obv?symbol=${symbol}&interval=${interval}`,
 			getDefaultOption({})
 		);
 		const json = (await resp.json()) as DTValue<number>[];
@@ -203,7 +203,7 @@ export const api = (customFetch = fetch) => ({
 	accumdist: async (): Promise<[LineData[], boolean]> => {
 		const { symbol, interval } = get(chartSettings);
 		const resp = await customFetch(
-			`${indicatorBaseUrl}/accumdist?symbol=${symbol}&interval=${interval}`,
+			`${indicatorUrl(url)}/accumdist?symbol=${symbol}&interval=${interval}`,
 			getDefaultOption({})
 		);
 		const json = (await resp.json()) as DTValue<number>[];
@@ -225,20 +225,14 @@ export const api = (customFetch = fetch) => ({
 		return [result, exceed1M];
 	},
 	getSettings: async (preset: string) => {
-		const resp = await customFetch(
-			`${PUBLIC_API_URL}/api/settings?preset=${preset}`,
-			getDefaultOption({})
-		);
+		const resp = await customFetch(`${url}/api/settings?preset=${preset}`, getDefaultOption({}));
 		const json = (await resp.json()) as Settings;
 		return json;
 	},
 	updateLinguisticVars: async (linguisticVariables: UpdateLinguisticVariable, preset: string) => {
-		console.log(linguisticVariables);
 		const body = JSON.stringify(linguisticVariables);
-		console.log(body);
-
 		const resp = await customFetch(
-			`${PUBLIC_API_URL}/api/settings/linguisticvars?preset=${preset}`,
+			`${url}/api/settings/linguisticvars?preset=${preset}`,
 			getDefaultOption({
 				method: 'PUT',
 				headers: {
@@ -251,14 +245,14 @@ export const api = (customFetch = fetch) => ({
 	},
 	deleteLinguisticVar: async (name: string, preset: string) => {
 		const resp = await customFetch(
-			`${PUBLIC_API_URL}/api/settings/linguisticvars/${name}?preset=${preset}`,
+			`${url}/api/settings/linguisticvars/${name}?preset=${preset}`,
 			getDefaultOption({ method: 'DELETE' })
 		);
 		return resp;
 	},
 	addFuzzyRules: async (data: NewFuzzyRule, preset: string) => {
 		const resp = await customFetch(
-			`${PUBLIC_API_URL}/api/settings/fuzzyrules?preset=${preset}`,
+			`${url}/api/settings/fuzzyrules?preset=${preset}`,
 			getDefaultOption({
 				body: JSON.stringify(data),
 				method: 'POST',
@@ -271,26 +265,26 @@ export const api = (customFetch = fetch) => ({
 	},
 	deleteFuzzyRule: async (id: string, preset: string) => {
 		const resp = await customFetch(
-			`${PUBLIC_API_URL}/api/settings/fuzzyrules/${id}?preset=${preset}`,
+			`${url}/api/settings/fuzzyrules/${id}?preset=${preset}`,
 			getDefaultOption({ method: 'DELETE' })
 		);
 		return resp;
 	},
-	getPresets: async () => {
-		const resp = await customFetch(`${PUBLIC_API_URL}/api/settings/presets`, getDefaultOption({}));
-		const json = (await resp.json()) as string[];
+	getPresets: async (options = getDefaultOption({})) => {
+		const resp = await customFetch(`${url}/api/settings/presets`, options);
+		const json = (await resp.json()) as [string, boolean][];
 		return json;
 	},
 	addPreset: async (presetName: string) => {
 		const resp = await customFetch(
-			`${PUBLIC_API_URL}/api/settings/presets/${presetName}`,
+			`${url}/api/settings/presets/${presetName}`,
 			getDefaultOption({ method: 'POST' })
 		);
 		return resp;
 	},
 	deletePreset: async (presetName: string) => {
 		const resp = await customFetch(
-			`${PUBLIC_API_URL}/api/settings/presets/${presetName}`,
+			`${url}/api/settings/presets/${presetName}`,
 			getDefaultOption({ method: 'DELETE' })
 		);
 		return resp;
@@ -299,7 +293,7 @@ export const api = (customFetch = fetch) => ({
 	 * Special Fake API for checking if username is valid
 	 */
 	isUsernameOkay: async (username: string) => {
-		const resp = await customFetch(`${PUBLIC_API_URL}/api/settings/presets`, {
+		const resp = await customFetch(`${url}/api/settings/presets`, {
 			headers: { Authorization: `Bearer ${username}` }
 		});
 
@@ -309,13 +303,13 @@ export const api = (customFetch = fetch) => ({
 		return true;
 	},
 	getUserSettings: async () => {
-		const resp = await customFetch(`${PUBLIC_API_URL}/api/settings/users`, getDefaultOption({}));
+		const resp = await customFetch(`${url}/api/settings/users`, getDefaultOption({}));
 		const json = (await resp.json()) as UserSettings;
 		return json;
 	},
 	updateUserSetting: async (data: UpdateUserSettings) => {
 		const resp = await customFetch(
-			`${PUBLIC_API_URL}/api/settings/users`,
+			`${url}/api/settings/users`,
 			getDefaultOption({
 				method: 'PUT',
 				body: JSON.stringify(data),
@@ -327,26 +321,23 @@ export const api = (customFetch = fetch) => ({
 		return resp;
 	},
 	getRunningBacktest: async () => {
-		const resp = await customFetch(
-			`${PUBLIC_API_URL}/api/backtesting/running`,
-			getDefaultOption({})
-		);
+		const resp = await customFetch(`${url}/api/backtesting/running`, getDefaultOption({}));
 		const json = (await resp.json()) as number;
 		return json;
 	},
 	getBacktestReports: async () => {
-		const resp = await customFetch(`${PUBLIC_API_URL}/api/backtesting`, getDefaultOption({}));
+		const resp = await customFetch(`${url}/api/backtesting`, getDefaultOption({}));
 		const json = (await resp.json()) as BacktestReport[];
 		return json;
 	},
 	getBacktestReport: async (id: string) => {
-		const resp = await customFetch(`${PUBLIC_API_URL}/api/backtesting/${id}`, getDefaultOption({}));
+		const resp = await customFetch(`${url}/api/backtesting/${id}`, getDefaultOption({}));
 		const json = (await resp.json()) as BacktestReport;
 		return json;
 	},
 	deleteBacktestReport: async (id: string) => {
 		const resp = await customFetch(
-			`${PUBLIC_API_URL}/api/backtesting/${id}`,
+			`${url}/api/backtesting/${id}`,
 			getDefaultOption({ method: 'DELETE' })
 		);
 		return resp;
@@ -358,7 +349,7 @@ export const api = (customFetch = fetch) => ({
 		preset: string
 	) => {
 		const resp = await customFetch(
-			`${PUBLIC_API_URL}/api/backtesting/run?symbol=${symbol}&interval=${interval}&preset=${preset}`,
+			`${url}/api/backtesting/run?symbol=${symbol}&interval=${interval}&preset=${preset}`,
 			getDefaultOption({
 				method: 'POST',
 				body: JSON.stringify(data),
@@ -370,20 +361,17 @@ export const api = (customFetch = fetch) => ({
 		return resp;
 	},
 	getRunningPso: async () => {
-		const resp = await customFetch(`${PUBLIC_API_URL}/api/pso/running`, getDefaultOption({}));
+		const resp = await customFetch(`${url}/api/pso/running`, getDefaultOption({}));
 		const json = (await resp.json()) as number;
 		return json;
 	},
 	getPsoResult: async () => {
-		const resp = await customFetch(`${PUBLIC_API_URL}/api/pso`, getDefaultOption({}));
+		const resp = await customFetch(`${url}/api/pso`, getDefaultOption({}));
 		const json = (await resp.json()) as PsoResult[];
 		return json;
 	},
 	deletePsoResult: async (id: string) => {
-		const resp = await customFetch(
-			`${PUBLIC_API_URL}/api/pso/${id}`,
-			getDefaultOption({ method: 'DELETE' })
-		);
+		const resp = await customFetch(`${url}/api/pso/${id}`, getDefaultOption({ method: 'DELETE' }));
 		return resp;
 	}
 });
