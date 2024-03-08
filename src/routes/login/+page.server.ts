@@ -16,7 +16,7 @@ export const actions = {
 			return fail(400, { username, incorrect: true });
 		}
 
-		cookies.set('session-username', username.toString());
+		cookies.set('session-username', username.toString(), { path: '/', secure: false });
 		throw redirect(303, '/');
 	}
 } satisfies Actions;
