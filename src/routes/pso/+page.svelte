@@ -52,12 +52,13 @@
 	};
 
 	const getLineData = (data: PsoResult) => {
-		return [
-			{
-				x: data.validation_progress.map((_, i) => i),
-				y: data.validation_progress
-			}
-		];
+		return data.validation_progress.map((fold, i) => {
+			return {
+				x: fold.map((_, i) => i),
+				y: fold,
+				name: `fold ${i}`
+			};
+		});
 	};
 
 	let dialogOpen = false;
@@ -106,10 +107,11 @@
 			<div>
 				test_f {item.test_f},
 				<a href={`/settings/${item.preset}`} class="text-blue-400"> {item.preset}</a>
+				<p>time used: {item.time_used} seconds</p>
 				<p>run at: {toDateTimeString(item.run_at)}</p>
 			</div>
 			<Plotly data={getLineData(item)} title="Validation Graph" />
-			<Plotly data={getScatterData(item)} title="Training Progress" />
+			<!-- <Plotly data={getScatterData(item)} title="Training Progress" /> -->
 			<div class="flex mt-2 space-x-4">
 				<button
 					class="bg-red-600 rounded-md hover:bg-red-500 p-2"

@@ -53,9 +53,9 @@
 			{#each $presets.data as preset}
 				<div class="card-container my-2">
 					<Card variant="outlined">
-						<Content><span class="font-bold">{preset}</span></Content>
+						<Content><span class="font-bold">{preset[0]}</span></Content>
 						<Actions>
-							<Button variant="outlined" href={`/settings/${preset}`}>
+							<Button variant="outlined" href={`/settings/${preset[0]}`}>
 								<Icon class="material-icons">edit</Icon>
 								<Label>Edit</Label>
 							</Button>

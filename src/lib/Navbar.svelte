@@ -73,7 +73,7 @@
 				<a class="font-nunito font-normal text-[#A6A6A6] text-l hover:text-[#FFFFFF]" href="/pso"
 					><span class:text-white={$page.url.pathname.includes('/pso')}>PSO</span></a
 				>
-				<form method="POST" action="?/logout">
+				<form method="POST" action="/?/logout">
 					<Button variant="outlined" class="my-primary-button">
 						<Icon class="material-icons">person_off</Icon>
 						<Label>LOGOUT</Label>
