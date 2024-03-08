@@ -1,3 +1,4 @@
+import { API_SERVER_URL } from '$env/static/private';
 import { api } from '$lib/apiClient';
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions } from './$types';
@@ -10,7 +11,7 @@ export const actions = {
 		if (username === null || username === '') {
 			throw redirect(307, '/login');
 		}
-		const okay = await api(fetch).isUsernameOkay(username.toString());
+		const okay = await api(fetch, API_SERVER_URL).isUsernameOkay(username.toString());
 		if (!okay) {
 			return fail(400, { username, incorrect: true });
 		}

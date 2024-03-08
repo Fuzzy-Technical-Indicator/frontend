@@ -1,4 +1,4 @@
-import { PUBLIC_API_SERVER_URL } from '$env/static/public';
+import { API_SERVER_URL } from '$env/static/private';
 import { api } from '$lib/apiClient';
 import { redirect, type Actions } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
@@ -6,12 +6,16 @@ import type { PageServerLoad } from './$types';
 export const load: PageServerLoad = async ({ fetch, cookies }) => {
 	const username = cookies.get('session-username');
 
-	const presets = await api(fetch, PUBLIC_API_SERVER_URL).getPresets({
+	const client = api(fetch, API_SERVER_URL);
+	const options: RequestInit = {
 		keepalive: true,
 		headers: { Authorization: `Bearer ${username}` }
-	});
+	};
+	const presets = await client.getPresets(options);
+	const bb = await client.bb(options);
+	const users = await client.getUserSettings(options);
 
-	return { presets };
+	return { presets, bb, users };
 };
 
 export const actions = {
