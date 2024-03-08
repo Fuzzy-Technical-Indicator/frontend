@@ -25,12 +25,14 @@
 		queryFn: () => api().ohlc()
 	});
 
+	export let data: PageServerData;
 	const bbData = createQuery({
 		queryKey: getQueryKey(['bb']),
-		queryFn: () => api().bb()
+		queryFn: () => api().bb(),
+		refetchOnMount: false,
+		initialData: data.bb
 	});
 
-	export let data: PageServerData;
 	const presets = createQuery({
 		queryKey: ['presets'],
 		queryFn: () => api().getPresets(),
@@ -40,7 +42,9 @@
 
 	const userSettings = createQuery({
 		queryKey: ['userSettings'],
-		queryFn: () => api().getUserSettings()
+		queryFn: () => api().getUserSettings(),
+		refetchOnMount: false,
+		initialData: data.users
 	});
 
 	let main: IChartApi | null;

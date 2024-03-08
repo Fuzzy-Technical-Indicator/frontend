@@ -28,10 +28,22 @@ export function toDateTimeString(timestamp: number) {
 	return formattedDate.replace(',', ' ');
 }
 
+export function secondsToHms(seconds: number) {
+	// https://stackoverflow.com/questions/37096367/how-to-convert-seconds-to-minutes-and-hours-in-javascript
+	const h = Math.floor(seconds / 3600);
+	const m = Math.floor((seconds % 3600) / 60);
+	const s = Math.floor((seconds % 3600) % 60);
+
+	const hDisplay = h > 0 ? h + ' hrs ' : '';
+	const mDisplay = m > 0 ? m + ' mins ' : '';
+	const sDisplay = s > 0 ? s + ' secs ' : '';
+	return hDisplay + mDisplay + sDisplay;
+}
+
 export const chartTheme = {
 	layout: {
 		background: {
-			color: '#1c1c20',
+			color: '#1c1c20'
 		},
 		lineColor: '#000000',
 		textColor: '#A6A6A6'

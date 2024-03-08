@@ -3,7 +3,7 @@
 	import BacktestReport from '$lib/components/BacktestReport.svelte';
 	import Plotly from '$lib/plotly/Plotly.svelte';
 	import type { PsoResult } from '$lib/types';
-	import { toDateTimeString } from '$lib/utils';
+	import { secondsToHms, toDateTimeString } from '$lib/utils';
 	import Dialog from '@smui/dialog';
 	import { createMutation, createQuery } from '@tanstack/svelte-query';
 
@@ -78,10 +78,6 @@
 	});
 </script>
 
-<svelte:head>
-	<script src="https://cdn.plot.ly/plotly-2.29.1.min.js" charset="utf-8"></script>
-</svelte:head>
-
 <div>
 	<h3>
 		Running
@@ -107,7 +103,7 @@
 			<div>
 				test_f {item.test_f},
 				<a href={`/settings/${item.preset}`} class="text-blue-400"> {item.preset}</a>
-				<p>time used: {item.time_used} seconds</p>
+				<p>time used: {secondsToHms(item.time_used)}</p>
 				<p>run at: {toDateTimeString(item.run_at)}</p>
 			</div>
 			<Plotly data={getLineData(item)} title="Validation Graph" />

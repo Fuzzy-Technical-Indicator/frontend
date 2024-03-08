@@ -54,11 +54,10 @@ function getDefaultOption({
 	body?: BodyInit;
 }): RequestInit {
 	const defaultHeader: HeadersInit = {
-		Connection: 'keep-alive',
 		Authorization: `Bearer ${get(username)}`,
 		...headers
 	};
-	return { method, body, headers: defaultHeader };
+	return { method, body, headers: defaultHeader, keepalive: true };
 }
 
 const indicatorUrl = (url: string) => `${url}/api/indicators`;
@@ -82,11 +81,11 @@ export const api = (customFetch = fetch, url = PUBLIC_API_URL) => ({
 		});
 		return data;
 	},
-	bb: async () => {
+	bb: async (options = getDefaultOption({})) => {
 		const { symbol, interval } = get(chartSettings);
 		const resp = await customFetch(
 			`${indicatorUrl(url)}/bb?symbol=${symbol}&interval=${interval}`,
-			getDefaultOption({})
+			options
 		);
 		const json = (await resp.json()) as DTValue<[number, number, number]>[];
 		return {
@@ -289,11 +288,9 @@ export const api = (customFetch = fetch, url = PUBLIC_API_URL) => ({
 		);
 		return resp;
 	},
-	/**
-	 * Special Fake API for checking if username is valid
-	 */
 	isUsernameOkay: async (username: string) => {
-		const resp = await customFetch(`${url}/api/settings/presets`, {
+		const resp = await customFetch(`${url}/api/user`, {
+			keepalive: true,
 			headers: { Authorization: `Bearer ${username}` }
 		});
 
@@ -302,8 +299,8 @@ export const api = (customFetch = fetch, url = PUBLIC_API_URL) => ({
 		}
 		return true;
 	},
-	getUserSettings: async () => {
-		const resp = await customFetch(`${url}/api/settings/users`, getDefaultOption({}));
+	getUserSettings: async (options = getDefaultOption({})) => {
+		const resp = await customFetch(`${url}/api/settings/users`, options);
 		const json = (await resp.json()) as UserSettings;
 		return json;
 	},
