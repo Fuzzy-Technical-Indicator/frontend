@@ -65,6 +65,8 @@
 		"@tanstack/svelte-table": "^8.10.7",
 		"@types/ramda": "^0.29.9",
 		"ramda": "^0.29.1",
-		"smui-theme": "^7.0.0-beta.16"
+		"smui-theme": "^7.0.0-beta.16",
+		"svelte-lightweight-charts": "^2.2.0",
+		"lightweight-charts": "^4.0.1"
 	}
 }
