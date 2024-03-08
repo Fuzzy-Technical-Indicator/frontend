@@ -187,10 +187,11 @@ export interface BacktestReport {
 
 export interface PsoResult {
 	preset: string;
-	train_progress: { epoch: number; group: number; f: number }[];
-	validation_progress: number[];
-	test_f: number;
 	backtest_id: string;
+	train_progress: { epoch: number; group: number; f: number }[];
+	validation_progress: number[][];
+	test_f: number;
 	run_at: number;
+	time_used: number;
 	_id: string;
 }
