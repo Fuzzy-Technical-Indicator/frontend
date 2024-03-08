@@ -288,11 +288,9 @@ export const api = (customFetch = fetch, url = PUBLIC_API_URL) => ({
 		);
 		return resp;
 	},
-	/**
-	 * Special Fake API for checking if username is valid
-	 */
 	isUsernameOkay: async (username: string) => {
-		const resp = await customFetch(`${url}/api/settings/presets`, {
+		const resp = await customFetch(`${url}/api/user`, {
+			keepalive: true,
 			headers: { Authorization: `Bearer ${username}` }
 		});
 
