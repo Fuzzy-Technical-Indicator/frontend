@@ -1,8 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import Button, { Label, Icon } from '@smui/button';
-	import { username } from './auth';
-	let showMenu = false;
+	let showMenu: boolean;
 	const toggleNavbar = () => {
 		showMenu = !showMenu;
 	};
@@ -20,7 +19,7 @@
 				>
 					<img src="/favicon.png" alt="fzt-logo" width="35" height="35" class="mr-2" />
 					<p
-						class="font-yuji text-transparent bg-clip-text bg-gradient-to-bl from-gray-900 via-gray-100 to-gray-900"
+						class="font-yuji text-transparent text-xs sm:text-base bg-clip-text bg-gradient-to-bl from-gray-900 via-gray-100 to-gray-900"
 					>
 						Fuzzy Technical Indicator
 					</p>
@@ -30,7 +29,7 @@
 				<div on:click={toggleNavbar} class="flex md:hidden">
 					<button
 						type="button"
-						class="text-gray-800 hover:text-gray-400 focus:outline-none focus:text-gray-400"
+						class="text-white hover:text-white focus:outline-none focus:text-white"
 					>
 						<svg
 							xmlns="http://www.w3.org/2000/svg"
@@ -70,8 +69,9 @@
 					href="/backtests"
 					><span class:text-white={$page.url.pathname.includes('/backtests')}>BACKTESTS</span></a
 				>
-				<a class="font-nunito font-normal text-[#A6A6A6] text-l hover:text-[#FFFFFF]" href="/pso"
-					><span class:text-white={$page.url.pathname.includes('/pso')}>PSO</span></a
+				<a
+					class="font-nunito font-normal text-[#A6A6A6] text-l hover:text-[#FFFFFF]"
+					href="/pso"><span class:text-white={$page.url.pathname.includes('/pso')}>PSO</span></a
 				>
 				<form method="POST" action="/?/logout">
 					<Button variant="outlined" class="my-primary-button">

@@ -19,10 +19,12 @@
 	});
 </script>
 
-<Dialog bind:open>
-	<div class="p-4 grid grid-cols-3 gap-y-2">
-		<slot />
-		<Button variant="raised" class="col-span-3" on:click={() => $updateMutation.mutate()}>Ok</Button
-		>
-	</div>
-</Dialog>
+<div class="absolute z-20">
+	<Dialog bind:open>
+		<div class="p-4 grid grid-cols-3 gap-y-2">
+			<slot />
+			<Button variant="raised" class="col-span-3" on:click={() => $updateMutation.mutate()}>Ok</Button
+			>
+		</div>
+	</Dialog>
+</div>

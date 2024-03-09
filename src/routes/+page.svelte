@@ -131,7 +131,7 @@
 </script>
 
 {#if $isFetching > 0}
-	<div class="z-20 absolute bottom-0 left-0 right-0 top-0 grid place-items-center">
+	<div class="z-50 absolute bottom-0 left-0 right-0 top-0 grid place-items-center">
 		<CircularProgress style="height: 128px; width: 128px;" indeterminate />
 	</div>
 {/if}
@@ -170,29 +170,31 @@
 			}}
 		>
 			<Icon class="material-icons">menu</Icon>
-			<Label>Fuzzy Presets</Label>
+			<Label class="text-xs sm:text-sm">Fuzzy Presets</Label>
 		</Button>
 		<Tooltip>Select your fuzzy presets then plotting chart.</Tooltip>
 	</Wrapper>
 </div>
 
 {#if $presets.isSuccess}
-	<Dialog bind:open={fuzzyDialogOpen}>
-		<div class="p-4">
-			<h1 class="text-lg">Fuzzy Presets</h1>
-			{#each $presets.data as preset}
-				<div class="flex">
-					<input
-						class="mr-2"
-						type="checkbox"
-						disabled={!preset[1]}
-						bind:checked={fuzzyPresets[preset[0]]}
-					/>
-					<span class="font-thin">{preset[0]}</span>
-				</div>
-			{/each}
-		</div>
-	</Dialog>
+	<div class="absolute z-20">
+		<Dialog bind:open={fuzzyDialogOpen}>
+			<div class="p-4">
+				<h1 class="text-lg">Fuzzy Presets</h1>
+				{#each $presets.data as preset}
+					<div class="flex">
+						<input
+							class="mr-2"
+							type="checkbox"
+							disabled={!preset[1]}
+							bind:checked={fuzzyPresets[preset[0]]}
+						/>
+						<span class="font-thin">{preset[0]}</span>
+					</div>
+				{/each}
+			</div>
+		</Dialog>
+	</div>
 {/if}
 
 {#if $userSettings.isSuccess}
@@ -203,7 +205,7 @@
 	<div class="flex-row h-screen">
 		<Chart
 			ref={(ref) => (main = ref)}
-			container={{ class: 'chart-container relative h-4/6' }}
+			container={{ class: 'chart-container relative h-4/6 sm:h-5/6 md:h-4/6' }}
 			autoSize={true}
 			{...chartTheme}
 			localization={{ priceFormatter: priceFn }}

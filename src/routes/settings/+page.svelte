@@ -31,7 +31,7 @@
 	<h1 class="font-yuji my-8 text-center text-2xl font-bold">Fuzzy Presets Setting</h1>
 	<h1 class="text-center text-xl font-extralight">{$username}'s settings</h1>
 	<div>
-		<Textfield class="mr-4" bind:value={currNewPresetName} label="Preset" />
+		<Textfield class="mr-4 ml-2 sm:ml-0 w-5/12 md:w-1/5" bind:value={currNewPresetName} label="Preset" />
 		<Wrapper>
 			<Button
 				variant="raised"
@@ -43,12 +43,12 @@
 				}}
 			>
 				<Icon class="material-icons">add</Icon>
-				<Label>Add new preset</Label>
+				<Label class="text-xs sm:text-sm">Add new preset</Label>
 			</Button>
 			<Tooltip>Add new fuzzy preset.</Tooltip>
 		</Wrapper>
 	</div>
-	<div class="preset-container grid grid-cols-4 gap-4 mt-8">
+	<div class="preset-container grid grid-cols-2 lg:grid-cols-4 gap-4 mt-8">
 		{#if $presets.isSuccess}
 			{#each $presets.data as preset}
 				<div class="card-container my-2">
@@ -56,8 +56,8 @@
 						<Content><span class="font-bold">{preset[0]}</span></Content>
 						<Actions>
 							<Button variant="outlined" href={`/settings/${preset[0]}`}>
-								<Icon class="material-icons">edit</Icon>
-								<Label>Edit</Label>
+								<Icon class="material-icons hidden">edit</Icon>
+								<Label class="text-xs md:text-sm">Edit</Label>
 							</Button>
 							<Button
 								variant="outlined"
@@ -67,8 +67,8 @@
 									}
 								}}
 							>
-								<Icon class="material-icons">delete</Icon>
-								<Label>Remove</Label>
+								<Icon class="material-icons hidden">delete</Icon>
+								<Label class="text-xs md:text-sm">Remove</Label>
 							</Button>
 						</Actions>
 					</Card>
