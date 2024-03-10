@@ -131,7 +131,7 @@
 </script>
 
 {#if $isFetching > 0}
-	<div class="z-20 absolute bottom-0 left-0 right-0 top-0 grid place-items-center">
+	<div class="z-50 absolute bottom-0 left-0 right-0 top-0 grid place-items-center">
 		<CircularProgress style="height: 128px; width: 128px;" indeterminate />
 	</div>
 {/if}
@@ -139,7 +139,7 @@
 <div class="flex py-4">
 	<Wrapper>
 		<select
-			class="bg-[#232428] text-[#F8F9FA] pl-2 rounded mr-4 custom-select"
+			class="bg-[#161616] text-[#F8F9FA] pl-2 rounded mr-4 custom-select"
 			on:change={handleSymbolChange}
 		>
 			{#each tickers as ticker}
@@ -151,7 +151,7 @@
 
 	<Wrapper>
 		<select
-			class="bg-[#232428] text-[#F8F9FA] pl-2 rounded custom-select"
+			class="bg-[#161616] text-[#F8F9FA] pl-2 rounded custom-select"
 			on:change={handleIntervalChange}
 		>
 			<option value={Interval.OneDay}>1D</option>
@@ -170,29 +170,34 @@
 			}}
 		>
 			<Icon class="material-icons">menu</Icon>
-			<Label>Fuzzy Presets</Label>
+			<Label class="text-xs sm:text-sm">Fuzzy Presets</Label>
 		</Button>
 		<Tooltip>Select your fuzzy presets then plotting chart.</Tooltip>
 	</Wrapper>
 </div>
 
 {#if $presets.isSuccess}
-	<Dialog bind:open={fuzzyDialogOpen}>
-		<div class="p-4">
-			<h1 class="text-lg">Fuzzy Presets</h1>
-			{#each $presets.data as preset}
-				<div class="flex">
-					<input
-						class="mr-2"
-						type="checkbox"
-						disabled={!preset[1]}
-						bind:checked={fuzzyPresets[preset[0]]}
-					/>
-					<span class="font-thin">{preset[0]}</span>
+	<div class="absolute z-20">
+		<Dialog bind:open={fuzzyDialogOpen}>
+			<div class="p-4">
+				<h1 class="pb-2 text-lg font-bold uppercase">Fuzzy Presets</h1>
+				{#each $presets.data as preset}
+					<div class="flex">
+						<input
+							class="mr-2"
+							type="checkbox"
+							disabled={!preset[1]}
+							bind:checked={fuzzyPresets[preset[0]]}
+						/>
+						<span class="font-thin">{preset[0]}</span>
+					</div>
+				{/each}
+				<div class="pt-4 grid grid-cols-3">
+					<Button class="col-span-3" variant="raised" on:click={() => {fuzzyDialogOpen = false}}>Ok</Button>
 				</div>
-			{/each}
-		</div>
-	</Dialog>
+			</div>
+		</Dialog>
+	</div>
 {/if}
 
 {#if $userSettings.isSuccess}
@@ -203,13 +208,13 @@
 	<div class="flex-row h-screen">
 		<Chart
 			ref={(ref) => (main = ref)}
-			container={{ class: 'chart-container relative h-4/6' }}
+			container={{ class: 'chart-container relative h-4/6 sm:h-5/6 md:h-4/6' }}
 			autoSize={true}
 			{...chartTheme}
 			localization={{ priceFormatter: priceFn }}
 		>
 			<div
-				class="absolute z-10 top-0 left-0 p-2 pr-4 bg-black bg-opacity-50 rounded drop-shadow-lg shadow-xl"
+				class="absolute z-10 top-0 left-0 p-2 pr-4 bg-[#00000080] border border-[#202020] rounded drop-shadow-lg shadow-xl"
 			>
 				{$chartSettings.symbol.toLocaleUpperCase()}
 				-

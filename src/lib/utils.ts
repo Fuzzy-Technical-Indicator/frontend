@@ -43,14 +43,14 @@ export function secondsToHms(seconds: number) {
 export const chartTheme = {
 	layout: {
 		background: {
-			color: '#1c1c20'
+			color: '#20202080'
 		},
 		lineColor: '#000000',
 		textColor: '#A6A6A6'
 	},
 	grid: {
-		vertLines: { color: '#3D4045' },
-		horzLines: { color: '#3D4045' }
+		vertLines: { color: '#3D404580' },
+		horzLines: { color: '#3D404580' }
 	}
 };
 
