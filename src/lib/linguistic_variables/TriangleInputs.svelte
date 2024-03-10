@@ -3,7 +3,7 @@
 	export let parameters: Record<string, number>;
 </script>
 
-<div class="grid grid-cols-3 gap-4">
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
 	<Textfield type="number" class="" variant="filled" bind:value={parameters.center} label="Center">
 	</Textfield>
 	<Textfield type="number" class="" variant="filled" bind:value={parameters.width} label="Width">

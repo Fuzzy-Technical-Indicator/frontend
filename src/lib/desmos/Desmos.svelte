@@ -60,9 +60,9 @@
 		{#each names as name, i}
 			<div class="flex space-x-1 p-4">
 				<span class="px-4 rounded" style={`background-color: ${colors[i % colors.length]}`} />
-				<p>{name}</p>
+				<p class="text-xs lg:text-base">{name}</p>
 			</div>
 		{/each}
 	</div>
-	<div id={`${graphId}-desmos-graph`} class="w-full h-[600px]" />
+	<div id={`${graphId}-desmos-graph`} class="w-full h-[250px] md:h-[350px] lg:h-[450px] xl:h-[550px]" />
 </div>

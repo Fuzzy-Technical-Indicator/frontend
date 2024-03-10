@@ -19,7 +19,7 @@
 				>
 					<img src="/favicon.png" alt="fzt-logo" width="35" height="35" class="mr-2" />
 					<p
-						class="font-yuji text-transparent text-xs sm:text-base bg-clip-text bg-gradient-to-bl from-gray-900 via-gray-100 to-gray-900"
+						class="font-yuji text-transparent text-xs sm:text-base md:text-xs lg:text-base bg-clip-text bg-gradient-to-bl from-gray-900 via-gray-100 to-gray-900"
 					>
 						Fuzzy Technical Indicator
 					</p>

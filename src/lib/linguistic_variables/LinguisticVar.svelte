@@ -117,8 +117,8 @@
 			<Accordion multiple>
 				<Panel bind:open={universePanelOpen}>
 					<Header
-						>Universe
-						<span slot="description">Edit universe's boundary</span>
+						><span class="text-sm lg:text-base">Universe</span>
+						<span class="text-xs xl:text-base" slot="description">Edit universe's boundary</span>
 						<IconButton slot="icon" toggle pressed={universePanelOpen}>
 							<Icon class="material-icons" on>expand_less</Icon>
 							<Icon class="material-icons">expand_more</Icon>
@@ -128,13 +128,14 @@
 						<div class="my-4 text-center bg-[#1A1A1A] border border-[#313131] rounded py-4">
 							<Textfield
 								type="number"
-								class="mr-4"
+								class="text-xs md:text-sm sm:mr-4"
 								variant="filled"
 								bind:value={lowerBoundary}
 								label="Lower Boundary"
 							/>
 							<Textfield
 								type="number"
+								class="text-xs md:text-sm"
 								variant="filled"
 								bind:value={upperBoundary}
 								label="Upper Boundary"
@@ -145,8 +146,8 @@
 
 				<Panel bind:open={shapesPanelOpen}>
 					<Header
-						>Shapes
-						<span slot="description">Edit shapes's parameters</span>
+						><span class="text-sm lg:text-base">Shapes</span>
+						<span class="text-xs xl:text-base" slot="description">Edit shapes's parameters</span>
 						<IconButton slot="icon" toggle pressed={shapesPanelOpen}>
 							<Icon class="material-icons" on>expand_less</Icon>
 							<Icon class="material-icons">expand_more</Icon>
@@ -157,7 +158,7 @@
 							{#each Object.entries(shapes) as [name, shape] (name)}
 								<div class="my-4 bg-[#1A1A1A] border border-[#313131] rounded py-4">
 									<div class="mx-4 mb-2 flex justify-between">
-										<p class="font-bold text-lg text-center">{`${name} - ${shape.shapeType}`}</p>
+										<p class="font-bold text-xs xl:text-base text-center">{`${name} - ${shape.shapeType}`}</p>
 										<button
 											class="bg-[#1A1A1A] text-[#FFFFFF] rounded px-2"
 											on:click={() => handleRemoveFuzzySet(name)}
@@ -217,7 +218,7 @@
 			}}
 		>
 			<Icon class="material-icons">save</Icon>
-			<Label>Save</Label>
+			<Label class="text-xs lg:text-sm">Save</Label>
 		</Button>
 		<Button
 			variant="outlined"
@@ -226,7 +227,7 @@
 			}}
 		>
 			<Icon class="material-icons">delete</Icon>
-			<Label>Remove</Label>
+			<Label class="text-xs lg:text-sm">Remove</Label>
 		</Button>
 	</div>
 </div>

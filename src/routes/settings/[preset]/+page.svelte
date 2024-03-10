@@ -64,16 +64,16 @@
 <div>
 	<Button variant="outlined" class="mt-8" href="/settings">
 		<Icon class="material-icons">arrow_back</Icon>
-		<Label>Back</Label>
+		<Label class="text-xs md:text-sm">Back</Label>
 	</Button>
-	<h1 class="text-3xl font-bold text-center py-4">{currPreset}</h1>
+	<h1 class="text-lg lg:text-3xl font-bold text-center py-4">{currPreset}</h1>
 	{#if $settings.isSuccess}
 		<div class="">
-			<h1 class="text-2xl text-center py-4">Linguistic Variables</h1>
-			<div class="linguistic-container grid grid-cols-1 lg:grid-cols-2 gap-4">
+			<h1 class="text-lg lg:text-2xl text-center py-4">Linguistic Variables</h1>
+			<div class="linguistic-container grid grid-cols-1 xl:grid-cols-2 gap-4">
 				{#each Object.entries($settings.data.linguisticVariables) as [name, info]}
 					<div class="my-8 p-4 border border-[#313131] rounded relative">
-						<h3 class="text-lg text-center">{name} ({info.kind})</h3>
+						<h3 class="text-base lg:text-lg text-center">{name} ({info.kind})</h3>
 						<Desmos
 							graphId={name}
 							boundary={{ left: info.lowerBoundary, right: info.upperBoundary }}
@@ -103,12 +103,12 @@
 
 				<Button class="mb-4" variant="raised" on:click={handleAddLinguisticVar}>
 					<Icon class="material-icons">add</Icon>
-					<Label>Add Linguistic Variable</Label>
+					<Label class="text-xs sm:text-sm">Add Linguistic Variable</Label>
 				</Button>
 			</div>
 		</div>
 		<div class="mt-16">
-			<h1 class="text-2xl text-center py-4">Rules</h1>
+			<h1 class="text-lg lg:text-2xl text-center py-4">Rules</h1>
 			<RulesTable
 				linguisticVariables={$settings.data.linguisticVariables}
 				fuzzyRules={$settings.data.fuzzyRules}

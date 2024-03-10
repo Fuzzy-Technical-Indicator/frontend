@@ -28,8 +28,8 @@
 </script>
 
 <div class="">
-	<h1 class="font-yuji my-8 text-center text-2xl font-bold">Fuzzy Presets Setting</h1>
-	<h1 class="text-center text-xl font-extralight">{$username}'s settings</h1>
+	<h1 class="font-yuji my-8 text-center text-lg lg:text-2xl font-bold">Fuzzy Presets Setting</h1>
+	<h1 class="text-center text-base lg:text-xl font-extralight">{$username}'s settings</h1>
 	<div>
 		<Textfield class="mr-4 ml-2 sm:ml-0 w-5/12 md:w-1/5" bind:value={currNewPresetName} label="Preset" />
 		<Wrapper>
