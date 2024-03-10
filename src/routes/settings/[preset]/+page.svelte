@@ -72,7 +72,7 @@
 			<h1 class="text-lg lg:text-2xl text-center py-4">Linguistic Variables</h1>
 			<div class="linguistic-container grid grid-cols-1 xl:grid-cols-2 gap-4">
 				{#each Object.entries($settings.data.linguisticVariables) as [name, info]}
-					<div class="my-8 p-4 border border-[#313131] rounded relative">
+					<div class="bg-[#00000080] my-8 p-4 border border-[#313131] rounded relative">
 						<h3 class="text-base lg:text-lg text-center">{name} ({info.kind})</h3>
 						<Desmos
 							graphId={name}

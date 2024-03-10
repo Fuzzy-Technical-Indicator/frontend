@@ -28,7 +28,7 @@
 </script>
 
 <div class="">
-	<h1 class="font-yuji my-8 text-center text-lg lg:text-2xl font-bold">Fuzzy Presets Setting</h1>
+	<h1 class="font-roboto uppercase my-8 text-center text-lg lg:text-2xl font-bold">Fuzzy Presets Setting</h1>
 	<h1 class="text-center text-base lg:text-xl font-extralight">{$username}'s settings</h1>
 	<div>
 		<Textfield class="mr-4 ml-2 sm:ml-0 w-5/12 md:w-1/5" bind:value={currNewPresetName} label="Preset" />
@@ -52,7 +52,7 @@
 		{#if $presets.isSuccess}
 			{#each $presets.data as preset}
 				<div class="card-container my-2">
-					<Card variant="outlined">
+					<Card class="bg-[#00000080]" variant="outlined">
 						<Content><span class="font-bold">{preset[0]}</span></Content>
 						<Actions>
 							<Button variant="outlined" href={`/settings/${preset[0]}`}>

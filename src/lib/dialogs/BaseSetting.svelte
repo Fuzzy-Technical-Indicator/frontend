@@ -23,7 +23,7 @@
 	<Dialog bind:open>
 		<div class="p-4 grid grid-cols-3 gap-y-2">
 			<slot />
-			<Button variant="raised" class="col-span-3" on:click={() => $updateMutation.mutate()}>Ok</Button
+			<Button variant="raised" class="mt-2 col-span-3" on:click={() => $updateMutation.mutate()}>Ok</Button
 			>
 		</div>
 	</Dialog>

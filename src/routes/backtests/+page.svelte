@@ -28,7 +28,7 @@
 	let openItemId = '';
 </script>
 
-<h1 class="font-yuji my-8 text-center text-2xl font-bold">Backtesting</h1>
+<h1 class="font-roboto uppercase my-8 text-center text-2xl font-bold">Backtesting</h1>
 
 <div class="flex justify-between">
 	<Button variant="raised" on:click={() => goto('/backtests/run')}>
