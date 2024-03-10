@@ -5,6 +5,8 @@
 	import { createMutation, createQuery } from '@tanstack/svelte-query';
 	import Button, { Label, Icon } from '@smui/button';
 	import Dialog, { Title, Content, Actions } from '@smui/dialog';
+	import CircularProgress from '@smui/circular-progress';
+	import { isEmpty } from 'ramda';
 
 	const backtests = createQuery({
 		queryKey: ['backtests'],
@@ -28,16 +30,16 @@
 	let openItemId = '';
 </script>
 
-<h1 class="font-roboto uppercase my-8 text-center text-2xl font-bold">Backtesting</h1>
+<h1 class="font-roboto uppercase my-8 text-center text-lg lg:text-2xl font-bold">Backtesting</h1>
 
 <div class="flex justify-between">
 	<Button variant="raised" on:click={() => goto('/backtests/run')}>
 		<Icon class="material-icons">speed</Icon>
-		<Label>Run Backtest</Label>
+		<Label class="text-xs md:text-sm">Run Backtest</Label>
 	</Button>
 
 	<h3>
-		Running
+		Running:
 		{#if $runningBacktests.isSuccess}
 			{$runningBacktests.data}
 		{:else}
@@ -64,10 +66,6 @@
 		{#each $backtests.data as item (item._id)}
 			<div class="border border-[#313131] rounded p-4 my-4">
 				<BacktestReport data={item} />
-				<!-- <Button class="mt-4" variant="outlined" on:click={() => $deleteMutation.mutate(item._id)}>
-					<Icon class="material-icons">delete</Icon>
-					<Label>Remove</Label>
-				</Button> -->
 				<Button
 					class="mt-4"
 					variant="outlined"
@@ -77,9 +75,18 @@
 					}}
 				>
 					<Icon class="material-icons">delete</Icon>
-					<Label>Remove</Label>
+					<Label class="text-xs sm:text-sm">Remove</Label>
 				</Button>
 			</div>
 		{/each}
+		{#if $backtests.data.length === 0}
+			<div class="text-center">
+				<h1 class="text-xs md:text-lg">No backtest result.</h1>
+			</div>
+		{/if}
+	{:else}
+	<div class="z-50 absolute bottom-0 left-0 right-0 top-0 grid place-items-center">
+		<CircularProgress style="height: 128px; width: 128px;" indeterminate />
+	</div>
 	{/if}
 </div>

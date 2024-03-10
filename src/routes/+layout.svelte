@@ -38,7 +38,7 @@
 			<Navbar/>
 		{/if}
 		{#if ($page.url.pathname === '/login') || ($username !== '')}
-			<div class="container mx-auto max-w-8xl bg-black">
+			<div class="container p-2 mx-auto max-w-8xl bg-black">
 				<PageTransition pathname={$page.url.pathname}>
 					<slot />
 				</PageTransition>

@@ -56,7 +56,7 @@
 						<Content><span class="font-bold">{preset[0]}</span></Content>
 						<Actions>
 							<Button variant="outlined" href={`/settings/${preset[0]}`}>
-								<Icon class="material-icons hidden">edit</Icon>
+								<span class="hidden sm:flex"><Icon class="material-icons">edit</Icon></span>
 								<Label class="text-xs md:text-sm">Edit</Label>
 							</Button>
 							<Button
@@ -67,7 +67,7 @@
 									}
 								}}
 							>
-								<Icon class="material-icons hidden">delete</Icon>
+								<span class="hidden sm:flex"><Icon class="material-icons hidden">delete</Icon></span>
 								<Label class="text-xs md:text-sm">Remove</Label>
 							</Button>
 						</Actions>
