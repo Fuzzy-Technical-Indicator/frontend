@@ -20,9 +20,9 @@
 	});
 </script>
 
-<div class="h-1/6 relative">
+<div class="h-2/6 md:h-1/6 relative">
 	<div class="absolute z-10 top-2 px-4 bg-black bg-opacity-50 rounded flex">
-		<p>FUZZY {preset}</p>
+		<p class="font-thin">FUZZY {preset}</p>
 	</div>
 	<Chart
 		ref={(r) => {

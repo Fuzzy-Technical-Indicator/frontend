@@ -193,7 +193,7 @@
 					</div>
 				{/each}
 				<div class="pt-4 grid grid-cols-3">
-					<Button class="col-span-3" variant="raised">Ok</Button>
+					<Button class="col-span-3" variant="raised" on:click={() => {fuzzyDialogOpen = false}}>Ok</Button>
 				</div>
 			</div>
 		</Dialog>
