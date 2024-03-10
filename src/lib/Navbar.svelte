@@ -5,6 +5,9 @@
 	const toggleNavbar = () => {
 		showMenu = !showMenu;
 	};
+	const closeNavbar = () => {
+		showMenu = false;
+	}
 </script>
 
 <div class="bg-black text-[#D4D4D4]">
@@ -57,20 +60,24 @@
 			>
 				<a
 					class="font-normal text-[#A6A6A6] transition duration-500 ease-in-out text-l hover:text-[#FFFFFF]"
+					on:click={closeNavbar}
 					href="/"><span class:text-white={$page.url.pathname === '/'}>CHART</span></a
 				>
 				<a
 					class="font-nunito font-normal text-[#A6A6A6] transition duration-500 ease-in-out text-l hover:text-[#FFFFFF]"
+					on:click={closeNavbar}
 					href="/settings"
 					><span class:text-white={$page.url.pathname.includes('/settings')}>SETTINGS</span></a
 				>
 				<a
 					class="font-nunito font-normal text-[#A6A6A6] transition duration-500 ease-in-out text-l hover:text-[#FFFFFF]"
+					on:click={closeNavbar}
 					href="/backtests"
 					><span class:text-white={$page.url.pathname.includes('/backtests')}>BACKTESTS</span></a
 				>
 				<a
 					class="font-nunito font-normal text-[#A6A6A6] text-l hover:text-[#FFFFFF]"
+					on:click={closeNavbar}
 					href="/pso"><span class:text-white={$page.url.pathname.includes('/pso')}>PSO</span></a
 				>
 				<form method="POST" action="/?/logout">
