@@ -10,6 +10,8 @@
 	import Textfield from '@smui/textfield';
 	import Tooltip, { Wrapper } from '@smui/tooltip';
 	import CircularProgress from '@smui/circular-progress';
+	import TooltipDialog from '$lib/components/TooltipDialog.svelte';
+	import FuzzyPresetInfo from '$lib/dialogs/FuzzyPresetInfo.svelte';
 
 	const presets = createQuery({
 		queryKey: ['presets'],
@@ -29,10 +31,16 @@
 </script>
 
 <div class="">
-	<h1 class="font-roboto uppercase my-8 text-center text-lg lg:text-2xl font-bold">Fuzzy Presets Setting</h1>
+	<h1 class="font-roboto uppercase my-8 text-center text-lg lg:text-2xl font-bold">
+		Fuzzy Presets Setting <TooltipDialog><FuzzyPresetInfo /></TooltipDialog>
+	</h1>
 	<h1 class="text-center text-base lg:text-xl font-extralight">{$username}'s settings</h1>
 	<div>
-		<Textfield class="mr-4 ml-2 sm:ml-0 w-5/12 md:w-1/5" bind:value={currNewPresetName} label="Preset" />
+		<Textfield
+			class="mr-4 ml-2 sm:ml-0 w-5/12 md:w-1/5"
+			bind:value={currNewPresetName}
+			label="Preset"
+		/>
 		<Wrapper>
 			<Button
 				variant="raised"
@@ -68,7 +76,8 @@
 									}
 								}}
 							>
-								<span class="hidden sm:flex"><Icon class="material-icons hidden">delete</Icon></span>
+								<span class="hidden sm:flex"><Icon class="material-icons hidden">delete</Icon></span
+								>
 								<Label class="text-xs md:text-sm">Remove</Label>
 							</Button>
 						</Actions>
@@ -76,14 +85,14 @@
 				</div>
 			{/each}
 			{#if $presets.data.length === 0}
-			<div class="text-center">
-				<h1 class="text-xs md:text-lg">You have no preset.</h1>
-			</div>
+				<div class="text-center">
+					<h1 class="text-xs md:text-lg">You have no preset.</h1>
+				</div>
 			{/if}
 		{:else}
-		<div class="z-50 absolute bottom-0 left-0 right-0 top-0 grid place-items-center">
-			<CircularProgress style="height: 128px; width: 128px;" indeterminate />
-		</div>
+			<div class="z-50 absolute bottom-0 left-0 right-0 top-0 grid place-items-center">
+				<CircularProgress style="height: 128px; width: 128px;" indeterminate />
+			</div>
 		{/if}
 	</div>
 </div>

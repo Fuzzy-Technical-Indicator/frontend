@@ -6,6 +6,8 @@
 	import Button, { Label, Icon } from '@smui/button';
 	import Dialog, { Title, Content, Actions } from '@smui/dialog';
 	import CircularProgress from '@smui/circular-progress';
+	import TooltipDialog from '$lib/components/TooltipDialog.svelte';
+	import BacktestInfo from '$lib/dialogs/BacktestInfo.svelte';
 
 	const backtests = createQuery({
 		queryKey: ['backtests'],
@@ -38,7 +40,7 @@
 	let currentRunning = 0;
 </script>
 
-<h1 class="font-roboto uppercase my-8 text-center text-lg lg:text-2xl font-bold">Backtesting</h1>
+<h1 class="font-roboto uppercase my-8 text-center text-lg lg:text-2xl font-bold">Backtesting <TooltipDialog><BacktestInfo/></TooltipDialog></h1>
 
 <div class="flex justify-between">
 	<Button variant="raised" on:click={() => goto('/backtests/run')}>

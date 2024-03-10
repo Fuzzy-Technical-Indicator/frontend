@@ -10,6 +10,8 @@
 	import DataTable, { Head, Body, Row, Cell } from '@smui/data-table';
 	import CircularProgress from '@smui/circular-progress';
 	import { goto } from '$app/navigation';
+	import TooltipDialog from '$lib/components/TooltipDialog.svelte';
+	import BacktestSetupInfo from '$lib/dialogs/BacktestSetupInfo.svelte';
 
 	const defaultCondition: SignalCondition = {
 		signal_index: 0,
@@ -65,7 +67,7 @@
 {/if}
 
 <div>
-	<h1 class="font-roboto uppercase my-8 text-center text-lg lg:text-2xl font-bold">Setup Backtesting</h1>
+	<h1 class="font-roboto uppercase my-8 text-center text-lg lg:text-2xl font-bold">Setup Backtesting <TooltipDialog><BacktestSetupInfo/></TooltipDialog></h1>
 </div>
 
 <div class="p-4">
@@ -231,7 +233,7 @@
 			setTimeout(() => {
 				loadBacktest = false;
 				goto('/backtests');
-			}, 2000);
+			}, 500);
 		}}
 	>
 		<Icon class="material-icons">speed</Icon>
