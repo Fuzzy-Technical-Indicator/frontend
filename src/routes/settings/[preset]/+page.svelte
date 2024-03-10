@@ -10,6 +10,7 @@
 	import { Icon } from '@smui/icon-button';
 	import Select, { Option } from '@smui/select';
 	import Textfield from '@smui/textfield';
+	import CircularProgress from '@smui/circular-progress';
 
 	export let data: PageData;
 	let currPreset = data.currPreset;
@@ -114,12 +115,10 @@
 				fuzzyRules={$settings.data.fuzzyRules}
 				{currPreset}
 			/>
-			<!-- <div class="text-center">
-				<Button class="mb-4" variant="raised" on:click={handleAddLinguisticVar}>
-					<Icon class="material-icons">add</Icon>
-					<Label>Add Linguistic Variable</Label>
-				</Button>
-			</div> -->
+		</div>
+	{:else}
+		<div class="z-50 absolute bottom-0 left-0 right-0 top-0 grid place-items-center">
+			<CircularProgress style="height: 128px; width: 128px;" indeterminate />
 		</div>
 	{/if}
 </div>

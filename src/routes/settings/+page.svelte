@@ -9,6 +9,7 @@
 	import { Icon } from '@smui/icon-button';
 	import Textfield from '@smui/textfield';
 	import Tooltip, { Wrapper } from '@smui/tooltip';
+	import CircularProgress from '@smui/circular-progress';
 
 	const presets = createQuery({
 		queryKey: ['presets'],
@@ -74,6 +75,15 @@
 					</Card>
 				</div>
 			{/each}
+			{#if $presets.data.length === 0}
+			<div class="text-center">
+				<h1 class="text-xs md:text-lg">You have no preset.</h1>
+			</div>
+			{/if}
+		{:else}
+		<div class="z-50 absolute bottom-0 left-0 right-0 top-0 grid place-items-center">
+			<CircularProgress style="height: 128px; width: 128px;" indeterminate />
+		</div>
 		{/if}
 	</div>
 </div>

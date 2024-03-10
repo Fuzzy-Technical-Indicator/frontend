@@ -24,7 +24,7 @@
 	<div class="text-sm md:text-base">
 		<span class="font-bold">Initial Capital</span> = {metadata.capital},
 		{#if metadata.tag === 'NormalBackTest'}
-			Start = {toDateTimeString(metadata.start_time)}, End = {toDateTimeString(metadata.end_time)}
+			<span class="font-bold">Start</span> = {toDateTimeString(metadata.start_time)}, <span class="font-bold">End</span> = {toDateTimeString(metadata.end_time)}
 		{/if}
 		{#each metadata.signal_conditions as condition, i}
 			<div>

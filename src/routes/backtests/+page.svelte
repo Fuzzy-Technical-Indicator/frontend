@@ -6,7 +6,6 @@
 	import Button, { Label, Icon } from '@smui/button';
 	import Dialog, { Title, Content, Actions } from '@smui/dialog';
 	import CircularProgress from '@smui/circular-progress';
-	import { isEmpty } from 'ramda';
 
 	const backtests = createQuery({
 		queryKey: ['backtests'],
@@ -14,7 +13,6 @@
 	});
 	const deleteMutation = createMutation({
 		mutationFn: (id: string) => {
-			// confirm('Are you sure you want to delete this backtest report?');
 			return api().deleteBacktestReport(id);
 		},
 		onSuccess: () => $backtests.refetch()
@@ -26,8 +24,18 @@
 		refetchInterval: 5000
 	});
 
+	const setCurrentRunAndShow = (curr: number) => {
+		currentRunning = curr;
+		return curr;
+	};
+
+	$: if ($runningBacktests.isSuccess && $runningBacktests.data !== currentRunning) {
+		$backtests.refetch();
+	}
+
 	let open = false;
 	let openItemId = '';
+	let currentRunning = 0;
 </script>
 
 <h1 class="font-roboto uppercase my-8 text-center text-lg lg:text-2xl font-bold">Backtesting</h1>
@@ -41,7 +49,7 @@
 	<h3>
 		Running:
 		{#if $runningBacktests.isSuccess}
-			{$runningBacktests.data}
+			{setCurrentRunAndShow($runningBacktests.data)}
 		{:else}
 			0
 		{/if}
@@ -85,8 +93,8 @@
 			</div>
 		{/if}
 	{:else}
-	<div class="z-50 absolute bottom-0 left-0 right-0 top-0 grid place-items-center">
-		<CircularProgress style="height: 128px; width: 128px;" indeterminate />
-	</div>
+		<div class="z-50 absolute bottom-0 left-0 right-0 top-0 grid place-items-center">
+			<CircularProgress style="height: 128px; width: 128px;" indeterminate />
+		</div>
 	{/if}
 </div>

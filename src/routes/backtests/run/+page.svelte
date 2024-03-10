@@ -99,7 +99,7 @@
 
 		<span class="pr-2">Start time</span>
 		<input
-			class="py-3 px-4 rounded-t bg-black border-b border-[#717171]"
+			class="py-3 px-4 rounded-t bg-black text-white border-b border-[#717171]"
 			type="date"
 			placeholder="start time"
 			bind:value={start_date}
@@ -107,7 +107,7 @@
 
 		<span class="pr-2">End time</span>
 		<input
-			class="py-3 px-4 rounded-t bg-black border-b border-[#717171]"
+			class="py-3 px-4 rounded-t bg-black text-white border-b border-[#717171]"
 			type="date"
 			placeholder="end time"
 			bind:value={end_date}
