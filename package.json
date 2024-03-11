@@ -52,6 +52,7 @@
 		]
 	},
 	"dependencies": {
+		"@leeoniya/ufuzzy": "^1.0.14",
 		"@smui-extra/accordion": "^7.0.0-beta.16",
 		"@smui/button": "^7.0.0-beta.16",
 		"@smui/card": "^7.0.0-beta.16",
@@ -64,9 +65,9 @@
 		"@tanstack/svelte-query": "^5.8.4",
 		"@tanstack/svelte-table": "^8.10.7",
 		"@types/ramda": "^0.29.9",
+		"lightweight-charts": "^4.0.1",
 		"ramda": "^0.29.1",
 		"smui-theme": "^7.0.0-beta.16",
-		"svelte-lightweight-charts": "^2.2.0",
-		"lightweight-charts": "^4.0.1"
+		"svelte-lightweight-charts": "^2.2.0"
 	}
 }

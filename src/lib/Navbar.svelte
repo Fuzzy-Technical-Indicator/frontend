@@ -74,7 +74,13 @@
 					><span class:text-white={$page.url.pathname.includes('/pso')}>PSO</span></a
 				>
 				<form method="POST" action="/?/logout">
-					<Button variant="outlined" class="my-primary-button">
+					<Button
+						variant="outlined"
+						class="my-primary-button"
+						on:click={() => {
+							username.set('');
+						}}
+					>
 						<Icon class="material-icons">person_off</Icon>
 						<Label>LOGOUT</Label>
 					</Button>
