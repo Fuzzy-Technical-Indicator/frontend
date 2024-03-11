@@ -133,11 +133,23 @@ export enum PosType {
 	Short = 'short'
 }
 
-export type CapitalManagement = {
-	type: 'Normal';
+export enum CapitalManagementType {
+	Normal = "Normal",
+	LiquidF = "LiquidF"
+}
+
+interface NormalCapitalManagement {
+	type: CapitalManagementType.Normal;
 	min_entry_size: number;
 	entry_size_percent: number;
-};
+}
+
+interface LiquidFCapitalManagement {
+	type: CapitalManagementType.LiquidF;
+	min_entry_size: number;
+}
+
+export type CapitalManagement = NormalCapitalManagement | LiquidFCapitalManagement;
 
 export interface SignalCondition {
 	signal_index: number;
@@ -153,6 +165,20 @@ export interface BacktestRequest {
 	capital: number;
 	start_time: number;
 	end_time: number;
+	signal_conditions: SignalCondition[];
+}
+
+export interface PsoParams {
+	limit: number;
+	particle_groups: number;
+	particle_amount: number;
+}
+
+export interface PsoRequest extends PsoParams {
+	capital: number;
+	validation_period: number;
+	test_start: number;
+	test_end: number;
 	signal_conditions: SignalCondition[];
 }
 

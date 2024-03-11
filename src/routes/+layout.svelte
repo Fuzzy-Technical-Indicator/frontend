@@ -32,7 +32,7 @@
 </svelte:head>
 
 <QueryClientProvider client={data.queryClient}>
-	<img src="/glow_2.png" alt="glow-overlay" class="absolute w-full h-full inset-0 object-cover pointer-events-none opacity-50"/>
+	<img src="/glow_3.png" alt="glow-overlay" class="absolute w-full h-full scale-80 sm:scale-100 inset-0 object-cover pointer-events-none opacity-50"/>
 	<main class="bg-black text-[#F8F9FA]">
 		{#if $username !== ''}
 			<Navbar/>

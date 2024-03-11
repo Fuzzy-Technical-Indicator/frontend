@@ -19,7 +19,8 @@ import {
 	type Settings,
 	type UpdateLinguisticVariable,
 	type UpdateUserSettings,
-	type UserSettings
+	type UserSettings,
+	type PsoRequest
 } from './types';
 
 function nullToNan(x: number | null): number {
@@ -347,6 +348,19 @@ export const api = (customFetch = fetch, url = PUBLIC_API_URL) => ({
 	) => {
 		const resp = await customFetch(
 			`${url}/api/backtesting/run?symbol=${symbol}&interval=${interval}&preset=${preset}`,
+			getDefaultOption({
+				method: 'POST',
+				body: JSON.stringify(data),
+				headers: {
+					'Content-Type': 'application/json'
+				}
+			})
+		);
+		return resp;
+	},
+	createPsoReport: async (data: PsoRequest, symbol: string, interval: Interval, preset: string) => {
+		const resp = await customFetch(
+			`${url}/api/pso/run/${preset}?interval=${interval}&symbol=${symbol}&runtype=normal`,
 			getDefaultOption({
 				method: 'POST',
 				body: JSON.stringify(data),
