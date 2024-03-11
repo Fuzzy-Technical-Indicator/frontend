@@ -7,6 +7,7 @@
 	import Dialog from '@smui/dialog';
 	import { createMutation, createQuery } from '@tanstack/svelte-query';
 
+	import CircularProgress from '@smui/circular-progress';
 	import Button, { Label, Icon } from '@smui/button';
 	import { goto } from '$app/navigation';
 
@@ -79,6 +80,17 @@
 		queryFn: () => api().getRunningPso(),
 		refetchInterval: 5000
 	});
+
+	const setCurrentRunAndShow = (curr: number) => {
+		currentRunning = curr;
+		return curr;
+	};
+
+	let currentRunning = 0;
+
+	$: if ($runningPSO.isSuccess && $runningPSO.data !== currentRunning) {
+		$psoResult.refetch();
+	}
 </script>
 
 <h1 class="font-roboto uppercase my-8 text-center text-lg lg:text-2xl font-bold">PSO</h1>
@@ -90,9 +102,9 @@
 	</Button>
 
 	<h3>
-		Running
+		Running:
 		{#if $runningPSO.isSuccess}
-			{$runningPSO.data}
+			{setCurrentRunAndShow($runningPSO.data)}
 		{:else}
 			0
 		{/if}
@@ -135,4 +147,13 @@
 			</div>
 		</div>
 	{/each}
+	{#if $psoResult.data.length === 0}
+		<div class="text-center">
+			<h1 class="text-xs md:text-lg">No PSO result.</h1>
+		</div>
+	{/if}
+{:else}
+	<div class="z-50 absolute bottom-0 left-0 right-0 top-0 grid place-items-center">
+		<CircularProgress style="height: 128px; width: 128px;" indeterminate />
+	</div>
 {/if}
