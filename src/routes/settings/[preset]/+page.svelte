@@ -75,7 +75,7 @@
 	<h1 class="text-lg lg:text-3xl font-bold text-center py-4">{currPreset}</h1>
 	{#if $settings.isSuccess}
 		<div class="">
-			<h1 class="text-lg lg:text-2xl text-center py-4">Linguistic Variables <TooltipDialog><LinguisticVarInfo /></TooltipDialog></h1>
+			<h1 class="text-lg lg:text-2xl text-center py-4">Linguistic Variables</h1>
 			<div class="linguistic-container grid grid-cols-1 xl:grid-cols-2 gap-4">
 				{#each Object.entries($settings.data.linguisticVariables) as [name, info]}
 					<div class="bg-[#00000080] my-8 p-4 border border-[#313131] rounded relative">
