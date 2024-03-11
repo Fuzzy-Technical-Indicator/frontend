@@ -1,19 +1,25 @@
 <script lang="ts">
-	import { api } from '$lib/apiClient';
-	import { Interval, PosType, CapitalManagementType, type SignalCondition } from '$lib/types';
-	import { tickers } from '$lib/utils';
-	import { createMutation, createQuery } from '@tanstack/svelte-query';
+    import { api } from '$lib/apiClient';
+    import { Interval, PosType, CapitalManagementType, type PsoParams, type SignalCondition } from '$lib/types';
+    import { tickers } from '$lib/utils';
+    import { createMutation, createQuery } from '@tanstack/svelte-query';
 
-	import Select, { Option } from '@smui/select';
+    import Select, { Option } from '@smui/select';
 	import Textfield from '@smui/textfield';
 	import Button, { Label, Icon } from '@smui/button';
 	import DataTable, { Head, Body, Row, Cell } from '@smui/data-table';
 	import CircularProgress from '@smui/circular-progress';
 	import { goto } from '$app/navigation';
-	import TooltipDialog from '$lib/components/TooltipDialog.svelte';
-	import BacktestSetupInfo from '$lib/dialogs/BacktestSetupInfo.svelte';
 
-	const defaultCondition: SignalCondition = {
+    const defaultPsoParams: PsoParams = {
+        limit: 10,
+        particle_groups: 5,
+        particle_amount: 10,
+    }
+
+    let psoParams = defaultPsoParams;
+
+    const defaultCondition: SignalCondition = {
 		signal_index: 0,
 		signal_threshold: 0,
 		signal_do_command: PosType.Long,
@@ -26,38 +32,41 @@
 		stop_loss_when: 10
 	};
 
-	const presets = createQuery({
+    const presets = createQuery({
 		queryKey: ['presets'],
 		queryFn: () => api().getPresets()
 	});
 
-	let ticker = tickers[0];
+    let ticker = tickers[0];
 	let interval = Interval.OneDay;
 	let preset: string;
 
-	let capital = 0;
+    let capital = 0;
 	let signal_conditions: SignalCondition[] = [];
 	let condition = defaultCondition;
 
-	let start_date = '';
-	let end_date = '';
-	let start_time = 0;
-	let end_time = 0;
+    let validation_period: number = 1;
 
-	$: start_time = start_date ? new Date(start_date).getTime() : 0;
-	$: end_time = end_date ? new Date(end_date).getTime() : 0;
+    let test_start_date = '';
+	let test_end_date = '';
+	let test_start = 0;
+	let test_end = 0;
 
-	let runMutation = createMutation({
+    $: test_start = test_start_date ? new Date(test_start_date).getTime() : 0;
+	$: test_end = test_end_date ? new Date(test_end_date).getTime() : 0;
+
+    let runMutation = createMutation({
 		mutationFn: () =>
-			api().createBacktestReport(
-				{ capital, start_time, end_time, signal_conditions },
+			api().createPsoReport(
+				{ ...psoParams, capital, validation_period, test_start, test_end, signal_conditions },
 				ticker,
 				interval,
 				preset
 			)
 	});
 
-	let fakeLoad = false;
+    let fakeLoad = false;
+
 </script>
 
 {#if fakeLoad}
@@ -67,9 +76,21 @@
 {/if}
 
 <div>
-	<h1 class="font-roboto uppercase my-8 text-center text-lg lg:text-2xl font-bold">
-		Setup Backtesting <TooltipDialog><BacktestSetupInfo /></TooltipDialog>
-	</h1>
+	<h1 class="font-roboto uppercase my-8 text-center text-lg lg:text-2xl font-bold">Setup PSO</h1>
+</div>
+
+<div class="p-4">
+	<h1 class="text-center text-lg lg:text-xl mb-12">Particle Swarm Optimization</h1>
+	<div class="grid grid-cols-2">
+		<span class="pr-2">Limit</span>
+		<Textfield variant="filled" type="number" bind:value={psoParams.limit} label="Limit" />
+
+        <span class="pr-2">Particle Groups</span>
+		<Textfield variant="filled" type="number" bind:value={psoParams.particle_groups} label="Particle Groups" />
+
+        <span class="pr-2">Particle Amout</span>
+		<Textfield variant="filled" type="number" bind:value={psoParams.particle_amount} label="Particle Amout" />
+	</div>
 </div>
 
 <div class="p-4">
@@ -106,7 +127,7 @@
 			class="py-3 px-4 rounded-t bg-black text-white border-b border-[#717171]"
 			type="date"
 			placeholder="start time"
-			bind:value={start_date}
+			bind:value={test_start_date}
 		/>
 
 		<span class="pr-2">End time</span>
@@ -114,8 +135,11 @@
 			class="py-3 px-4 rounded-t bg-black text-white border-b border-[#717171]"
 			type="date"
 			placeholder="end time"
-			bind:value={end_date}
+			bind:value={test_end_date}
 		/>
+
+        <span class="pr-2">Validation Period (months)</span>
+		<Textfield variant="filled" type="number" bind:value={validation_period} label="Validation Period (months)" />
 	</div>
 </div>
 
@@ -261,11 +285,11 @@
 			fakeLoad = true;
 			setTimeout(() => {
 				fakeLoad = false;
-				goto('/backtests');
+				goto('/pso');
 			}, 500);
 		}}
 	>
 		<Icon class="material-icons">speed</Icon>
-		<Label class="text-xs sm:text-sm">Run Backtest</Label>
+		<Label class="text-xs sm:text-sm">Run PSO</Label>
 	</Button>
 </div>

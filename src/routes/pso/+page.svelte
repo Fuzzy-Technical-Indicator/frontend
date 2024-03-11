@@ -7,6 +7,9 @@
 	import Dialog from '@smui/dialog';
 	import { createMutation, createQuery } from '@tanstack/svelte-query';
 
+	import Button, { Label, Icon } from '@smui/button';
+	import { goto } from '$app/navigation';
+
 	const psoResult = createQuery({
 		queryKey: ['pso'],
 		queryFn: () => api().getPsoResult()
@@ -78,7 +81,14 @@
 	});
 </script>
 
-<div>
+<h1 class="font-roboto uppercase my-8 text-center text-lg lg:text-2xl font-bold">PSO</h1>
+
+<div class="flex justify-between">
+	<Button variant="raised" on:click={() => goto('/pso/run')}>
+		<Icon class="material-icons">speed</Icon>
+		<Label class="text-xs md:text-sm">Run PSO</Label>
+	</Button>
+
 	<h3>
 		Running
 		{#if $runningPSO.isSuccess}

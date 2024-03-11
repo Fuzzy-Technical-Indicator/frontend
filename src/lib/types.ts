@@ -168,6 +168,20 @@ export interface BacktestRequest {
 	signal_conditions: SignalCondition[];
 }
 
+export interface PsoParams {
+	limit: number;
+	particle_groups: number;
+	particle_amount: number;
+}
+
+export interface PsoRequest extends PsoParams {
+	capital: number;
+	validation_period: number;
+	test_start: number;
+	test_end: number;
+	signal_conditions: SignalCondition[];
+}
+
 export interface PsoBacktest {
 	tag: 'PsoBackTest';
 	capital: number;
