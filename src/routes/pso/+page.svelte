@@ -7,10 +7,17 @@
 	import uFuzzy from '@leeoniya/ufuzzy';
 	import Dialog from '@smui/dialog';
 	import Textfield from '@smui/textfield';
+	import Dialog, { Title, Content, Actions } from '@smui/dialog';
 	import { createMutation, createQuery } from '@tanstack/svelte-query';
 	import type { PageServerData } from './$types';
 
 	export let data: PageServerData;
+	import CircularProgress from '@smui/circular-progress';
+	import Button, { Label, Icon } from '@smui/button';
+	import { goto } from '$app/navigation';
+	import TooltipDialog from '$lib/components/TooltipDialog.svelte';
+	import PsoInfo from '$lib/dialogs/PsoInfo.svelte';
+
 	const psoResult = createQuery({
 		queryKey: ['pso'],
 		queryFn: () => api().getPsoResult(),
@@ -20,7 +27,6 @@
 
 	const deleteMutation = createMutation({
 		mutationFn: (id: string) => {
-			confirm('Are you sure you want to delete this pso report?');
 			return api().deletePsoResult(id);
 		},
 		onSuccess: () => $psoResult.refetch()
@@ -71,14 +77,36 @@
 		queryFn: () => api().getRunningPso(),
 		refetchInterval: 5000
 	});
+
+	const setCurrentRunAndShow = (curr: number) => {
+		currentRunning = curr;
+		return curr;
+	};
+
+	let currentRunning = 0;
+
+	$: if ($runningPSO.isSuccess && $runningPSO.data !== currentRunning) {
+		$psoResult.refetch();
+	}
+
+	let open = false;
+	let openItemId = '';
 </script>
 
 <div class="flex justify-between items-center">
 	<Textfield class="" bind:value={searchTerm} label="Search" />
+<h1 class="font-roboto uppercase my-8 text-center text-lg lg:text-2xl font-bold">PSO <TooltipDialog><PsoInfo/></TooltipDialog></h1>
+
+<div class="flex justify-between">
+	<Button variant="raised" on:click={() => goto('/pso/run')}>
+		<Icon class="material-icons">speed</Icon>
+		<Label class="text-xs md:text-sm">Run PSO</Label>
+	</Button>
+
 	<h3>
-		Running
+		Running:
 		{#if $runningPSO.isSuccess}
-			{$runningPSO.data}
+			{setCurrentRunAndShow($runningPSO.data)}
 		{:else}
 			0
 		{/if}
@@ -120,3 +148,66 @@
 		</div>
 	</div>
 {/each}
+<Dialog bind:open aria-labelledby="simple-title" aria-describedby="simple-content">
+	<Title id="simple-title">Confirm</Title>
+	<Content id="simple-content">Are you sure you want to delete this pso report?</Content>
+	<Actions>
+		<Button>
+			<Label>No</Label>
+		</Button>
+		<Button on:click={() => $deleteMutation.mutate(openItemId)}>
+			<Label>Yes</Label>
+		</Button>
+	</Actions>
+</Dialog>
+
+{#if $psoResult.isSuccess}
+	<div class="mt-6">
+		{#each $psoResult.data as item (item._id)}
+			<div class="h-1/6 border border-[#313131] rounded p-4 my-4">
+				<span class="font-bold">test_f</span> {item.test_f},
+				<a href={`/settings/${item.preset}`} class="text-blue-400"> {item.preset}</a>
+				<p><span class="font-bold">time used</span>: {secondsToHms(item.time_used)}</p>
+				<p><span class="font-bold">run at</span>: {toDateTimeString(item.run_at)}</p>
+			<div class="my-4 border border-[#313131] h-1/6">
+				<Plotly data={getLineData(item)} title="Validation Graph" />
+			</div>
+			<div class="flex mt-2 space-x-4">
+				<Button
+					class="mt-4"
+					variant="outlined"
+					on:click={() => {
+						open = true;
+						openItemId = item._id;
+					}}
+				>
+					<Icon class="material-icons">delete</Icon>
+					<Label class="text-xs sm:text-sm">Remove</Label>
+				</Button>
+				<Button
+					class="mt-4"
+					variant="outlined"
+					on:click={() => {
+						backtest_id = item.backtest_id;
+						currTimestamp = new Date();
+						$backtest.refetch();
+						dialogOpen = true;
+					}}
+				>
+					<Icon class="material-icons">search</Icon>
+					<Label class="text-xs sm:text-sm">Test Result</Label>
+				</Button>
+			</div>
+		</div>
+		{/each}
+	</div>
+	{#if $psoResult.data.length === 0}
+		<div class="text-center">
+			<h1 class="text-xs md:text-lg">No PSO result.</h1>
+		</div>
+	{/if}
+{:else}
+	<div class="z-50 absolute bottom-0 left-0 right-0 top-0 grid place-items-center">
+		<CircularProgress style="height: 128px; width: 128px;" indeterminate />
+	</div>
+{/if}

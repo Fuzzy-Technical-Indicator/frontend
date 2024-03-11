@@ -12,6 +12,9 @@
 	import Textfield from '@smui/textfield';
 	import CircularProgress from '@smui/circular-progress';
 	import TooltipDialog from '$lib/components/TooltipDialog.svelte';
+	import MacdInfo from '$lib/dialogs/MacdInfo.svelte';
+	import BbInfo from '$lib/dialogs/BbInfo.svelte';
+	import NonTransformInfo from '$lib/dialogs/NonTransformInfo.svelte';
 	import LinguisticVarInfo from '$lib/dialogs/LinguisticVarInfo.svelte';
 
 	export let data: PageData;
@@ -72,11 +75,21 @@
 	<h1 class="text-lg lg:text-3xl font-bold text-center py-4">{currPreset}</h1>
 	{#if $settings.isSuccess}
 		<div class="">
-			<h1 class="text-lg lg:text-2xl text-center py-4">Linguistic Variables <TooltipDialog><LinguisticVarInfo /></TooltipDialog></h1>
+			<h1 class="text-lg lg:text-2xl text-center py-4">Linguistic Variables</h1>
 			<div class="linguistic-container grid grid-cols-1 xl:grid-cols-2 gap-4">
 				{#each Object.entries($settings.data.linguisticVariables) as [name, info]}
 					<div class="bg-[#00000080] my-8 p-4 border border-[#313131] rounded relative">
-						<h3 class="text-base lg:text-lg text-center">{name} ({info.kind})</h3>
+						<h3 class="text-base lg:text-lg text-center">{name} ({info.kind}) 
+							{#if name.includes("macd")}
+							<TooltipDialog><MacdInfo/></TooltipDialog>
+							{/if}
+							{#if name.includes("bb")}
+							<TooltipDialog><BbInfo/></TooltipDialog>
+							{/if}
+							{#if info.kind === "input" && !name.includes("macd") && !name.includes("bb")}
+							<TooltipDialog><NonTransformInfo/></TooltipDialog>
+							{/if}
+						</h3>
 						<Desmos
 							graphId={name}
 							boundary={{ left: info.lowerBoundary, right: info.upperBoundary }}
