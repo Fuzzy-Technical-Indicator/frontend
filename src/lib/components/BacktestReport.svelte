@@ -29,9 +29,11 @@
 		{#each metadata.signal_conditions as condition, i}
 			<div>
 				<span class="font-bold">Condition</span> {i + 1} → index: {condition.signal_index}, threshold: {condition.signal_threshold}
-				type: {condition.signal_do_command}, entry size %: {condition.capital_management
-					.entry_size_percent}
-				take profit %: {condition.take_profit_when}
+				type: {condition.signal_do_command}, capital manage: {condition.capital_management.type}, min entry: {condition.capital_management.min_entry_size},
+				entry size %: {condition.capital_management.type === "Normal"
+					? condition.capital_management.entry_size_percent
+					: 'N/A'},
+				take profit %: {condition.take_profit_when},
 				stop loss %: {condition.stop_loss_when}
 			</div>
 		{/each}

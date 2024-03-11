@@ -133,11 +133,23 @@ export enum PosType {
 	Short = 'short'
 }
 
-export type CapitalManagement = {
-	type: 'Normal';
+export enum CapitalManagementType {
+	Normal = "Normal",
+	LiquidF = "LiquidF"
+}
+
+interface NormalCapitalManagement {
+	type: CapitalManagementType.Normal;
 	min_entry_size: number;
 	entry_size_percent: number;
-};
+}
+
+interface LiquidFCapitalManagement {
+	type: CapitalManagementType.LiquidF;
+	min_entry_size: number;
+}
+
+export type CapitalManagement = NormalCapitalManagement | LiquidFCapitalManagement;
 
 export interface SignalCondition {
 	signal_index: number;

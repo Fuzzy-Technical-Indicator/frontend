@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { api } from '$lib/apiClient';
-	import { Interval, PosType, type SignalCondition } from '$lib/types';
+	import { Interval, PosType, CapitalManagementType, type SignalCondition } from '$lib/types';
 	import { tickers } from '$lib/utils';
 	import { createMutation, createQuery } from '@tanstack/svelte-query';
 
@@ -18,7 +18,7 @@
 		signal_threshold: 0,
 		signal_do_command: PosType.Long,
 		capital_management: {
-			type: 'Normal',
+			type: CapitalManagementType.Normal,
 			min_entry_size: 10,
 			entry_size_percent: 10
 		},
@@ -67,7 +67,9 @@
 {/if}
 
 <div>
-	<h1 class="font-roboto uppercase my-8 text-center text-lg lg:text-2xl font-bold">Setup Backtesting <TooltipDialog><BacktestSetupInfo/></TooltipDialog></h1>
+	<h1 class="font-roboto uppercase my-8 text-center text-lg lg:text-2xl font-bold">
+		Setup Backtesting <TooltipDialog><BacktestSetupInfo /></TooltipDialog>
+	</h1>
 </div>
 
 <div class="p-4">
@@ -117,7 +119,7 @@
 	</div>
 </div>
 
-<div class=p-4>
+<div class="p-4">
 	<h1 class="text-center text-lg lg:text-xl mt-12">Ordering Conditions</h1>
 	<div class="flex justify-between py-4">
 		<h1 class="font-bold">Condition Setup</h1>
@@ -125,7 +127,8 @@
 			class=""
 			variant="raised"
 			on:click={() => {
-				signal_conditions.push({ ...condition });
+				const newCondition = JSON.parse(JSON.stringify(condition)); // Deep copy the condition
+				signal_conditions.push(newCondition);
 				signal_conditions = signal_conditions;
 				condition = defaultCondition;
 			}}
@@ -158,21 +161,41 @@
 			<Option value="short">Short</Option>
 		</Select>
 
-		<span>Minimum Entry Size</span>
-		<Textfield
+		<span>Capital Management Type</span>
+		<Select
 			variant="filled"
-			type="number"
-			bind:value={condition.capital_management.min_entry_size}
-			label="Minimum Entry Size"
-		/>
+			bind:value={condition.capital_management.type}
+			label="Capital Management Type"
+		>
+			<Option value={CapitalManagementType.Normal}>{CapitalManagementType.Normal}</Option>
+			<Option value={CapitalManagementType.LiquidF}>{CapitalManagementType.LiquidF}</Option>
+		</Select>
 
-		<span>Entry size (%)</span>
-		<Textfield
-			variant="filled"
-			type="number"
-			bind:value={condition.capital_management.entry_size_percent}
-			label="Entry size (%)"
-		/>
+		{#if condition.capital_management.type === CapitalManagementType.Normal}
+			<span>Minimum Entry Size</span>
+			<Textfield
+				variant="filled"
+				type="number"
+				bind:value={condition.capital_management.min_entry_size}
+				label="Minimum Entry Size"
+			/>
+
+			<span>Entry size (%)</span>
+			<Textfield
+				variant="filled"
+				type="number"
+				bind:value={condition.capital_management.entry_size_percent}
+				label="Entry size (%)"
+			/>
+		{:else if condition.capital_management.type === CapitalManagementType.LiquidF}
+			<span>Minimum Entry Size</span>
+			<Textfield
+				variant="filled"
+				type="number"
+				bind:value={condition.capital_management.min_entry_size}
+				label="Minimum Entry Size"
+			/>
+		{/if}
 
 		<span>Take profit (%)</span>
 		<Textfield
@@ -200,6 +223,7 @@
 				<Cell numeric>Signal Index</Cell>
 				<Cell numeric>Signal Threshold</Cell>
 				<Cell>Signal Do Command</Cell>
+				<Cell>Capital Management Type</Cell>
 				<Cell numeric>Minimum Entry Size</Cell>
 				<Cell numeric>Entry size (%)</Cell>
 				<Cell numeric>Take profit (%)</Cell>
@@ -213,8 +237,13 @@
 					<Cell class="text-center" numeric>{cond.signal_index}</Cell>
 					<Cell class="text-center" numeric>{cond.signal_threshold}</Cell>
 					<Cell class="text-center">{cond.signal_do_command}</Cell>
+					<Cell class="text-center">{cond.capital_management.type}</Cell>
 					<Cell class="text-center" numeric>{cond.capital_management.min_entry_size}</Cell>
-					<Cell class="text-center" numeric>{cond.capital_management.entry_size_percent}</Cell>
+					<Cell class="text-center" numeric
+						>{cond.capital_management.type === CapitalManagementType.Normal
+							? cond.capital_management.entry_size_percent
+							: 'N/A'}</Cell
+					>
 					<Cell class="text-center" numeric>{cond.take_profit_when}</Cell>
 					<Cell class="text-center" numeric>{cond.stop_loss_when}</Cell>
 				</Row>
