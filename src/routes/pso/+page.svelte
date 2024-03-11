@@ -4,12 +4,14 @@
 	import Plotly from '$lib/plotly/Plotly.svelte';
 	import type { PsoResult } from '$lib/types';
 	import { secondsToHms, toDateTimeString } from '$lib/utils';
-	import Dialog from '@smui/dialog';
+	import Dialog, { Title, Content, Actions } from '@smui/dialog';
 	import { createMutation, createQuery } from '@tanstack/svelte-query';
 
 	import CircularProgress from '@smui/circular-progress';
 	import Button, { Label, Icon } from '@smui/button';
 	import { goto } from '$app/navigation';
+	import TooltipDialog from '$lib/components/TooltipDialog.svelte';
+	import PsoInfo from '$lib/dialogs/PsoInfo.svelte';
 
 	const psoResult = createQuery({
 		queryKey: ['pso'],
@@ -18,7 +20,6 @@
 
 	const deleteMutation = createMutation({
 		mutationFn: (id: string) => {
-			confirm('Are you sure you want to delete this pso report?');
 			return api().deletePsoResult(id);
 		},
 		onSuccess: () => $psoResult.refetch()
@@ -91,9 +92,12 @@
 	$: if ($runningPSO.isSuccess && $runningPSO.data !== currentRunning) {
 		$psoResult.refetch();
 	}
+
+	let open = false;
+	let openItemId = '';
 </script>
 
-<h1 class="font-roboto uppercase my-8 text-center text-lg lg:text-2xl font-bold">PSO</h1>
+<h1 class="font-roboto uppercase my-8 text-center text-lg lg:text-2xl font-bold">PSO <TooltipDialog><PsoInfo/></TooltipDialog></h1>
 
 <div class="flex justify-between">
 	<Button variant="raised" on:click={() => goto('/pso/run')}>
@@ -119,34 +123,59 @@
 	</Dialog>
 {/if}
 
+<Dialog bind:open aria-labelledby="simple-title" aria-describedby="simple-content">
+	<Title id="simple-title">Confirm</Title>
+	<Content id="simple-content">Are you sure you want to delete this pso report?</Content>
+	<Actions>
+		<Button>
+			<Label>No</Label>
+		</Button>
+		<Button on:click={() => $deleteMutation.mutate(openItemId)}>
+			<Label>Yes</Label>
+		</Button>
+	</Actions>
+</Dialog>
+
 {#if $psoResult.isSuccess}
-	{#each $psoResult.data as item (item._id)}
-		<div class="mt-6">
-			<div>
-				test_f {item.test_f},
+	<div class="mt-6">
+		{#each $psoResult.data as item (item._id)}
+			<div class="h-1/6 border border-[#313131] rounded p-4 my-4">
+				<span class="font-bold">test_f</span> {item.test_f},
 				<a href={`/settings/${item.preset}`} class="text-blue-400"> {item.preset}</a>
-				<p>time used: {secondsToHms(item.time_used)}</p>
-				<p>run at: {toDateTimeString(item.run_at)}</p>
+				<p><span class="font-bold">time used</span>: {secondsToHms(item.time_used)}</p>
+				<p><span class="font-bold">run at</span>: {toDateTimeString(item.run_at)}</p>
+			<div class="my-4 border border-[#313131] h-1/6">
+				<Plotly data={getLineData(item)} title="Validation Graph" />
 			</div>
-			<Plotly data={getLineData(item)} title="Validation Graph" />
-			<!-- <Plotly data={getScatterData(item)} title="Training Progress" /> -->
 			<div class="flex mt-2 space-x-4">
-				<button
-					class="bg-red-600 rounded-md hover:bg-red-500 p-2"
-					on:click={() => $deleteMutation.mutate(item._id)}>Delete</button
+				<Button
+					class="mt-4"
+					variant="outlined"
+					on:click={() => {
+						open = true;
+						openItemId = item._id;
+					}}
 				>
-				<button
-					class="bg-gray-900 hover:bg-gray-800 rounded-md p-2"
+					<Icon class="material-icons">delete</Icon>
+					<Label class="text-xs sm:text-sm">Remove</Label>
+				</Button>
+				<Button
+					class="mt-4"
+					variant="outlined"
 					on:click={() => {
 						backtest_id = item.backtest_id;
 						currTimestamp = new Date();
 						$backtest.refetch();
 						dialogOpen = true;
-					}}>Test Result</button
+					}}
 				>
+					<Icon class="material-icons">search</Icon>
+					<Label class="text-xs sm:text-sm">Test Result</Label>
+				</Button>
 			</div>
 		</div>
-	{/each}
+		{/each}
+	</div>
 	{#if $psoResult.data.length === 0}
 		<div class="text-center">
 			<h1 class="text-xs md:text-lg">No PSO result.</h1>

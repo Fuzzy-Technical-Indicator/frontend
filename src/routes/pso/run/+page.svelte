@@ -10,6 +10,8 @@
 	import DataTable, { Head, Body, Row, Cell } from '@smui/data-table';
 	import CircularProgress from '@smui/circular-progress';
 	import { goto } from '$app/navigation';
+	import TooltipDialog from '$lib/components/TooltipDialog.svelte';
+	import PsoSetupInfo from '$lib/dialogs/PsoSetupInfo.svelte';
 
     const defaultPsoParams: PsoParams = {
         limit: 10,
@@ -76,7 +78,7 @@
 {/if}
 
 <div>
-	<h1 class="font-roboto uppercase my-8 text-center text-lg lg:text-2xl font-bold">Setup PSO</h1>
+	<h1 class="font-roboto uppercase my-8 text-center text-lg lg:text-2xl font-bold">Setup PSO <TooltipDialog><PsoSetupInfo/></TooltipDialog></h1>
 </div>
 
 <div class="p-4">
