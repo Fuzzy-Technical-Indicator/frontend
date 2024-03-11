@@ -10,6 +10,8 @@
 	import DataTable, { Head, Body, Row, Cell } from '@smui/data-table';
 	import CircularProgress from '@smui/circular-progress';
 	import { goto } from '$app/navigation';
+	import TooltipDialog from '$lib/components/TooltipDialog.svelte';
+	import BacktestSetupInfo from '$lib/dialogs/BacktestSetupInfo.svelte';
 
 	const defaultCondition: SignalCondition = {
 		signal_index: 0,
@@ -65,11 +67,11 @@
 {/if}
 
 <div>
-	<h1 class="font-yuji my-8 text-center text-2xl font-bold">Setup Backtesting</h1>
+	<h1 class="font-roboto uppercase my-8 text-center text-lg lg:text-2xl font-bold">Setup Backtesting <TooltipDialog><BacktestSetupInfo/></TooltipDialog></h1>
 </div>
 
-<div>
-	<h1 class="text-center text-xl mb-12">Trading Essentials</h1>
+<div class="p-4">
+	<h1 class="text-center text-lg lg:text-xl mb-12">Trading Essentials</h1>
 	<div class="grid grid-cols-2">
 		<span class="pr-2">Ticker</span>
 		<Select variant="filled" bind:value={ticker} label="Ticker">
@@ -89,7 +91,7 @@
 		<Select variant="filled" bind:value={preset} label="Fuzzy Preset">
 			{#if $presets.isSuccess}
 				{#each $presets.data as preset}
-					<Option value={preset}>{preset}</Option>
+					<Option value={preset[0]}>{preset[0]}</Option>
 				{/each}
 			{/if}
 		</Select>
@@ -99,7 +101,7 @@
 
 		<span class="pr-2">Start time</span>
 		<input
-			class="py-3 px-4 rounded-t bg-[#0A0A0A] border-b border-[#717171]"
+			class="py-3 px-4 rounded-t bg-black text-white border-b border-[#717171]"
 			type="date"
 			placeholder="start time"
 			bind:value={start_date}
@@ -107,7 +109,7 @@
 
 		<span class="pr-2">End time</span>
 		<input
-			class="py-3 px-4 rounded-t bg-[#0A0A0A] border-b border-[#717171]"
+			class="py-3 px-4 rounded-t bg-black text-white border-b border-[#717171]"
 			type="date"
 			placeholder="end time"
 			bind:value={end_date}
@@ -115,8 +117,8 @@
 	</div>
 </div>
 
-<div>
-	<h1 class="text-center text-xl mt-12">Ordering Conditions</h1>
+<div class=p-4>
+	<h1 class="text-center text-lg lg:text-xl mt-12">Ordering Conditions</h1>
 	<div class="flex justify-between py-4">
 		<h1 class="font-bold">Condition Setup</h1>
 		<Button
@@ -129,7 +131,7 @@
 			}}
 		>
 			<Icon class="material-icons">add</Icon>
-			<Label>Add Condition</Label>
+			<Label class="text-xs md:text-sm">Add Condition</Label>
 		</Button>
 	</div>
 
@@ -190,7 +192,7 @@
 	</div>
 </div>
 
-<div class="text-center mt-8">
+<div class="mx-auto text-center mt-8">
 	<DataTable table$aria-label="Condition List" style="max-width: 100%;">
 		<Head>
 			<Row>
@@ -231,10 +233,10 @@
 			setTimeout(() => {
 				loadBacktest = false;
 				goto('/backtests');
-			}, 2000);
+			}, 500);
 		}}
 	>
 		<Icon class="material-icons">speed</Icon>
-		<Label>Run Backtest</Label>
+		<Label class="text-xs sm:text-sm">Run Backtest</Label>
 	</Button>
 </div>

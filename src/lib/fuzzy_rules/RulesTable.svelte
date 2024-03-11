@@ -120,13 +120,13 @@
 	const table = createSvelteTable(options);
 </script>
 
-<div class="py-4 px-64">
+<div class="px-4 xl:px-64">
 	<table class="border-collapse w-full border border-[#313131]">
 		<thead>
 			{#each $table.getHeaderGroups() as headerGroup}
 				<tr>
 					{#each headerGroup.headers as header}
-						<td class="bg-[#1A1A1A] border-[#313131] text-center p-3 font-bold" class:border-b={!header.isPlaceholder} class:border-l={!header.isPlaceholder} class:border-r={!header.isPlaceholder} colSpan={header.colSpan}>
+						<td class="bg-[#1A1A1A] border-[#313131] text-center p-3 font-bold text-xs lg:text-sm xl:text-base" class:border-b={!header.isPlaceholder} class:border-l={!header.isPlaceholder} class:border-r={!header.isPlaceholder} colSpan={header.colSpan}>
 							{#if !header.isPlaceholder}
 								<div>
 									<svelte:component
@@ -143,16 +143,16 @@
 			{#each $table.getRowModel().rows as row}
 				<tr>
 					{#each row.getVisibleCells() as cell}
-						<td class="border border-[#313131] p-2">
+						<td class="border border-[#313131] p-2 text-xs lg:text-sm xl:text-base">
 							{#if cell.column.columnDef.id === 'actions'}
 								<div class="text-center">
 								<Button class="" variant="outlined" on:click={() => $deleteMutation.mutate(cell.getValue())}>
 									<Icon class="material-icons">delete</Icon>
-									<Label>Remove</Label>
+									<Label class="text-xs lg:text-sm">Remove</Label>
 								</Button>
 								</div>
 							{:else}
-								<div class="text-center">
+								<div class="text-center text-xs lg:text-sm xl:text-base">
 									<svelte:component
 									this={flexRender(cell.column.columnDef.cell, cell.getContext())}
 								/>
@@ -169,11 +169,11 @@
 				{#each ruleOptions as ruleOpt}
 					<th class="p-2">
 						<select
-							class="bg-[#1A1A1A] text-[#A6A6A6] border border-[#313131] rounded-md"
+							class="bg-[#1A1A1A] text-[#A6A6A6] border border-[#313131] rounded-md text-xs lg:text-sm xl:text-base"
 							bind:value={newRule[ruleOpt.kind][ruleOpt.name]}
 						>
 							{#each ruleOpt.options as opt}
-								<option value={opt}>{opt}</option>
+								<option class="lg:p-4 text-xs lg:text-sm" value={opt}>{opt}</option>
 							{/each}
 						</select>
 					</th>
@@ -181,7 +181,7 @@
 				<th class="p-2">
 					<Button class="" variant="outlined" on:click={() => $addMutataion.mutate(newRule)}>
 						<Icon class="material-icons">add</Icon>
-						<Label>Add Rule</Label>
+						<Label class="text-xs lg:text-sm">Add Rule</Label>
 					</Button>
 				</th>
 			</tr>

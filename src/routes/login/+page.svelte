@@ -32,14 +32,14 @@
 		<CircularProgress style="height: 32px; width: 32px;" indeterminate />
 	</div>
 {:else}
-	<div class="flex flex-col justify-center items-center mt-56 bg-black">
+	<div class="flex flex-col justify-center items-center mt-20 bg-black">
 		<div class="flex py-4">
-			<img src="favicon.png" alt="fzt-logo" width="40" class="mr-4" />
-			<h1
+			<img src="favicon.png" alt="fzt-logo" width="300" class="" />
+			<!-- <h1
 				class="font-yuji text-transparent text-4xl bg-clip-text bg-gradient-to-bl from-gray-900 via-gray-100 to-gray-900"
 			>
 				Fuzzy Technical Indicator
-			</h1>
+			</h1> -->
 		</div>
 		<form method="POST">
 			<Textfield
@@ -51,9 +51,9 @@
 			>
 				<Icon class="material-icons" slot="leadingIcon">person</Icon>
 			</Textfield>
-			<Button variant="raised" class="my-primary-button">
+			<div class="text-center mt-8"><Button variant="raised" class="my-primary-button">
 				<Label>Login</Label>
-			</Button>
+			</Button></div>
 		</form>
 	</div>
 {/if}

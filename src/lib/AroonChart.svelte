@@ -28,7 +28,7 @@
 
 <Chart
 	{ref}
-	container={{ class: 'chart-container h-1/6 relative pt-2', style: offsetStyle }}
+	container={{ class: 'chart-container h-2/6 md:h-1/6 relative pt-2', style: offsetStyle }}
 	autoSize={true}
 	{...chartTheme}
 >
