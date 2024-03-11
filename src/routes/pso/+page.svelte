@@ -4,8 +4,11 @@
 	import Plotly from '$lib/plotly/Plotly.svelte';
 	import type { PsoResult } from '$lib/types';
 	import { secondsToHms, toDateTimeString } from '$lib/utils';
+	import uFuzzy from '@leeoniya/ufuzzy';
+	import Textfield from '@smui/textfield';
 	import Dialog, { Title, Content, Actions } from '@smui/dialog';
 	import { createMutation, createQuery } from '@tanstack/svelte-query';
+	import type { PageServerData } from './$types';
 
 	import CircularProgress from '@smui/circular-progress';
 	import Button, { Label, Icon } from '@smui/button';
@@ -13,9 +16,12 @@
 	import TooltipDialog from '$lib/components/TooltipDialog.svelte';
 	import PsoInfo from '$lib/dialogs/PsoInfo.svelte';
 
+	export let data: PageServerData;
 	const psoResult = createQuery({
 		queryKey: ['pso'],
-		queryFn: () => api().getPsoResult()
+		queryFn: () => api().getPsoResult(),
+		refetchOnMount: false,
+		initialData: data.psoData
 	});
 
 	const deleteMutation = createMutation({
@@ -24,37 +30,6 @@
 		},
 		onSuccess: () => $psoResult.refetch()
 	});
-
-	const getScatterData = (data: PsoResult) => {
-		let m = new Map<
-			number,
-			{
-				x: number[];
-				y: number[];
-				type: string;
-				mode: string;
-				name: string;
-				marker: Record<string, any>;
-			}
-		>();
-		for (const dt of data.train_progress) {
-			if (!m.has(dt.group)) {
-				m.set(dt.group, {
-					x: [],
-					y: [],
-					type: 'scatter',
-					mode: 'markers',
-					name: `group ${dt.group}`,
-					marker: {
-						opacity: 0.5
-					}
-				});
-			}
-			m.get(dt.group)?.x.push(dt.epoch);
-			m.get(dt.group)?.y.push(dt.f);
-		}
-		return Array.from(m.values());
-	};
 
 	const getLineData = (data: PsoResult) => {
 		return data.validation_progress.map((fold, i) => {
@@ -65,6 +40,26 @@
 			};
 		});
 	};
+
+	let searchTerm = '';
+	$: psoArr = $psoResult.isSuccess ? $psoResult.data : [];
+
+	const uf = new uFuzzy();
+	let timer: ReturnType<typeof setTimeout>;
+	const debounce = (data: PsoResult[], searchTerm: string) => {
+		clearTimeout(timer);
+		timer = setTimeout(() => {
+			const haystacks = data.map((item) => item.preset);
+			let idxs = uf.filter(haystacks, searchTerm);
+			if (idxs !== null) {
+				psoArr = idxs.map((i) => data[i]);
+			}
+		}, 250);
+	};
+
+	$: if ($psoResult.isSuccess) {
+		debounce($psoResult.data, searchTerm);
+	}
 
 	let dialogOpen = false;
 	let backtest_id = '';
@@ -97,13 +92,18 @@
 	let openItemId = '';
 </script>
 
-<h1 class="font-roboto uppercase my-8 text-center text-lg lg:text-2xl font-bold">PSO <TooltipDialog><PsoInfo/></TooltipDialog></h1>
+<h1 class="font-roboto uppercase my-8 text-center text-lg lg:text-2xl font-bold">
+	PSO <TooltipDialog><PsoInfo /></TooltipDialog>
+</h1>
 
-<div class="flex justify-between">
-	<Button variant="raised" on:click={() => goto('/pso/run')}>
-		<Icon class="material-icons">speed</Icon>
-		<Label class="text-xs md:text-sm">Run PSO</Label>
-	</Button>
+<div class="flex justify-between items-center">
+	<div class="h-fit">
+		<Textfield class="mr-4" bind:value={searchTerm} label="Search" />
+		<Button variant="raised" on:click={() => goto('/pso/run')}>
+			<Icon class="material-icons">speed</Icon>
+			<Label class="text-xs md:text-sm">Run PSO</Label>
+		</Button>
+	</div>
 
 	<h3>
 		Running:
@@ -138,42 +138,43 @@
 
 {#if $psoResult.isSuccess}
 	<div class="mt-6">
-		{#each $psoResult.data as item (item._id)}
+		{#each psoArr as item (item._id)}
 			<div class="h-1/6 border border-[#313131] rounded p-4 my-4">
-				<span class="font-bold">test_f</span> {item.test_f},
+				<span class="font-bold">test_f</span>
+				{item.test_f},
 				<a href={`/settings/${item.preset}`} class="text-blue-400"> {item.preset}</a>
 				<p><span class="font-bold">time used</span>: {secondsToHms(item.time_used)}</p>
 				<p><span class="font-bold">run at</span>: {toDateTimeString(item.run_at)}</p>
-			<div class="my-4 border border-[#313131] h-1/6">
-				<Plotly data={getLineData(item)} title="Validation Graph" />
+				<div class="my-4 border border-[#313131] h-1/6">
+					<Plotly data={getLineData(item)} title="Validation Graph" />
+				</div>
+				<div class="flex mt-2 space-x-4">
+					<Button
+						class="mt-4"
+						variant="outlined"
+						on:click={() => {
+							open = true;
+							openItemId = item._id;
+						}}
+					>
+						<Icon class="material-icons">delete</Icon>
+						<Label class="text-xs sm:text-sm">Remove</Label>
+					</Button>
+					<Button
+						class="mt-4"
+						variant="outlined"
+						on:click={() => {
+							backtest_id = item.backtest_id;
+							currTimestamp = new Date();
+							$backtest.refetch();
+							dialogOpen = true;
+						}}
+					>
+						<Icon class="material-icons">search</Icon>
+						<Label class="text-xs sm:text-sm">Test Result</Label>
+					</Button>
+				</div>
 			</div>
-			<div class="flex mt-2 space-x-4">
-				<Button
-					class="mt-4"
-					variant="outlined"
-					on:click={() => {
-						open = true;
-						openItemId = item._id;
-					}}
-				>
-					<Icon class="material-icons">delete</Icon>
-					<Label class="text-xs sm:text-sm">Remove</Label>
-				</Button>
-				<Button
-					class="mt-4"
-					variant="outlined"
-					on:click={() => {
-						backtest_id = item.backtest_id;
-						currTimestamp = new Date();
-						$backtest.refetch();
-						dialogOpen = true;
-					}}
-				>
-					<Icon class="material-icons">search</Icon>
-					<Label class="text-xs sm:text-sm">Test Result</Label>
-				</Button>
-			</div>
-		</div>
 		{/each}
 	</div>
 	{#if $psoResult.data.length === 0}

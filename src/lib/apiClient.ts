@@ -323,8 +323,8 @@ export const api = (customFetch = fetch, url = PUBLIC_API_URL) => ({
 		const json = (await resp.json()) as number;
 		return json;
 	},
-	getBacktestReports: async () => {
-		const resp = await customFetch(`${url}/api/backtesting`, getDefaultOption({}));
+	getBacktestReports: async (options = getDefaultOption({})) => {
+		const resp = await customFetch(`${url}/api/backtesting`, options);
 		const json = (await resp.json()) as BacktestReport[];
 		return json;
 	},
@@ -376,8 +376,8 @@ export const api = (customFetch = fetch, url = PUBLIC_API_URL) => ({
 		const json = (await resp.json()) as number;
 		return json;
 	},
-	getPsoResult: async () => {
-		const resp = await customFetch(`${url}/api/pso`, getDefaultOption({}));
+	getPsoResult: async (options = getDefaultOption({})) => {
+		const resp = await customFetch(`${url}/api/pso`, options);
 		const json = (await resp.json()) as PsoResult[];
 		return json;
 	},

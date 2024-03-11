@@ -51,9 +51,11 @@
 			>
 				<Icon class="material-icons" slot="leadingIcon">person</Icon>
 			</Textfield>
-			<div class="text-center mt-8"><Button variant="raised" class="my-primary-button">
-				<Label>Login</Label>
-			</Button></div>
+			<div class="text-center mt-8">
+				<Button variant="raised" class="my-primary-button">
+					<Label>Login</Label>
+				</Button>
+			</div>
 		</form>
 	</div>
 {/if}
