@@ -8,10 +8,14 @@
 	import CircularProgress from '@smui/circular-progress';
 	import TooltipDialog from '$lib/components/TooltipDialog.svelte';
 	import BacktestInfo from '$lib/dialogs/BacktestInfo.svelte';
+	import type { PageServerData } from './$types';
 
+	export let data: PageServerData;
 	const backtests = createQuery({
 		queryKey: ['backtests'],
-		queryFn: () => api().getBacktestReports()
+		queryFn: () => api().getBacktestReports(),
+		refetchOnMount: false,
+		initialData: data.backtestData
 	});
 	const deleteMutation = createMutation({
 		mutationFn: (id: string) => {
@@ -40,7 +44,9 @@
 	let currentRunning = 0;
 </script>
 
-<h1 class="font-roboto uppercase my-8 text-center text-lg lg:text-2xl font-bold">Backtesting <TooltipDialog><BacktestInfo/></TooltipDialog></h1>
+<h1 class="font-roboto uppercase my-8 text-center text-lg lg:text-2xl font-bold">
+	Backtesting <TooltipDialog><BacktestInfo /></TooltipDialog>
+</h1>
 
 <div class="flex justify-between">
 	<Button variant="raised" on:click={() => goto('/backtests/run')}>

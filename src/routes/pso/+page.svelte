@@ -8,10 +8,14 @@
 	import Dialog from '@smui/dialog';
 	import Textfield from '@smui/textfield';
 	import { createMutation, createQuery } from '@tanstack/svelte-query';
+	import type { PageServerData } from './$types';
 
+	export let data: PageServerData;
 	const psoResult = createQuery({
 		queryKey: ['pso'],
-		queryFn: () => api().getPsoResult()
+		queryFn: () => api().getPsoResult(),
+		refetchOnMount: false,
+		initialData: data.psoData
 	});
 
 	const deleteMutation = createMutation({
